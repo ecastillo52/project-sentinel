@@ -1,0 +1,368 @@
+[
+    {
+        "filename": "Fortnite Test 1.CSV",
+        "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\Fortnite Test 1.CSV",
+        "timestamp": "2026-06-30T06:05:52.282492",
+        "metrics": {
+            "cpu_temp": {
+                "display": "CPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 87.0,
+                    "average": 77.80222222222223
+                }
+            },
+            "cpu_usage": {
+                "display": "CPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 99.6,
+                    "average": 58.705777777777776
+                }
+            },
+            "gpu_temp": {
+                "display": "GPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 57.7,
+                    "average": 48.80622222222222
+                }
+            },
+            "gpu_usage": {
+                "display": "GPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 70.0,
+                    "average": 42.25333333333333
+                }
+            },
+            "ram_usage": {
+                "display": "RAM Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 25.0,
+                    "maximum": 86.6,
+                    "average": 81.55044444444444
+                }
+            },
+            "fps": {
+                "display": "Average FPS",
+                "unit": "FPS",
+                "stats": {
+                    "minimum": 2.0,
+                    "maximum": 201.8,
+                    "average": 74.57777777777778
+                }
+            }
+        }
+    },
+    {
+        "filename": "Logging_Testing.CSV",
+        "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\Logging_Testing.CSV",
+        "timestamp": "2026-06-30T06:05:52.298600",
+        "metrics": {
+            "cpu_temp": {
+                "display": "CPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 73.5,
+                    "average": 58.65
+                }
+            },
+            "cpu_usage": {
+                "display": "CPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 16.7,
+                    "average": 7.93
+                }
+            },
+            "gpu_temp": {
+                "display": "GPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 34.3,
+                    "average": 29.25
+                }
+            },
+            "gpu_usage": {
+                "display": "GPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 3.0,
+                    "average": 1.0
+                }
+            },
+            "ram_usage": {
+                "display": "RAM Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 25.0,
+                    "maximum": 54.0,
+                    "average": 50.89
+                }
+            },
+            "fps": {
+                "display": "Average FPS",
+                "unit": "FPS",
+                "stats": {
+                    "minimum": 19.4,
+                    "maximum": 74.6,
+                    "average": 68.46666666666665
+                }
+            }
+        }
+    },
+    {
+        "filename": "SC2 Run 1.CSV",
+        "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\SC2 Run 1.CSV",
+        "timestamp": "2026-06-30T06:05:52.431566",
+        "metrics": {
+            "cpu_temp": {
+                "display": "CPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 88.5,
+                    "average": 72.39437217945314
+                }
+            },
+            "cpu_usage": {
+                "display": "CPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 87.7,
+                    "average": 28.96410937085214
+                }
+            },
+            "gpu_temp": {
+                "display": "GPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 67.2,
+                    "average": 48.48224050968941
+                }
+            },
+            "gpu_usage": {
+                "display": "GPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 68.0,
+                    "average": 36.08415184496947
+                }
+            },
+            "ram_usage": {
+                "display": "RAM Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 25.0,
+                    "maximum": 73.8,
+                    "average": 67.34072205999469
+                }
+            },
+            "fps": {
+                "display": "Average FPS",
+                "unit": "FPS",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 239.8,
+                    "average": 49.60156664896442
+                }
+            }
+        }
+    },
+    {
+        "filename": "Fortnite Test 1.CSV",
+        "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\Fortnite Test 1.CSV",
+        "timestamp": "2026-06-30T06:05:52.491015",
+        "metrics": {
+            "cpu_temp": {
+                "display": "CPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 87.0,
+                    "average": 77.80222222222223
+                }
+            },
+            "cpu_usage": {
+                "display": "CPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 99.6,
+                    "average": 58.705777777777776
+                }
+            },
+            "gpu_temp": {
+                "display": "GPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 57.7,
+                    "average": 48.80622222222222
+                }
+            },
+            "gpu_usage": {
+                "display": "GPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 70.0,
+                    "average": 42.25333333333333
+                }
+            },
+            "ram_usage": {
+                "display": "RAM Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 25.0,
+                    "maximum": 86.6,
+                    "average": 81.55044444444444
+                }
+            },
+            "fps": {
+                "display": "Average FPS",
+                "unit": "FPS",
+                "stats": {
+                    "minimum": 2.0,
+                    "maximum": 201.8,
+                    "average": 74.57777777777778
+                }
+            }
+        }
+    },
+    {
+        "filename": "Logging_Testing.CSV",
+        "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\Logging_Testing.CSV",
+        "timestamp": "2026-06-30T06:05:52.507570",
+        "metrics": {
+            "cpu_temp": {
+                "display": "CPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 73.5,
+                    "average": 58.65
+                }
+            },
+            "cpu_usage": {
+                "display": "CPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 16.7,
+                    "average": 7.93
+                }
+            },
+            "gpu_temp": {
+                "display": "GPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 34.3,
+                    "average": 29.25
+                }
+            },
+            "gpu_usage": {
+                "display": "GPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 3.0,
+                    "average": 1.0
+                }
+            },
+            "ram_usage": {
+                "display": "RAM Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 25.0,
+                    "maximum": 54.0,
+                    "average": 50.89
+                }
+            },
+            "fps": {
+                "display": "Average FPS",
+                "unit": "FPS",
+                "stats": {
+                    "minimum": 19.4,
+                    "maximum": 74.6,
+                    "average": 68.46666666666665
+                }
+            }
+        }
+    },
+    {
+        "filename": "SC2 Run 1.CSV",
+        "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\SC2 Run 1.CSV",
+        "timestamp": "2026-06-30T06:05:52.634660",
+        "metrics": {
+            "cpu_temp": {
+                "display": "CPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 88.5,
+                    "average": 72.39437217945314
+                }
+            },
+            "cpu_usage": {
+                "display": "CPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 87.7,
+                    "average": 28.96410937085214
+                }
+            },
+            "gpu_temp": {
+                "display": "GPU Temperature",
+                "unit": "\u00b0C",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 67.2,
+                    "average": 48.48224050968941
+                }
+            },
+            "gpu_usage": {
+                "display": "GPU Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 68.0,
+                    "average": 36.08415184496947
+                }
+            },
+            "ram_usage": {
+                "display": "RAM Usage",
+                "unit": "%",
+                "stats": {
+                    "minimum": 25.0,
+                    "maximum": 73.8,
+                    "average": 67.34072205999469
+                }
+            },
+            "fps": {
+                "display": "Average FPS",
+                "unit": "FPS",
+                "stats": {
+                    "minimum": 0.0,
+                    "maximum": 239.8,
+                    "average": 49.60156664896442
+                }
+            }
+        }
+    }
+]
