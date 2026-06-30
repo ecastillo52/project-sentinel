@@ -1,5 +1,10 @@
 # core/processor.py
 
+from core.sensors import get_all_sensors
+from core.analyzer import analyze_sensor
+from core import health
+from core.reader import load_log
+
 def run():
     for sensor in get_all_sensors():
 
