@@ -38,3 +38,38 @@ def get_all_records():
 
 def clear_database():
     save_database([])
+
+from core.hashing import file_hash
+
+
+def record_exists(file_path):
+    """
+    Returns True if this exact file has already been analyzed.
+    """
+
+    current_hash = file_hash(file_path)
+
+    for record in load_database():
+
+        if record["hash"] == current_hash:
+            return True
+
+    return False
+
+
+def add_analysis(file_path, results):
+    """
+    Saves one completed analysis into the database.
+    """
+
+    import uuid
+
+    record = {
+        "id": str(uuid.uuid4()),
+        "hash": file_hash(file_path),
+        "filename": file_path.name,
+        "analyzed_at": datetime.now().isoformat(timespec="seconds"),
+        "results": results
+    }
+
+    insert_record(record)
