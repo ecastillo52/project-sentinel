@@ -1,14 +1,20 @@
 # core/analyzer.py
 
-# =========================
+import re
+
+NUMBER_PATTERN = re.compile(r"-?\d+(?:,\d{3})*(?:\.\d+)?")
+
+
+# ==========================================================
 # HEADER MATCHING ENGINE
-# =========================
+# ==========================================================
 
 def normalize(text):
-    return text.lower().strip()
+    return str(text).lower().strip()
 
 
 def score_header(header, keyword):
+
     h = normalize(header)
     k = normalize(keyword)
 
@@ -19,46 +25,54 @@ def score_header(header, keyword):
 
     if "avg" in h:
         score += 2
+
     if "package" in h:
         score += 3
+
     if "total" in h:
         score += 1
 
-    if "core" in h or "thread" in h:
+    if "core" in h:
+        score -= 2
+
+    if "thread" in h:
         score -= 2
 
     return score
 
 
 def find_best_match(log, keyword):
-    headers = log["header_map"].keys()
 
     scored = []
 
-    for header in headers:
-        s = score_header(header, keyword)
-        if s > 0:
-            scored.append((s, header))
+    for header in log["header_map"]:
+
+        score = score_header(header, keyword)
+
+        if score > 0:
+            scored.append((score, header))
 
     if not scored:
-        raise ValueError(f"No match found for '{keyword}'")
+        return None
 
     scored.sort(reverse=True)
+
     return scored[0][1]
 
 
-# =========================
-# DATA PIPELINE
-# =========================
+# ==========================================================
+# DATA EXTRACTION
+# ==========================================================
 
-def extract_column(log, header_name):
-    index = log["header_map"][header_name]
-    return [row[index] for row in log["rows"]]
+def extract_column(log, header):
 
+    index = log["header_map"][header]
 
-import re
+    return [
+        row[index]
+        for row in log["rows"]
+    ]
 
-NUMBER_PATTERN = re.compile(r"-?\d+(?:,\d{3})*(?:\.\d+)?")
 
 def clean_values(values, value_type):
 
@@ -91,26 +105,49 @@ def clean_values(values, value_type):
                 cleaned.append(False)
 
     else:
+
         cleaned = list(values)
 
     return cleaned
 
 
+# ==========================================================
+# STATISTICS
+# ==========================================================
+
 def calculate_statistics(numbers):
+
     if not numbers:
         return None
 
     return {
+
+        "current": numbers[-1],
+
         "minimum": min(numbers),
+
         "maximum": max(numbers),
-        "average": sum(numbers) / len(numbers),
+
+        "average": round(sum(numbers) / len(numbers), 2),
+
+        "samples": len(numbers)
+
     }
 
 
+# ==========================================================
+# ANALYSIS
+# ==========================================================
+
 def analyze_sensor(log, keyword, value_type="float"):
+
     header = find_best_match(log, keyword)
+
+    if header is None:
+        return None
+
     values = extract_column(log, header)
+
     numbers = clean_values(values, value_type)
+
     return calculate_statistics(numbers)
-
-

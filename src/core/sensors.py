@@ -25,6 +25,7 @@ SENSORS = {
         "display": "CPU Temperature",
         "keyword": "cpu (tctl/tdie)",
         "unit": "°C",
+        "value_type": "float",
         "type": "temperature",
         "category": "CPU",
         "priority": 1,
@@ -36,6 +37,7 @@ SENSORS = {
         "display": "CPU Usage",
         "keyword": "total cpu usage",
         "unit": "%",
+        "value_type": "float",
         "type": "usage",
         "category": "CPU",
         "priority": 2,
@@ -51,6 +53,7 @@ SENSORS = {
         "display": "GPU Temperature",
         "keyword": "gpu temperature",
         "unit": "°C",
+        "value_type": "float",
         "type": "temperature",
         "category": "GPU",
         "priority": 1,
@@ -62,6 +65,7 @@ SENSORS = {
         "display": "GPU Usage",
         "keyword": "gpu core load",
         "unit": "%",
+        "value_type": "float",
         "type": "usage",
         "category": "GPU",
         "priority": 2,
@@ -77,6 +81,7 @@ SENSORS = {
         "display": "Memory Usage",
         "keyword": "physical memory load",
         "unit": "%",
+        "value_type": "float",
         "type": "usage",
         "category": "Memory",
         "priority": 1,
@@ -92,6 +97,7 @@ SENSORS = {
         "display": "Average FPS",
         "keyword": "framerate displayed (avg)",
         "unit": "FPS",
+        "value_type": "float",
         "type": "performance",
         "category": "Performance",
         "priority": 1,
@@ -101,27 +107,41 @@ SENSORS = {
 
 }
 
+
 def get_sensor(sensor_name):
-    """
-    Return a sensor definition by its ID.
-    """
-    return SENSORS[sensor_name]
+    sensor = SENSORS[sensor_name].copy()
+    sensor["id"] = sensor_name
+    return sensor
 
 
 def get_all_sensors():
-    """
-    Return the complete sensor registry.
-    """
-    return SENSORS.values()
+    sensors = []
+
+    for sensor_id, sensor in SENSORS.items():
+        s = sensor.copy()
+        s["id"] = sensor_id
+        sensors.append(s)
+
+    return sorted(
+        sensors,
+        key=lambda s: (s["category"], s["priority"])
+    )
 
 
 def get_category(category):
-    """
-    Return every sensor in a category.
-    """
 
-    return [
-        sensor
-        for sensor in SENSORS.values()
-        if sensor["category"] == category
-    ]
+    sensors = []
+
+    for sensor_id, sensor in SENSORS.items():
+
+        if sensor["category"] == category:
+
+            s = sensor.copy()
+            s["id"] = sensor_id
+
+            sensors.append(s)
+
+    return sorted(
+        sensors,
+        key=lambda s: s["priority"]
+    )
