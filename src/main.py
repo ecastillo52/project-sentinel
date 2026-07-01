@@ -6,28 +6,22 @@ Project Sentinel
 Main Entry Point
 """
 
-from pathlib import Path
+from core.config import INCOMING_FOLDER
 
-from core.engine.scanner import get_new_logs
+from core.metadata.archive import archive_log
+from core.metadata.database import add_analysis
+from core.metadata.game_detector import prompt_for_game
+from core.metadata.history import (
+    get_session,
+    print_history,
+)
+
 from core.engine.processor import run
 from core.engine.reporter import (
     print_report,
     print_saved_session,
 )
-from core.metadata.database import add_analysis
-from core.metadata.history import (
-    print_history,
-    get_session,
-)
-
-
-# ==========================================================
-# Configuration
-# ==========================================================
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-
-RAW_FOLDER = PROJECT_ROOT / "data" / "raw"
+from core.engine.scanner import get_new_logs
 
 
 # ==========================================================
@@ -55,7 +49,7 @@ def analyze_logs():
 
     header()
 
-    new_logs = get_new_logs(RAW_FOLDER)
+    new_logs = get_new_logs(INCOMING_FOLDER)
 
     if not new_logs:
 
@@ -75,15 +69,53 @@ def analyze_logs():
         print(f"Analyzing: {log.name}")
         print("=" * 70)
 
+        #
+        # Step 1 - Detect Game
+        #
+        game = prompt_for_game(log.name)
+
+        #
+        # Step 2 - Analyze Log
+        #
         report = run(log)
 
+        #
+        # Step 3 - Display Report
+        #
         print_report(report)
 
-        add_analysis(log, report)
+        #
+        # Step 4 - Archive Original CSV
+        #
+        archive_path = archive_log(
+            log,
+            game
+        )
 
-        processed += 1
+        #
+        # Step 5 - Save Analysis
+        #
+        saved = add_analysis(
+            original_path=log,
+            archive_path=archive_path,
+            game=game,
+            report=report
+        )
 
-        print("\n✓ Analysis saved.\n")
+        if saved:
+
+            processed += 1
+
+            print(f"\n✓ Archived to:")
+            print(f"  {archive_path}")
+
+            print("✓ Analysis saved.")
+
+        else:
+
+            print("\nLog already exists in database.")
+
+        print()
 
     print("=" * 70)
     print(f"Processed {processed} new log(s).")
@@ -166,13 +198,11 @@ def menu():
         elif choice == "3":
 
             print("\nGoodbye.\n")
-
             break
 
         else:
 
             print("\nInvalid selection.")
-
             pause()
 
 
@@ -186,4 +216,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()

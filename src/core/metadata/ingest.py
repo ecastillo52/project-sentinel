@@ -1,7 +1,7 @@
 # core/ingest.py
 
 from datetime import datetime
-from reader import load_hwinfo_log
+from Programming.Sentinel.src.core.engine.reader import load_hwinfo_log
 from ..engine.sensors import get_sensor
 from database import insert_record
 

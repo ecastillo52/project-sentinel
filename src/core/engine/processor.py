@@ -12,7 +12,7 @@ Analyzer
 Health Engine
 """
 
-from ..metadata.reader import load_hwinfo_log
+from Programming.Sentinel.src.core.engine.reader import load_hwinfo_log
 from .sensors import get_all_sensors
 from .analyzer import analyze_sensor
 from ..engine import health
