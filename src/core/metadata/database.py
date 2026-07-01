@@ -13,7 +13,7 @@ from datetime import datetime
 import json
 import uuid
 
-from core.hashing import file_hash
+from hashing import file_hash
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

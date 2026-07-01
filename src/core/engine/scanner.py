@@ -10,8 +10,7 @@ Responsible ONLY for discovering new HWiNFO logs.
 
 from pathlib import Path
 
-from core.database import record_exists
-
+from ..metadata.database import record_exists
 
 SUPPORTED_EXTENSIONS = (
     ".csv",

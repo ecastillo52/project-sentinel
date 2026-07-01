@@ -1,9 +1,9 @@
 # core/ingest.py
 
 from datetime import datetime
-from core.reader import load_hwinfo_log
-from core.sensors import get_sensor
-from core.database import insert_record
+from reader import load_hwinfo_log
+from ..engine.sensors import get_sensor
+from database import insert_record
 
 
 def process_file(file_path):

@@ -8,7 +8,7 @@ History Manager
 Loads previously analyzed sessions.
 """
 
-from core.database import get_all_records
+from database import get_all_records
 
 
 def list_sessions():

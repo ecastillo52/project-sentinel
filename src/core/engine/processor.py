@@ -12,9 +12,9 @@ Analyzer
 Health Engine
 """
 
-from core.reader import load_hwinfo_log
-from core.sensors import get_all_sensors
-from core.analyzer import analyze_sensor
+from ..metadata.reader import load_hwinfo_log
+from sensors import get_all_sensors
+from analyzer import analyze_sensor
 from core import health
 
 
