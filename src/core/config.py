@@ -1,7 +1,7 @@
 # config.py
 
 PROJECT_NAME = "\033[1mProject Sentinel\033[0m"
-VERSION = "0.1.0"
+VERSION = "0.2.1 - The embryo grows!"
 DEVELOPER = "Erik Castillo"
 STATUS = "Development"
 

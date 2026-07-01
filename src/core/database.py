@@ -5,26 +5,21 @@ Project Sentinel
 
 Database Layer
 
-Stores every completed analysis session.
-
-Current backend:
-JSON
-
-Future backend:
-SQLite
+Responsible for storing and retrieving analyzed sessions.
 """
-
-import json
-import uuid
 
 from pathlib import Path
 from datetime import datetime
+import json
+import uuid
 
 from core.hashing import file_hash
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 DB_FILE = (
-    Path(__file__).resolve().parents[1]
+    PROJECT_ROOT
     / "data"
     / "processed"
     / "sentinel_db.json"
@@ -32,13 +27,29 @@ DB_FILE = (
 
 
 # ==========================================================
-# BASIC DATABASE
+# Internal Helpers
+# ==========================================================
+
+def _ensure_database():
+
+    DB_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    if not DB_FILE.exists():
+
+        with open(DB_FILE, "w", encoding="utf-8") as f:
+            json.dump([], f)
+
+
+# ==========================================================
+# Database
 # ==========================================================
 
 def load_database():
 
-    if not DB_FILE.exists():
-        return []
+    _ensure_database()
 
     try:
 
@@ -47,37 +58,40 @@ def load_database():
 
     except json.JSONDecodeError:
 
-        # Corrupted database
-
         return []
 
 
-def save_database(data):
+def save_database(database):
 
-    DB_FILE.parent.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    _ensure_database()
 
     with open(DB_FILE, "w", encoding="utf-8") as f:
 
         json.dump(
-            data,
+            database,
             f,
             indent=4
         )
 
 
 def clear_database():
+
     save_database([])
 
 
 # ==========================================================
-# RECORD HELPERS
+# Queries
 # ==========================================================
 
 def get_all_records():
-    return load_database()
+
+    database = load_database()
+
+    return sorted(
+        database,
+        key=lambda record: record["analyzed_at"],
+        reverse=True
+    )
 
 
 def get_record(record_id):
@@ -108,22 +122,10 @@ def record_exists(file_path):
 
 
 # ==========================================================
-# INSERT
+# Insert
 # ==========================================================
 
-def insert_record(record):
-
-    database = load_database()
-
-    database.append(record)
-
-    save_database(database)
-
-
-def create_record(file_path, results):
-    """
-    Build a standardized Sentinel record.
-    """
+def create_record(file_path, report):
 
     return {
 
@@ -139,19 +141,30 @@ def create_record(file_path, results):
             timespec="seconds"
         ),
 
-        "results": results
+        "report": report
 
     }
 
 
-def add_analysis(file_path, results):
+def insert_record(record):
+
+    database = load_database()
+
+    database.append(record)
+
+    save_database(database)
+
+
+def add_analysis(file_path, report):
 
     if record_exists(file_path):
-        return
+        return False
 
     record = create_record(
         file_path,
-        results
+        report
     )
 
     insert_record(record)
+
+    return True
