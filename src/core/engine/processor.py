@@ -13,9 +13,9 @@ Health Engine
 """
 
 from ..metadata.reader import load_hwinfo_log
-from sensors import get_all_sensors
-from analyzer import analyze_sensor
-from core import health
+from .sensors import get_all_sensors
+from .analyzer import analyze_sensor
+from ..engine import health
 
 
 def run(file_path):

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from core.engine.scanner import get_new_logs
 from core.engine.processor import run
-from core.presentation.reporter import (
+from core.engine.reporter import (
     print_report,
     print_saved_session,
 )
