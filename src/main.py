@@ -8,14 +8,14 @@ Main Entry Point
 
 from pathlib import Path
 
-from core.scanner import get_new_logs
-from core.processor import run
-from core.reporter import (
+from Programming.Sentinel.src.core.engine.scanner import get_new_logs
+from Programming.Sentinel.src.core.engine.processor import run
+from Programming.Sentinel.src.core.presentation.reporter import (
     print_report,
     print_saved_session
 )
-from core.database import add_analysis
-from core.history import (
+from Programming.Sentinel.src.core.metadata.database import add_analysis
+from Programming.Sentinel.src.core.metadata.history import (
     print_history,
     get_session
 )
