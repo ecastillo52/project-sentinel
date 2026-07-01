@@ -1,34 +1,40 @@
 # core/config.py
 
-PROJECT_NAME = "\033[1mProject Sentinel\033[0m"
-VERSION = "0.2.2 - Cells become a heartbeat"
-DEVELOPER = "Erik Castillo"
-STATUS = "Development"
-
-
-def print_header():
-    print(PROJECT_NAME)
-    print("Version:", VERSION)
-    print("Developed:", DEVELOPER)
-    print("Status:", STATUS)
-    print("_" * 30)
-
 """
 Project Sentinel
 
 Global Configuration
 
-Every file and folder used by Sentinel should be defined here.
+This module is the single source of truth for:
 
-If the project structure changes,
-this is the ONLY file that should require updates.
+    • Project paths
+    • Application metadata
+    • Folder locations
+    • Version information
+    • Common helper functions
+
+Every module should import paths from here instead of
+building paths with Path(__file__).parents[x].
 """
 
 from pathlib import Path
 
 
 # ==========================================================
-# Project
+# Application Information
+# ==========================================================
+
+APP_NAME = "Project Sentinel"
+
+APP_VERSION = "0.2.0"
+
+AUTHOR = "Erik Castillo"
+
+ENGINE_NAME = "Sentinel Analysis Engine"
+
+
+# ==========================================================
+# Project Root
 # ==========================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -52,27 +58,111 @@ EXPORTS_FOLDER = DATA_FOLDER / "exports"
 
 
 # ==========================================================
-# Reports
+# Output Folders
 # ==========================================================
 
 REPORTS_FOLDER = PROJECT_ROOT / "reports"
 
+IMAGES_FOLDER = PROJECT_ROOT / "images"
 
-# ==========================================================
-# Database
-# ==========================================================
+LOGS_FOLDER = PROJECT_ROOT / "logs"
 
-DATABASE_FILE = (
-    PROCESSED_FOLDER
-    / "sentinel_db.json"
-)
+TESTS_FOLDER = PROJECT_ROOT / "tests"
 
 
 # ==========================================================
-# Config Files
+# Configuration Files
 # ==========================================================
 
-ALIASES_FILE = (
-    CONFIG_FOLDER
-    / "game_aliases.json"
-)
+DATABASE_FILE = PROCESSED_FOLDER / "sentinel_db.json"
+
+ALIASES_FILE = CONFIG_FOLDER / "game_aliases.json"
+
+
+# ==========================================================
+# Ensure Required Directories Exist
+# ==========================================================
+
+REQUIRED_DIRECTORIES = [
+
+    DATA_FOLDER,
+
+    INCOMING_FOLDER,
+
+    ARCHIVE_FOLDER,
+
+    PROCESSED_FOLDER,
+
+    CONFIG_FOLDER,
+
+    EXPORTS_FOLDER,
+
+    REPORTS_FOLDER,
+
+    IMAGES_FOLDER,
+
+    LOGS_FOLDER,
+
+]
+
+
+def initialize():
+    """
+    Creates every required Sentinel directory.
+
+    Safe to call multiple times.
+    """
+
+    for folder in REQUIRED_DIRECTORIES:
+
+        folder.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+
+# ==========================================================
+# Console Helpers
+# ==========================================================
+
+LINE = "=" * 70
+
+DIVIDER = "-" * 70
+
+
+def print_header(title=APP_NAME):
+    """
+    Prints a standardized Sentinel header.
+    """
+
+    print()
+    print(LINE)
+    print(title)
+    print(LINE)
+
+
+def print_divider():
+    """
+    Prints a divider line.
+    """
+
+    print(DIVIDER)
+
+
+# ==========================================================
+# Version Helpers
+# ==========================================================
+
+def version_string():
+    """
+    Returns the formatted application version.
+    """
+
+    return f"{APP_NAME} v{APP_VERSION}"
+
+
+# ==========================================================
+# Startup
+# ==========================================================
+
+initialize()

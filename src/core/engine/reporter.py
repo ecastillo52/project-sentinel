@@ -82,9 +82,7 @@ def print_report(report):
 
 def print_saved_session(session):
     """
-    Print a report that was loaded from the database.
+    Display a previously saved Session.
     """
 
-    print_report(
-        session["report"]
-    )
+    print_report(session.report)

@@ -1,11 +1,11 @@
-# core/database.py
+# core/metadata/database.py
 
 """
 Project Sentinel
 
 Database Layer
 
-Responsible for storing and retrieving analyzed sessions.
+Responsible for storing and retrieving Sentinel Sessions.
 """
 
 import json
@@ -14,8 +14,10 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from .hashing import file_hash
 from core.config import DATABASE_FILE
+
+from .hashing import file_hash
+from ..models.session import Session
 
 
 # ==========================================================
@@ -86,111 +88,116 @@ def clear_database():
 
 
 # ==========================================================
-# Queries
+# Session Queries
 # ==========================================================
 
-def get_all_records():
+def get_all_sessions():
+    """
+    Returns every session as Session objects.
+    """
+
+    sessions = [
+
+        Session.from_dict(record)
+
+        for record in load_database()
+
+    ]
 
     return sorted(
-        load_database(),
-        key=lambda record: record["analyzed_at"],
+        sessions,
+        key=lambda s: s.date,
         reverse=True
     )
 
 
-def get_record(record_id):
+def get_session_by_id(session_id):
 
-    for record in load_database():
+    for session in get_all_sessions():
 
-        if record["id"] == record_id:
-            return record
+        if session.id == session_id:
+            return session
 
     return None
 
 
-def get_record_by_hash(hash_value):
+def get_session_by_hash(hash_value):
 
-    for record in load_database():
+    for session in get_all_sessions():
 
-        if record["hash"] == hash_value:
-            return record
+        if session.hash == hash_value:
+            return session
 
     return None
 
 
 def record_exists(file_path):
-    """
-    Returns True if a file with the same SHA-256
-    already exists in the database.
-    """
 
     try:
 
-        file_hash_value = file_hash(file_path)
+        return (
+            get_session_by_hash(
+                file_hash(file_path)
+            )
+            is not None
+        )
 
     except FileNotFoundError:
 
         return False
 
-    return get_record_by_hash(
-        file_hash_value
-    ) is not None
-
 
 # ==========================================================
-# Record Builder
+# Session Numbering
 # ==========================================================
 
-def create_record(
-    *,
-    original_path,
-    archive_path,
-    game,
-    report
-):
+def get_next_session_number(game):
     """
-    Build one Sentinel session record.
-
-    The archived file becomes the canonical copy.
+    Returns the next session number
+    for a particular game.
     """
 
-    archive_path = Path(archive_path)
+    sessions = [
 
-    return {
+        session
 
-        "id": str(uuid.uuid4()),
+        for session in get_all_sessions()
 
-        "game": game,
+        if session.game.lower() == game.lower()
 
-        "hash": file_hash(archive_path),
+    ]
 
-        "filename": Path(original_path).name,
+    if not sessions:
 
-        "archive_path": str(
-            archive_path.resolve()
-        ),
+        return 1
 
-        "analyzed_at": datetime.now().isoformat(
-            timespec="seconds"
-        ),
+    return max(
 
-        "report": report
+        session.session_number
 
-    }
+        for session in sessions
+
+    ) + 1
 
 
 # ==========================================================
 # Insert
 # ==========================================================
 
-def insert_record(record):
+def insert_session(session):
 
     database = load_database()
 
-    database.append(record)
+    database.append(
+        session.to_dict()
+    )
 
     save_database(database)
 
+
+# ==========================================================
+# Public API
+# ==========================================================
 
 def add_analysis(
     *,
@@ -200,30 +207,50 @@ def add_analysis(
     report
 ):
     """
-    Save one completed Sentinel analysis.
+    Create and store a Session.
 
     Returns
     -------
-    bool
-        True if inserted.
-        False if this archived file already exists.
+    Session | None
     """
 
     archive_path = Path(archive_path)
 
     archive_hash = file_hash(archive_path)
 
-    if get_record_by_hash(archive_hash):
+    if get_session_by_hash(
+        archive_hash
+    ):
+        return None
 
-        return False
+    session = Session(
 
-    record = create_record(
-        original_path=original_path,
-        archive_path=archive_path,
+        id=str(uuid.uuid4()),
+
         game=game,
+
+        session_number=get_next_session_number(
+            game
+        ),
+
+        filename=Path(
+            original_path
+        ).name,
+
+        archive_path=str(
+            archive_path.resolve()
+        ),
+
+        hash=archive_hash,
+
+        analyzed_at=datetime.now().isoformat(
+            timespec="seconds"
+        ),
+
         report=report
+
     )
 
-    insert_record(record)
+    insert_session(session)
 
-    return True
+    return session

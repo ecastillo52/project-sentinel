@@ -295,5 +295,113 @@
                 }
             }
         }
+    },
+    {
+        "id": "10133e27-ccd0-429f-9eaa-c65e9ad48043",
+        "game": {
+            "name": "test",
+            "session": 2
+        },
+        "source": {
+            "filename": "Test.CSV",
+            "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\test\\Test.CSV",
+            "hash": "8fb7388d42d6f08f7cc212e9591644e5def2a6e9c15efbd6dc055d4ebb5f4fcf"
+        },
+        "analysis": {
+            "created": "2026-07-01T15:52:40",
+            "version": "0.2.0",
+            "engine": "Sentinel Analysis Engine"
+        },
+        "report": {
+            "filename": "Test.CSV",
+            "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Test.CSV",
+            "samples": 8,
+            "results": {
+                "cpu_temp": {
+                    "display": "CPU Temperature",
+                    "category": "CPU",
+                    "unit": "\u00b0C",
+                    "description": "Overall CPU package temperature.",
+                    "stats": {
+                        "current": 0.0,
+                        "minimum": 0.0,
+                        "maximum": 78.2,
+                        "average": 62.96,
+                        "samples": 7
+                    },
+                    "status": "Excellent"
+                },
+                "cpu_usage": {
+                    "display": "CPU Usage",
+                    "category": "CPU",
+                    "unit": "%",
+                    "description": "Overall processor utilization.",
+                    "stats": {
+                        "current": 0.0,
+                        "minimum": 0.0,
+                        "maximum": 31.8,
+                        "average": 18.04,
+                        "samples": 7
+                    },
+                    "status": "Healthy"
+                },
+                "gpu_temp": {
+                    "display": "GPU Temperature",
+                    "category": "GPU",
+                    "unit": "\u00b0C",
+                    "description": "GPU core temperature.",
+                    "stats": {
+                        "current": 0.0,
+                        "minimum": 0.0,
+                        "maximum": 38.4,
+                        "average": 32.9,
+                        "samples": 7
+                    },
+                    "status": "Excellent"
+                },
+                "gpu_usage": {
+                    "display": "GPU Usage",
+                    "category": "GPU",
+                    "unit": "%",
+                    "description": "GPU utilization.",
+                    "stats": {
+                        "current": 0.0,
+                        "minimum": 0.0,
+                        "maximum": 39.0,
+                        "average": 27.86,
+                        "samples": 7
+                    },
+                    "status": "Healthy"
+                },
+                "memory_usage": {
+                    "display": "Memory Usage",
+                    "category": "Memory",
+                    "unit": "%",
+                    "description": "System memory utilization.",
+                    "stats": {
+                        "current": 25.0,
+                        "minimum": 25.0,
+                        "maximum": 88.8,
+                        "average": 79.53,
+                        "samples": 7
+                    },
+                    "status": "High"
+                },
+                "fps": {
+                    "display": "Average FPS",
+                    "category": "Performance",
+                    "unit": "FPS",
+                    "description": "Average displayed framerate.",
+                    "stats": {
+                        "current": 60.0,
+                        "minimum": 58.9,
+                        "maximum": 80.9,
+                        "average": 63.3,
+                        "samples": 6
+                    },
+                    "status": "Playable"
+                }
+            }
+        }
     }
 ]
