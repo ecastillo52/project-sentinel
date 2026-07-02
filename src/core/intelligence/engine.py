@@ -5,18 +5,17 @@ Project Sentinel
 
 Historical Intelligence Engine
 
-Coordinates the historical analysis pipeline.
+Coordinates the historical intelligence pipeline.
 
 History
     ↓
-Analyzer
-    ↓
 Historical Report
+    ↓
+Renderer
 """
 
 from core.history.loader import load_history
 
-from .analyzer import analyze
 from .report import build_report
 
 
@@ -36,9 +35,4 @@ def run():
 
     history = load_history()
 
-    analysis = analyze(history)
-
-    return build_report(
-        history,
-        analysis,
-    )
+    return build_report(history)

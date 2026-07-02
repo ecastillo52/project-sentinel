@@ -7,95 +7,107 @@ Historical Intelligence Report
 
 Builds the final historical intelligence report.
 
-This module performs no calculations.
-It only structures analyzed data.
+This module performs no rendering.
+It assembles historical intelligence from the
+history analysis modules.
 """
+
+from . import recommendations
+
+from core.history import (
+    statistics,
+    metrics,
+    insights,
+)
 
 
 # ==========================================================
 # Public API
 # ==========================================================
 
-def build_report(
-    history,
-    analysis,
-):
+def build_report(history):
     """
-    Build a historical intelligence report.
+    Build the historical intelligence report.
 
     Parameters
     ----------
     history : list[Session]
-
-    analysis : dict
 
     Returns
     -------
     dict
     """
 
-    return {
+    report = {
 
         "history": {
 
             "total_sessions":
-                analysis["statistics"]["total_sessions"],
+                statistics.total_sessions(history),
 
             "total_games":
-                analysis["statistics"]["total_games"],
+                statistics.total_games(history),
 
             "oldest_session":
-                analysis["statistics"]["oldest_session"],
+                statistics.oldest_session(history),
 
             "latest_session":
-                analysis["statistics"]["latest_session"],
+                statistics.latest_session(history),
 
         },
 
         "performance": {
 
             "average_fps":
-                analysis["metrics"]["average_fps"],
+                metrics.average_fps(history),
 
             "best_session":
-                analysis["insights"]["best_fps_session"],
+                insights.best_fps_session(history),
 
             "trend":
-                analysis["insights"]["fps_direction"],
+                insights.fps_direction(history),
 
         },
 
         "cpu": {
 
             "average_temperature":
-                analysis["metrics"]["average_cpu_temperature"],
+                metrics.average_cpu_temperature(history),
 
             "highest_temperature":
-                analysis["metrics"]["highest_cpu_temperature"],
+                metrics.highest_cpu_temperature(history),
 
             "trend":
-                analysis["insights"]["cpu_temperature_direction"],
+                insights.cpu_temperature_direction(history),
 
         },
 
         "gpu": {
 
             "average_temperature":
-                analysis["metrics"]["average_gpu_temperature"],
+                metrics.average_gpu_temperature(history),
 
             "highest_temperature":
-                analysis["metrics"]["highest_gpu_temperature"],
+                metrics.highest_gpu_temperature(history),
 
         },
 
         "memory": {
 
             "average_load":
-                analysis["metrics"]["average_memory_load"],
+                metrics.average_memory_load(history),
 
             "highest_load":
-                analysis["metrics"]["highest_memory_load"],
+                metrics.highest_memory_load(history),
 
         },
 
     }
+
+    # ------------------------------------------------------
+    # Recommendations
+    # ------------------------------------------------------
+
+    report["recommendations"] = recommendations.generate(report)
+
+    return report

@@ -13,6 +13,7 @@ This module contains application flow only.
 All printing is delegated to console.py.
 """
 
+from core.intelligence.engine import run as run_intelligence
 from core.intelligence.renderer import render as render_intelligence
 from core.config import INCOMING_FOLDER
 
@@ -181,7 +182,9 @@ def historical_intelligence():
 
     header()
 
-    render_intelligence()
+    report = run_intelligence()
+
+    render_intelligence(report)
 
     pause()
 
