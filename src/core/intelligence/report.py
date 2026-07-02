@@ -12,12 +12,16 @@ It assembles historical intelligence from the
 history analysis modules.
 """
 
-from . import recommendations
+from . import (
+    historical,
+    recommendations,
+)
 
 from core.history import (
     statistics,
     metrics,
     insights,
+    timeline,
 )
 
 
@@ -54,6 +58,9 @@ def build_report(history):
             "latest_session":
                 statistics.latest_session(history),
 
+            "timeline":
+                timeline.recent_sessions(history),
+
         },
 
         "performance": {
@@ -66,6 +73,9 @@ def build_report(history):
 
             "trend":
                 insights.fps_direction(history),
+
+            "intelligence":
+                historical.performance(history),
 
         },
 
@@ -80,6 +90,9 @@ def build_report(history):
             "trend":
                 insights.cpu_temperature_direction(history),
 
+            "intelligence":
+                historical.cpu(history),
+
         },
 
         "gpu": {
@@ -90,6 +103,9 @@ def build_report(history):
             "highest_temperature":
                 metrics.highest_gpu_temperature(history),
 
+            "intelligence":
+                historical.gpu(history),
+
         },
 
         "memory": {
@@ -99,6 +115,9 @@ def build_report(history):
 
             "highest_load":
                 metrics.highest_memory_load(history),
+
+            "intelligence":
+                historical.memory(history),
 
         },
 

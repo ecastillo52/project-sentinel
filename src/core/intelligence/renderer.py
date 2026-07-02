@@ -13,6 +13,8 @@ This module performs no analysis.
 It only renders intelligence reports.
 """
 
+from textwrap import fill
+
 # ==========================================================
 # Constants
 # ==========================================================
@@ -21,6 +23,12 @@ REPORT_WIDTH = 52
 LABEL_WIDTH = 24
 
 LINE = "=" * REPORT_WIDTH
+
+ICONS = {
+    "Critical": "✖",
+    "Warning": "⚠",
+    "Information": "ℹ",
+}
 
 
 # ==========================================================
@@ -36,6 +44,9 @@ def render(report: dict) -> None:
 
     if "history" in report:
         print_history(report["history"])
+
+        if "timeline" in report["history"]:
+            print_recent_activity(report["history"]["timeline"])
 
     if "performance" in report:
         print_performance(report["performance"])
@@ -71,6 +82,68 @@ def print_header() -> None:
 
 
 # ==========================================================
+# Formatting
+# ==========================================================
+
+def format_fps(value) -> str:
+    """
+    Format an FPS value.
+    """
+
+    if value is None:
+        return "--"
+
+    return f"{round(value)} FPS"
+
+
+def format_temperature(value) -> str:
+    """
+    Format a temperature.
+    """
+
+    if value is None:
+        return "--"
+
+    return f"{value:.1f} °C"
+
+
+def format_percent(value) -> str:
+    """
+    Format a percentage.
+    """
+
+    if value is None:
+        return "--"
+
+    return f"{value:.1f} %"
+
+
+def format_number(value) -> str:
+    """
+    Format a numeric value.
+    """
+
+    if value is None:
+        return "--"
+
+    if isinstance(value, float):
+        return f"{value:.1f}"
+
+    return str(value)
+
+
+def truncate(text: str, width: int) -> str:
+    """
+    Truncate text to a fixed width.
+    """
+
+    if len(text) <= width:
+        return text
+
+    return text[:width - 3] + "..."
+
+
+# ==========================================================
 # History
 # ==========================================================
 
@@ -82,9 +155,41 @@ def print_history(history: dict) -> None:
     heading("History")
 
     field("Total Sessions", history.get("total_sessions"))
-    field("Games Played", history.get("games"))
-    field("First Session", history.get("first_session"))
+    field("Games Played", history.get("total_games"))
+    field("First Session", history.get("oldest_session"))
     field("Latest Session", history.get("latest_session"))
+
+    blank()
+
+
+# ==========================================================
+# Recent Activity
+# ==========================================================
+
+def print_recent_activity(timeline: list[dict]) -> None:
+    """
+    Render the most recent Sentinel sessions.
+    """
+
+    heading("Recent Activity")
+
+    if not timeline:
+
+        print("No historical sessions.")
+        blank()
+        return
+
+    for session in timeline:
+
+        date = session["date"].strftime("%Y-%m-%d %H:%M")
+        game = truncate(session["game"], 15)
+        number = session["session"]
+
+        print(
+            f"● {date:<16}  "
+            f"{game:<15}  "
+            f"Session {number}"
+        )
 
     blank()
 
@@ -100,9 +205,24 @@ def print_performance(performance: dict) -> None:
 
     heading("Performance")
 
-    field("Average FPS", performance.get("average_fps"))
-    field("Best FPS", performance.get("best_fps"))
-    field("Trend", performance.get("trend"))
+    field(
+        "Average FPS",
+        format_fps(performance.get("average_fps")),
+    )
+
+    field(
+        "Best Session",
+        performance.get("best_session"),
+    )
+
+    field(
+        "Trend",
+        performance.get("trend"),
+    )
+
+    print_intelligence(
+        performance.get("intelligence", [])
+    )
 
     blank()
 
@@ -118,9 +238,24 @@ def print_cpu(cpu: dict) -> None:
 
     heading("CPU")
 
-    field("Average Temp", cpu.get("average_temp"))
-    field("Highest Temp", cpu.get("highest_temp"))
-    field("Trend", cpu.get("trend"))
+    field(
+        "Average Temp",
+        format_temperature(cpu.get("average_temperature")),
+    )
+
+    field(
+        "Highest Temp",
+        format_temperature(cpu.get("highest_temperature")),
+    )
+
+    field(
+        "Trend",
+        cpu.get("trend"),
+    )
+
+    print_intelligence(
+        cpu.get("intelligence", [])
+    )
 
     blank()
 
@@ -136,9 +271,24 @@ def print_gpu(gpu: dict) -> None:
 
     heading("GPU")
 
-    field("Average Temp", gpu.get("average_temp"))
-    field("Highest Temp", gpu.get("highest_temp"))
-    field("Trend", gpu.get("trend"))
+    field(
+        "Average Temp",
+        format_temperature(gpu.get("average_temperature")),
+    )
+
+    field(
+        "Highest Temp",
+        format_temperature(gpu.get("highest_temperature")),
+    )
+
+    field(
+        "Trend",
+        gpu.get("trend"),
+    )
+
+    print_intelligence(
+        gpu.get("intelligence", [])
+    )
 
     blank()
 
@@ -154,18 +304,62 @@ def print_memory(memory: dict) -> None:
 
     heading("Memory")
 
-    field("Average Load", memory.get("average_load"))
-    field("Highest Load", memory.get("highest_load"))
-    field("Trend", memory.get("trend"))
+    field(
+        "Average Load",
+        format_percent(memory.get("average_load")),
+    )
+
+    field(
+        "Highest Load",
+        format_percent(memory.get("highest_load")),
+    )
+
+    field(
+        "Trend",
+        memory.get("trend"),
+    )
+
+    print_intelligence(
+        memory.get("intelligence", [])
+    )
 
     blank()
 
 
 # ==========================================================
+# Historical Intelligence
+# ==========================================================
+
+def print_intelligence(statements: list[str]) -> None:
+    """
+    Render historical intelligence statements.
+    """
+
+    if not statements:
+        return
+
+    print("Historical Intelligence")
+    print()
+
+    for statement in statements:
+
+        wrapped = fill(
+            statement,
+            width=REPORT_WIDTH - 4,
+            initial_indent="• ",
+            subsequent_indent="  ",
+        )
+
+        print(wrapped)
+
+    blank()
+
+# ==========================================================
 # Recommendations
 # ==========================================================
 
-def print_recommendations(recommendations: list[str]) -> None:
+
+def print_recommendations(recommendations: list[dict]) -> None:
     """
     Render Sentinel recommendations.
     """
@@ -175,11 +369,29 @@ def print_recommendations(recommendations: list[str]) -> None:
     if not recommendations:
 
         print("No recommendations.")
+        blank()
+        return
 
-    else:
+    for recommendation in recommendations:
 
-        for recommendation in recommendations:
-            print(f"• {recommendation}")
+        level = recommendation.get("level", "")
+        title = recommendation.get("title", "")
+        message = recommendation.get("message", "")
+
+        icon = ICONS.get(level, "•")
+
+        print(f"{icon} {title}")
+        print()
+
+        wrapped = fill(
+            message,
+            width=REPORT_WIDTH - 4,
+            initial_indent="    ",
+            subsequent_indent="    ",
+        )
+
+        print(wrapped)
+        print()
 
     blank()
 
@@ -194,11 +406,8 @@ def heading(title: str) -> None:
     """
 
     divider()
-
     print(title)
-
     divider()
-
     blank()
 
 

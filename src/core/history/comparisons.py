@@ -5,154 +5,205 @@ Project Sentinel
 
 History Comparisons
 
-Compare two Sentinel sessions.
+Utilities for comparing Sentinel sessions.
+
+These functions compare the most recent session against
+the previous session and return structured comparison
+objects suitable for historical intelligence reports.
 """
 
 from core.models.session import Session
 
 
 # ==========================================================
-# Generic Comparisons
+# Helpers
 # ==========================================================
 
-def sensor_difference(
+def sensor_average(
+    session: Session,
+    sensor_id: str,
+):
+    """
+    Return the average value for a sensor.
+
+    Parameters
+    ----------
+    session : Session
+
+    sensor_id : str
+
+    Returns
+    -------
+    float | None
+    """
+
+    try:
+        return session.report["sensors"][sensor_id]["stats"]["average"]
+
+    except (KeyError, TypeError):
+        return None
+
+
+def compare_sensor(
     previous: Session,
     current: Session,
     sensor_id: str,
-) -> float:
+):
     """
-    Compare average values for a sensor.
+    Compare a sensor between two sessions.
+
+    Returns
+    -------
+    dict
     """
 
-    previous_value = (
-        previous.report["sensors"][sensor_id]["stats"]["average"]
+    previous_value = sensor_average(
+        previous,
+        sensor_id,
     )
 
-    current_value = (
-        current.report["sensors"][sensor_id]["stats"]["average"]
+    current_value = sensor_average(
+        current,
+        sensor_id,
     )
 
-    return current_value - previous_value
+    if previous_value is None or current_value is None:
+
+        difference = None
+
+    else:
+
+        difference = current_value - previous_value
+
+    return {
+
+        "previous": previous_value,
+
+        "current": current_value,
+
+        "difference": difference,
+
+    }
 
 
 # ==========================================================
-# Sensor Comparisons
+# Public Comparisons
 # ==========================================================
 
-def fps_difference(
+def fps(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare average FPS.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "fps",
     )
 
 
-def cpu_temperature_difference(
+def cpu_temperature(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare CPU temperature.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "cpu_temp",
     )
 
 
-def cpu_usage_difference(
+def cpu_usage(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare CPU usage.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "cpu_usage",
     )
 
 
-def gpu_temperature_difference(
+def gpu_temperature(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare GPU temperature.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "gpu_temp",
     )
 
 
-def gpu_usage_difference(
+def gpu_usage(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare GPU usage.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "gpu_usage",
     )
 
 
-def memory_used_difference(
+def memory_used(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare physical memory used.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "memory_used",
     )
 
 
-def memory_available_difference(
+def memory_available(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare physical memory available.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "memory_available",
     )
 
 
-def memory_load_difference(
+def memory_load(
     previous: Session,
     current: Session,
-) -> float:
+):
     """
     Compare physical memory load.
     """
 
-    return sensor_difference(
+    return compare_sensor(
         previous,
         current,
         "memory_load",
