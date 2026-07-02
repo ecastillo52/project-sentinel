@@ -21,7 +21,6 @@ from core.history import (
     statistics,
     metrics,
     insights,
-    timeline,
 )
 
 
@@ -29,13 +28,18 @@ from core.history import (
 # Public API
 # ==========================================================
 
-def build_report(history):
+def build_report(
+    history,
+    game: str,
+) -> dict:
     """
     Build the historical intelligence report.
 
     Parameters
     ----------
     history : list[Session]
+
+    game : str
 
     Returns
     -------
@@ -44,22 +48,18 @@ def build_report(history):
 
     report = {
 
-        "history": {
+        "game": {
 
-            "total_sessions":
+            "name": game,
+
+            "sessions":
                 statistics.total_sessions(history),
 
-            "total_games":
-                statistics.total_games(history),
-
-            "oldest_session":
+            "first_session":
                 statistics.oldest_session(history),
 
             "latest_session":
                 statistics.latest_session(history),
-
-            "timeline":
-                timeline.recent_sessions(history),
 
         },
 
@@ -127,6 +127,8 @@ def build_report(history):
     # Recommendations
     # ------------------------------------------------------
 
-    report["recommendations"] = recommendations.generate(report)
+    report["recommendations"] = recommendations.generate(
+        report
+    )
 
     return report

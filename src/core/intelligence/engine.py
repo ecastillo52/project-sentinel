@@ -1,5 +1,3 @@
-# core/intelligence/engine.py
-
 """
 Project Sentinel
 
@@ -9,12 +7,15 @@ Coordinates the historical intelligence pipeline.
 
 History
     ↓
+Game Filter
+    ↓
 Historical Report
     ↓
 Renderer
 """
 
 from core.history.loader import load_history
+from core.history.game_history import sessions_for_game
 
 from .report import build_report
 
@@ -23,9 +24,16 @@ from .report import build_report
 # Public API
 # ==========================================================
 
-def run():
+def run(
+    game: str,
+) -> dict:
     """
-    Execute the historical intelligence pipeline.
+    Execute the historical intelligence pipeline for a
+    single game.
+
+    Parameters
+    ----------
+    game : str
 
     Returns
     -------
@@ -35,4 +43,12 @@ def run():
 
     history = load_history()
 
-    return build_report(history)
+    history = sessions_for_game(
+        history,
+        game,
+    )
+
+    return build_report(
+        history,
+        game,
+    )

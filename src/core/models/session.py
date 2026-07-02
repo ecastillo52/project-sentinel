@@ -37,7 +37,6 @@ class Session:
     # ======================================================
 
     game: str
-
     session_number: int
 
     # ======================================================
@@ -45,9 +44,7 @@ class Session:
     # ======================================================
 
     filename: str
-
     archive_path: str
-
     hash: str
 
     # ======================================================
@@ -57,7 +54,6 @@ class Session:
     analyzed_at: str
 
     version: str = "0.2.0"
-
     engine: str = "Sentinel Analysis Engine"
 
     report: list[dict[str, Any]] = field(default_factory=list)
@@ -69,33 +65,31 @@ class Session:
     @property
     def archive(self) -> Path:
         """
-        Returns the archived CSV as a Path object.
+        Return the archived CSV path.
         """
-
         return Path(self.archive_path)
 
     @property
     def date(self) -> datetime:
         """
-        Returns the analysis timestamp as a datetime.
+        Return the analysis timestamp.
         """
-
         return datetime.fromisoformat(self.analyzed_at)
 
     @property
     def label(self) -> str:
         """
-        Session 3
+        Example:
+            Session 3
         """
-
         return f"Session {self.session_number}"
 
     @property
     def display_name(self) -> str:
         """
-        Fortnite - Session 3
+        Example:
+            Fortnite - Session 3
         """
-
         return f"{self.game} - {self.label}"
 
     # ======================================================
@@ -104,132 +98,88 @@ class Session:
 
     def to_dict(self) -> dict:
         """
-        Convert Session into the Sentinel database format.
+        Convert the session into the Sentinel database format.
         """
 
         return {
-
             "id": self.id,
-
             "game": {
-
                 "name": self.game,
-
-                "session": self.session_number
-
+                "session": self.session_number,
             },
-
             "source": {
-
                 "filename": self.filename,
-
                 "archive_path": self.archive_path,
-
-                "hash": self.hash
-
+                "hash": self.hash,
             },
-
             "analysis": {
-
                 "created": self.analyzed_at,
-
                 "version": self.version,
-
-                "engine": self.engine
-
+                "engine": self.engine,
             },
-
-            "report": self.report
-
+            "report": self.report,
         }
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict) -> "Session":
         """
-        Build a Session from either the old or new
-        Sentinel database format.
+        Build a Session from either the new or legacy
+        Sentinel database schema.
         """
 
-        #
+        # --------------------------------------------------
         # New schema
-        #
+        # --------------------------------------------------
 
         if isinstance(data.get("game"), dict):
+
             return cls(
-
                 id=data["id"],
-
                 game=data["game"]["name"],
-
                 session_number=data["game"]["session"],
-
                 filename=data["source"]["filename"],
-
                 archive_path=data["source"]["archive_path"],
-
                 hash=data["source"]["hash"],
-
                 analyzed_at=data["analysis"]["created"],
-
                 version=data["analysis"].get(
                     "version",
-                    "0.2.0"
+                    "0.2.0",
                 ),
-
                 engine=data["analysis"].get(
                     "engine",
-                    "Sentinel Analysis Engine"
+                    "Sentinel Analysis Engine",
                 ),
-
-                report=data.get(
-                    "report",
-                    []
-                ),
+                report=data.get("report", []),
             )
 
-        #
+        # --------------------------------------------------
         # Legacy schema
-        #
+        # --------------------------------------------------
 
         return cls(
-
             id=data["id"],
-
             game=data.get("game", "Unknown"),
-
             session_number=data.get(
                 "session_number",
-                1
+                1,
             ),
-
             filename=data["filename"],
-
             archive_path=data["archive_path"],
-
             hash=data["hash"],
-
             analyzed_at=data["analyzed_at"],
-
             version="0.1.0",
-
             engine="Legacy Database",
-
-            report=data.get(
-                "report",
-                []
-            ),
+            report=data.get("report", []),
         )
 
     # ======================================================
     # Display
     # ======================================================
 
-    def __str__(self):
-
+    def __str__(self) -> str:
         return self.display_name
 
-    def __repr__(self):
-
+    def __repr__(self) -> str:
         return (
             f"Session("
             f"game='{self.game}', "

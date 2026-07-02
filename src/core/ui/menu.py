@@ -29,11 +29,14 @@ from core.metadata.history import (
     print_history,
 )
 
+from core.history.loader import load_history
+
 from .console import (
     header,
     pause,
     main_menu,
 )
+from .game_selector import select_game
 
 
 # ==========================================================
@@ -180,9 +183,26 @@ def historical_intelligence():
     Display Sentinel's historical analysis.
     """
 
+    history = load_history()
+
+    if not history:
+
+        header()
+
+        print("No historical sessions found.")
+
+        pause()
+
+        return
+
+    game = select_game(history)
+
+    if game is None:
+        return
+
     header()
 
-    report = run_intelligence()
+    report = run_intelligence(game)
 
     render_intelligence(report)
 

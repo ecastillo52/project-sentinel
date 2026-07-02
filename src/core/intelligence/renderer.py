@@ -15,6 +15,7 @@ It only renders intelligence reports.
 
 from textwrap import fill
 
+
 # ==========================================================
 # Constants
 # ==========================================================
@@ -42,11 +43,8 @@ def render(report: dict) -> None:
 
     print_header()
 
-    if "history" in report:
-        print_history(report["history"])
-
-        if "timeline" in report["history"]:
-            print_recent_activity(report["history"]["timeline"])
+    if "game" in report:
+        print_game(report["game"])
 
     if "performance" in report:
         print_performance(report["performance"])
@@ -118,20 +116,6 @@ def format_percent(value) -> str:
     return f"{value:.1f} %"
 
 
-def format_number(value) -> str:
-    """
-    Format a numeric value.
-    """
-
-    if value is None:
-        return "--"
-
-    if isinstance(value, float):
-        return f"{value:.1f}"
-
-    return str(value)
-
-
 def truncate(text: str, width: int) -> str:
     """
     Truncate text to a fixed width.
@@ -144,52 +128,35 @@ def truncate(text: str, width: int) -> str:
 
 
 # ==========================================================
-# History
+# Game
 # ==========================================================
 
-def print_history(history: dict) -> None:
+def print_game(game: dict) -> None:
     """
-    Render historical summary.
-    """
-
-    heading("History")
-
-    field("Total Sessions", history.get("total_sessions"))
-    field("Games Played", history.get("total_games"))
-    field("First Session", history.get("oldest_session"))
-    field("Latest Session", history.get("latest_session"))
-
-    blank()
-
-
-# ==========================================================
-# Recent Activity
-# ==========================================================
-
-def print_recent_activity(timeline: list[dict]) -> None:
-    """
-    Render the most recent Sentinel sessions.
+    Render selected game summary.
     """
 
-    heading("Recent Activity")
+    heading("Game")
 
-    if not timeline:
+    field(
+        "Name",
+        game.get("name"),
+    )
 
-        print("No historical sessions.")
-        blank()
-        return
+    field(
+        "Sessions Recorded",
+        game.get("sessions"),
+    )
 
-    for session in timeline:
+    field(
+        "First Session",
+        game.get("first_session"),
+    )
 
-        date = session["date"].strftime("%Y-%m-%d %H:%M")
-        game = truncate(session["game"], 15)
-        number = session["session"]
-
-        print(
-            f"● {date:<16}  "
-            f"{game:<15}  "
-            f"Session {number}"
-        )
+    field(
+        "Latest Session",
+        game.get("latest_session"),
+    )
 
     blank()
 
@@ -210,9 +177,11 @@ def print_performance(performance: dict) -> None:
         format_fps(performance.get("average_fps")),
     )
 
+    best = performance.get("best_session")
+
     field(
         "Best Session",
-        performance.get("best_session"),
+        str(best) if best else "--",
     )
 
     field(
@@ -330,7 +299,9 @@ def print_memory(memory: dict) -> None:
 # Historical Intelligence
 # ==========================================================
 
-def print_intelligence(statements: list[str]) -> None:
+def print_intelligence(
+    statements: list[str],
+) -> None:
     """
     Render historical intelligence statements.
     """
@@ -354,12 +325,14 @@ def print_intelligence(statements: list[str]) -> None:
 
     blank()
 
+
 # ==========================================================
 # Recommendations
 # ==========================================================
 
-
-def print_recommendations(recommendations: list[dict]) -> None:
+def print_recommendations(
+    recommendations: list[dict],
+) -> None:
     """
     Render Sentinel recommendations.
     """
@@ -411,7 +384,10 @@ def heading(title: str) -> None:
     blank()
 
 
-def field(label: str, value) -> None:
+def field(
+    label: str,
+    value,
+) -> None:
     """
     Print an aligned label/value pair.
     """
