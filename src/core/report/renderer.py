@@ -22,6 +22,8 @@ Report Flow
         ↓
     Session Summary
 """
+
+from collections import OrderedDict
 from core.config import APP_NAME, APP_VERSION
 
 # ==========================================================
@@ -142,14 +144,30 @@ def print_machine(report):
 # ==========================================================
 
 def print_sensors(report):
-    """Print every analyzed sensor."""
+    """
+    Print all analyzed sensors grouped by category.
+    """
 
     print("Sensor Reports")
     blank()
 
-    for sensor in report["sensors"].values():
-        print_sensor(sensor)
+    categories = OrderedDict()
 
+    for sensor in report["sensors"].values():
+        categories.setdefault(
+            sensor["category"],
+            []
+        ).append(sensor)
+
+    for category, sensors in categories.items():
+
+        divider()
+        print(category)
+        divider()
+        blank()
+
+        for sensor in sensors:
+            print_sensor(sensor)
 
 def print_sensor(sensor):
     """Print a single sensor."""

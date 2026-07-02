@@ -15,6 +15,7 @@ Health Engine
 from datetime import datetime
 from pathlib import Path
 
+from core.config import REPORT_SCHEMA
 from core.engine.reader import load_hwinfo_log
 from core.metadata.machine import get_machine_info
 from core.engine.summary import build_summary
@@ -36,6 +37,7 @@ def run(file_path, game="Unknown"):
 
     # Build the report object
     report = {
+        "schema": REPORT_SCHEMA,
         "session": build_session(file_path, game),
         "machine": get_machine_info(),
         "sensors": {},

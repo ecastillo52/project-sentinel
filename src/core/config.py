@@ -28,6 +28,8 @@ APP_NAME = "Project Sentinel"
 
 APP_VERSION = "0.4.0 - The era of Information"
 
+REPORT_SCHEMA = 1
+
 AUTHOR = "Erik Castillo"
 
 ENGINE_NAME = "Sentinel Analysis Engine"
