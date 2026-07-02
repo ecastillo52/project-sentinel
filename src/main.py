@@ -11,7 +11,6 @@ the Sentinel user interface.
 
 from core.ui.menu import run_menu
 
-
 def main():
     """
     Launch Sentinel.

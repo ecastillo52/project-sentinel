@@ -16,10 +16,8 @@ All printing is delegated to console.py.
 from core.config import INCOMING_FOLDER
 
 from core.engine.processor import run
-from core.engine.reporter import (
-    print_report,
-    print_saved_session,
-)
+from core.report.renderer import render
+from core.engine.reporter import print_saved_session
 from core.engine.scanner import get_new_logs
 
 from core.metadata.archive import archive_log
@@ -75,9 +73,9 @@ def analyze_logs():
         # Analyze
         #
 
-        report = run(log)
+        report = run(log, game)
 
-        print_report(report)
+        render(report)
 
         #
         # Archive
