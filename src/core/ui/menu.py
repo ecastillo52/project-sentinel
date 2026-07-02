@@ -17,7 +17,6 @@ from core.config import INCOMING_FOLDER
 
 from core.engine.processor import run
 from core.report.renderer import render
-from core.engine.reporter import print_saved_session
 from core.engine.scanner import get_new_logs
 
 from core.metadata.archive import archive_log
@@ -162,7 +161,10 @@ def view_history():
 
         header()
 
-        print_saved_session(session)
+        render(
+            session.report,
+            session=session
+        )
 
         pause()
 

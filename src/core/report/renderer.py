@@ -22,6 +22,7 @@ Report Flow
         ↓
     Session Summary
 """
+from core.config import APP_NAME, APP_VERSION
 
 # ==========================================================
 # Constants
@@ -30,8 +31,6 @@ Report Flow
 REPORT_WIDTH = 52
 LABEL_WIDTH = 20
 
-TITLE = "PROJECT SENTINEL"
-VERSION = "Version 0.1.0"
 
 LINE = "=" * REPORT_WIDTH
 SECTION = "-" * REPORT_WIDTH
@@ -48,8 +47,11 @@ HEALTH_ICONS = {
 # Public API
 # ==========================================================
 
-def render(report):
+def render(report, session=None):
     """Render a complete Sentinel report."""
+
+    if session is not None:
+        print_saved_session_header(session)
 
     print_header()
     print_session(report)
@@ -57,6 +59,24 @@ def render(report):
     print_sensors(report)
     print_summary(report)
 
+def print_saved_session_header(session):
+    """Print metadata for a saved session."""
+
+    divider()
+
+    print(session.game.center(REPORT_WIDTH))
+
+    divider()
+    blank()
+
+    field("Session", session.session_number)
+    field("Analyzed", session.date.strftime("%Y-%m-%d %H:%M:%S"))
+    field("Source", session.filename)
+    field("Archive", session.archive)
+    field("Version", session.version)
+    field("Engine", session.engine)
+
+    blank()
 
 # ==========================================================
 # Header
@@ -67,8 +87,8 @@ def print_header():
 
     divider()
 
-    print(TITLE.center(REPORT_WIDTH))
-    print(VERSION.center(REPORT_WIDTH))
+    print(APP_NAME.center(REPORT_WIDTH))
+    print(f"Version {APP_VERSION}".center(REPORT_WIDTH))
 
     divider()
     blank()
@@ -102,13 +122,15 @@ def print_session(report):
 def print_machine(report):
     """Print machine information."""
 
+    machine = report["machine"]
+
     print("Machine Information")
     blank()
 
-    field("CPU", "(placeholder)")
-    field("GPU", "(placeholder)")
-    field("RAM", "(placeholder)")
-    field("Motherboard", "(placeholder)")
+    field("CPU", machine["cpu"])
+    field("GPU", machine["gpu"])
+    field("RAM", machine["ram"])
+    field("Motherboard", machine["motherboard"])
 
     blank()
     divider()
@@ -158,21 +180,43 @@ def print_sensor(sensor):
 # ==========================================================
 
 def print_summary(report):
-    """Print the session summary."""
+    """
+    Print the session summary.
+    """
+
+    summary = report["summary"]
 
     divider()
     print("SESSION SUMMARY".center(REPORT_WIDTH))
     divider()
     blank()
 
-    field("Average FPS", "(placeholder)")
-    field("Peak CPU Temp", "(placeholder)")
-    field("Peak GPU Temp", "(placeholder)")
-    field("Peak RAM Usage", "(placeholder)")
+    field(
+        "Average FPS",
+        format_value(summary["average_fps"], "FPS")
+    )
+
+    field(
+        "Peak CPU Temp",
+        format_value(summary["peak_cpu_temp"], "°C")
+    )
+
+    field(
+        "Peak GPU Temp",
+        format_value(summary["peak_gpu_temp"], "°C")
+    )
+
+    field(
+        "Peak RAM Usage",
+        format_value(summary["peak_ram_usage"], "%")
+    )
 
     blank()
 
-    field("Overall Health", "✓ Excellent")
+    field(
+        "Overall Health",
+        health(summary["overall_health"])
+    )
 
     blank()
 

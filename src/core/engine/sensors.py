@@ -77,15 +77,39 @@ SENSORS = {
     # Memory
     # ==========================================================
 
-    "memory_usage": {
-        "display": "Memory Usage",
+    "memory_used": {
+        "display": "Physical Memory Used",
+        "keyword": "physical memory used",
+        "unit": "GB",
+        "value_type": "float",
+        "type": "memory",
+        "category": "Memory",
+        "priority": 1,
+        "description": "Amount of physical memory currently in use.",
+        "health": "memory_usage_status"
+    },
+
+    "memory_available": {
+        "display": "Physical Memory Available",
+        "keyword": "physical memory available",
+        "unit": "GB",
+        "value_type": "float",
+        "type": "memory",
+        "category": "Memory",
+        "priority": 2,
+        "description": "Amount of available physical memory.",
+        "health": "memory_usage_status"
+    },
+
+    "memory_load": {
+        "display": "Physical Memory Load",
         "keyword": "physical memory load",
         "unit": "%",
         "value_type": "float",
-        "type": "usage",
+        "type": "memory",
         "category": "Memory",
-        "priority": 1,
-        "description": "System memory utilization.",
+        "priority": 3,
+        "description": "Overall physical memory utilization.",
         "health": "memory_usage_status"
     },
 

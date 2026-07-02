@@ -16,6 +16,9 @@ from datetime import datetime
 from pathlib import Path
 
 from core.engine.reader import load_hwinfo_log
+from core.metadata.machine import get_machine_info
+from core.engine.summary import build_summary
+
 from .sensors import get_all_sensors
 from .analyzer import analyze_sensor
 from ..engine import health
@@ -34,7 +37,7 @@ def run(file_path, game="Unknown"):
     # Build the report object
     report = {
         "session": build_session(file_path, game),
-        "machine": {},
+        "machine": get_machine_info(),
         "sensors": {},
         "summary": {}
     }
@@ -63,6 +66,9 @@ def run(file_path, game="Unknown"):
             "stats": stats,
             "status": status
         }
+
+    # Build the executive summary
+    report["summary"] = build_summary(report)
 
     return report
 
