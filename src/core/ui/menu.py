@@ -13,6 +13,7 @@ This module contains application flow only.
 All printing is delegated to console.py.
 """
 
+from core.intelligence.renderer import render as render_intelligence
 from core.config import INCOMING_FOLDER
 
 from core.engine.processor import run
@@ -170,6 +171,22 @@ def view_history():
 
 
 # ==========================================================
+# Historical Intelligence
+# ==========================================================
+
+def historical_intelligence():
+    """
+    Display Sentinel's historical analysis.
+    """
+
+    header()
+
+    render_intelligence()
+
+    pause()
+
+
+# ==========================================================
 # Main Menu
 # ==========================================================
 
@@ -194,6 +211,10 @@ def run_menu():
             view_history()
 
         elif choice == "3":
+
+            historical_intelligence()
+
+        elif choice == "4":
 
             print("\nGoodbye.\n")
 

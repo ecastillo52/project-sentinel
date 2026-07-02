@@ -76,12 +76,12 @@ def section(title):
 # ==========================================================
 
 def main_menu():
-
-    print()
+    """Print the main menu."""
 
     print("1. Analyze New Logs")
     print("2. View Previous Reports")
-    print("3. Exit")
+    print("3. Historical Intelligence")
+    print("4. Exit")
 
 
 def prompt(message):
