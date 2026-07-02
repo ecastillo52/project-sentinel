@@ -1,407 +1,545 @@
-[
-    {
-        "id": "42681cbb-7098-4ba5-971e-ace5fdbdb190",
-        "game": "test",
-        "hash": "42b2ab616c951d92d2d81edc951943c5b538380e2f1334ba81c433013cbb1425",
-        "filename": "Logging_Testing.CSV",
-        "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\test\\Logging_Testing.CSV",
-        "analyzed_at": "2026-06-30T20:15:36",
-        "report": {
-            "filename": "Logging_Testing.CSV",
-            "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Logging_Testing.CSV",
-            "samples": 11,
-            "results": {
-                "cpu_temp": {
-                    "display": "CPU Temperature",
-                    "category": "CPU",
-                    "unit": "\u00b0C",
-                    "description": "Overall CPU package temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 73.5,
-                        "average": 58.65,
-                        "samples": 10
+{
+    "version": "0.2.0",
+    "sessions": [
+        {
+            "id": "10133e27-ccd0-429f-9eaa-c65e9ad48043",
+            "game": {
+                "name": "test",
+                "session": 2
+            },
+            "source": {
+                "filename": "Test.CSV",
+                "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\test\\Test.CSV",
+                "hash": "8fb7388d42d6f08f7cc212e9591644e5def2a6e9c15efbd6dc055d4ebb5f4fcf"
+            },
+            "analysis": {
+                "created": "2026-07-01T15:52:40",
+                "version": "0.2.0",
+                "engine": "Sentinel Analysis Engine"
+            },
+            "report": {
+                "filename": "Test.CSV",
+                "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Test.CSV",
+                "samples": 8,
+                "results": {
+                    "cpu_temp": {
+                        "display": "CPU Temperature",
+                        "category": "CPU",
+                        "unit": "\u00b0C",
+                        "description": "Overall CPU package temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 78.2,
+                            "average": 62.96,
+                            "samples": 7
+                        },
+                        "status": "Excellent"
                     },
-                    "status": "Excellent"
-                },
-                "cpu_usage": {
-                    "display": "CPU Usage",
-                    "category": "CPU",
-                    "unit": "%",
-                    "description": "Overall processor utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 16.7,
-                        "average": 7.93,
-                        "samples": 10
+                    "cpu_usage": {
+                        "display": "CPU Usage",
+                        "category": "CPU",
+                        "unit": "%",
+                        "description": "Overall processor utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 31.8,
+                            "average": 18.04,
+                            "samples": 7
+                        },
+                        "status": "Healthy"
                     },
-                    "status": "Healthy"
-                },
-                "gpu_temp": {
-                    "display": "GPU Temperature",
-                    "category": "GPU",
-                    "unit": "\u00b0C",
-                    "description": "GPU core temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 34.3,
-                        "average": 29.25,
-                        "samples": 10
+                    "gpu_temp": {
+                        "display": "GPU Temperature",
+                        "category": "GPU",
+                        "unit": "\u00b0C",
+                        "description": "GPU core temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 38.4,
+                            "average": 32.9,
+                            "samples": 7
+                        },
+                        "status": "Excellent"
                     },
-                    "status": "Excellent"
-                },
-                "gpu_usage": {
-                    "display": "GPU Usage",
-                    "category": "GPU",
-                    "unit": "%",
-                    "description": "GPU utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 3.0,
-                        "average": 1.0,
-                        "samples": 10
+                    "gpu_usage": {
+                        "display": "GPU Usage",
+                        "category": "GPU",
+                        "unit": "%",
+                        "description": "GPU utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 39.0,
+                            "average": 27.86,
+                            "samples": 7
+                        },
+                        "status": "Healthy"
                     },
-                    "status": "Healthy"
-                },
-                "memory_usage": {
-                    "display": "Memory Usage",
-                    "category": "Memory",
-                    "unit": "%",
-                    "description": "System memory utilization.",
-                    "stats": {
-                        "current": 25.0,
-                        "minimum": 25.0,
-                        "maximum": 54.0,
-                        "average": 50.89,
-                        "samples": 10
+                    "memory_usage": {
+                        "display": "Memory Usage",
+                        "category": "Memory",
+                        "unit": "%",
+                        "description": "System memory utilization.",
+                        "stats": {
+                            "current": 25.0,
+                            "minimum": 25.0,
+                            "maximum": 88.8,
+                            "average": 79.53,
+                            "samples": 7
+                        },
+                        "status": "High"
                     },
-                    "status": "Healthy"
-                },
-                "fps": {
-                    "display": "Average FPS",
-                    "category": "Performance",
-                    "unit": "FPS",
-                    "description": "Average displayed framerate.",
-                    "stats": {
-                        "current": 19.4,
-                        "minimum": 19.4,
-                        "maximum": 74.6,
-                        "average": 68.47,
-                        "samples": 9
-                    },
-                    "status": "Playable"
+                    "fps": {
+                        "display": "Average FPS",
+                        "category": "Performance",
+                        "unit": "FPS",
+                        "description": "Average displayed framerate.",
+                        "stats": {
+                            "current": 60.0,
+                            "minimum": 58.9,
+                            "maximum": 80.9,
+                            "average": 63.3,
+                            "samples": 6
+                        },
+                        "status": "Playable"
+                    }
                 }
             }
-        }
-    },
-    {
-        "id": "1d4c59cc-eb5d-4a31-aa65-eb9647ea340b",
-        "game": "StarCraft II",
-        "hash": "73947ca7fe7f4e4b7c4e1728b6147b2b36334165ae9c2628524349db898f350a",
-        "filename": "SC2 Run 1.CSV",
-        "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\StarCraft II\\SC2 Run 1.CSV",
-        "analyzed_at": "2026-06-30T20:15:36",
-        "report": {
-            "filename": "SC2 Run 1.CSV",
-            "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\SC2 Run 1.CSV",
-            "samples": 3768,
-            "results": {
-                "cpu_temp": {
-                    "display": "CPU Temperature",
-                    "category": "CPU",
-                    "unit": "\u00b0C",
-                    "description": "Overall CPU package temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 88.5,
-                        "average": 72.39,
-                        "samples": 3767
-                    },
-                    "status": "Healthy"
-                },
-                "cpu_usage": {
-                    "display": "CPU Usage",
-                    "category": "CPU",
-                    "unit": "%",
-                    "description": "Overall processor utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 87.7,
-                        "average": 28.96,
-                        "samples": 3767
-                    },
-                    "status": "Healthy"
-                },
-                "gpu_temp": {
-                    "display": "GPU Temperature",
-                    "category": "GPU",
-                    "unit": "\u00b0C",
-                    "description": "GPU core temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 67.2,
-                        "average": 48.48,
-                        "samples": 3767
-                    },
-                    "status": "Excellent"
-                },
-                "gpu_usage": {
-                    "display": "GPU Usage",
-                    "category": "GPU",
-                    "unit": "%",
-                    "description": "GPU utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 68.0,
-                        "average": 36.08,
-                        "samples": 3767
-                    },
-                    "status": "Healthy"
-                },
-                "memory_usage": {
-                    "display": "Memory Usage",
-                    "category": "Memory",
-                    "unit": "%",
-                    "description": "System memory utilization.",
-                    "stats": {
-                        "current": 25.0,
-                        "minimum": 25.0,
-                        "maximum": 73.8,
-                        "average": 67.34,
-                        "samples": 3767
-                    },
-                    "status": "Healthy"
-                },
-                "fps": {
-                    "display": "Average FPS",
-                    "category": "Performance",
-                    "unit": "FPS",
-                    "description": "Average displayed framerate.",
-                    "stats": {
-                        "current": 9.3,
-                        "minimum": 0.0,
-                        "maximum": 239.8,
-                        "average": 49.6,
-                        "samples": 3766
-                    },
-                    "status": "Poor"
-                }
-            }
-        }
-    },
-    {
-        "id": "1d4d07a1-212f-448b-a384-3ea1dcd051f4",
-        "game": "Fortnite",
-        "hash": "ed433bc933be72d248614e6a571da29850e87833a909cfbce0272eebc717be4f",
-        "filename": "Fortnite Test 1.CSV",
-        "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\Fortnite\\Fortnite Test 1.CSV",
-        "analyzed_at": "2026-06-30T20:16:26",
-        "report": {
-            "filename": "Fortnite Test 1.CSV",
-            "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Fortnite Test 1.CSV",
-            "samples": 451,
-            "results": {
-                "cpu_temp": {
-                    "display": "CPU Temperature",
-                    "category": "CPU",
-                    "unit": "\u00b0C",
-                    "description": "Overall CPU package temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 87.0,
-                        "average": 77.8,
-                        "samples": 450
-                    },
-                    "status": "Warm"
-                },
-                "cpu_usage": {
-                    "display": "CPU Usage",
-                    "category": "CPU",
-                    "unit": "%",
-                    "description": "Overall processor utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 99.6,
-                        "average": 58.71,
-                        "samples": 450
-                    },
-                    "status": "Healthy"
-                },
-                "gpu_temp": {
-                    "display": "GPU Temperature",
-                    "category": "GPU",
-                    "unit": "\u00b0C",
-                    "description": "GPU core temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 57.7,
-                        "average": 48.81,
-                        "samples": 450
-                    },
-                    "status": "Excellent"
-                },
-                "gpu_usage": {
-                    "display": "GPU Usage",
-                    "category": "GPU",
-                    "unit": "%",
-                    "description": "GPU utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 70.0,
-                        "average": 42.25,
-                        "samples": 450
-                    },
-                    "status": "Healthy"
-                },
-                "memory_usage": {
-                    "display": "Memory Usage",
-                    "category": "Memory",
-                    "unit": "%",
-                    "description": "System memory utilization.",
-                    "stats": {
-                        "current": 25.0,
-                        "minimum": 25.0,
-                        "maximum": 86.6,
-                        "average": 81.55,
-                        "samples": 450
-                    },
-                    "status": "High"
-                },
-                "fps": {
-                    "display": "Average FPS",
-                    "category": "Performance",
-                    "unit": "FPS",
-                    "description": "Average displayed framerate.",
-                    "stats": {
-                        "current": 2.0,
-                        "minimum": 2.0,
-                        "maximum": 201.8,
-                        "average": 74.58,
-                        "samples": 450
-                    },
-                    "status": "Playable"
-                }
-            }
-        }
-    },
-    {
-        "id": "10133e27-ccd0-429f-9eaa-c65e9ad48043",
-        "game": {
-            "name": "test",
-            "session": 2
         },
-        "source": {
-            "filename": "Test.CSV",
-            "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\test\\Test.CSV",
-            "hash": "8fb7388d42d6f08f7cc212e9591644e5def2a6e9c15efbd6dc055d4ebb5f4fcf"
+        {
+            "id": "1d4d07a1-212f-448b-a384-3ea1dcd051f4",
+            "game": {
+                "name": "Fortnite",
+                "session": 1
+            },
+            "source": {
+                "filename": "Fortnite Test 1.CSV",
+                "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\Fortnite\\Fortnite Test 1.CSV",
+                "hash": "ed433bc933be72d248614e6a571da29850e87833a909cfbce0272eebc717be4f"
+            },
+            "analysis": {
+                "created": "2026-06-30T20:16:26",
+                "version": "0.1.0",
+                "engine": "Legacy Database"
+            },
+            "report": {
+                "filename": "Fortnite Test 1.CSV",
+                "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Fortnite Test 1.CSV",
+                "samples": 451,
+                "results": {
+                    "cpu_temp": {
+                        "display": "CPU Temperature",
+                        "category": "CPU",
+                        "unit": "\u00b0C",
+                        "description": "Overall CPU package temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 87.0,
+                            "average": 77.8,
+                            "samples": 450
+                        },
+                        "status": "Warm"
+                    },
+                    "cpu_usage": {
+                        "display": "CPU Usage",
+                        "category": "CPU",
+                        "unit": "%",
+                        "description": "Overall processor utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 99.6,
+                            "average": 58.71,
+                            "samples": 450
+                        },
+                        "status": "Healthy"
+                    },
+                    "gpu_temp": {
+                        "display": "GPU Temperature",
+                        "category": "GPU",
+                        "unit": "\u00b0C",
+                        "description": "GPU core temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 57.7,
+                            "average": 48.81,
+                            "samples": 450
+                        },
+                        "status": "Excellent"
+                    },
+                    "gpu_usage": {
+                        "display": "GPU Usage",
+                        "category": "GPU",
+                        "unit": "%",
+                        "description": "GPU utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 70.0,
+                            "average": 42.25,
+                            "samples": 450
+                        },
+                        "status": "Healthy"
+                    },
+                    "memory_usage": {
+                        "display": "Memory Usage",
+                        "category": "Memory",
+                        "unit": "%",
+                        "description": "System memory utilization.",
+                        "stats": {
+                            "current": 25.0,
+                            "minimum": 25.0,
+                            "maximum": 86.6,
+                            "average": 81.55,
+                            "samples": 450
+                        },
+                        "status": "High"
+                    },
+                    "fps": {
+                        "display": "Average FPS",
+                        "category": "Performance",
+                        "unit": "FPS",
+                        "description": "Average displayed framerate.",
+                        "stats": {
+                            "current": 2.0,
+                            "minimum": 2.0,
+                            "maximum": 201.8,
+                            "average": 74.58,
+                            "samples": 450
+                        },
+                        "status": "Playable"
+                    }
+                }
+            }
         },
-        "analysis": {
-            "created": "2026-07-01T15:52:40",
-            "version": "0.2.0",
-            "engine": "Sentinel Analysis Engine"
+        {
+            "id": "42681cbb-7098-4ba5-971e-ace5fdbdb190",
+            "game": {
+                "name": "test",
+                "session": 1
+            },
+            "source": {
+                "filename": "Logging_Testing.CSV",
+                "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\test\\Logging_Testing.CSV",
+                "hash": "42b2ab616c951d92d2d81edc951943c5b538380e2f1334ba81c433013cbb1425"
+            },
+            "analysis": {
+                "created": "2026-06-30T20:15:36",
+                "version": "0.1.0",
+                "engine": "Legacy Database"
+            },
+            "report": {
+                "filename": "Logging_Testing.CSV",
+                "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Logging_Testing.CSV",
+                "samples": 11,
+                "results": {
+                    "cpu_temp": {
+                        "display": "CPU Temperature",
+                        "category": "CPU",
+                        "unit": "\u00b0C",
+                        "description": "Overall CPU package temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 73.5,
+                            "average": 58.65,
+                            "samples": 10
+                        },
+                        "status": "Excellent"
+                    },
+                    "cpu_usage": {
+                        "display": "CPU Usage",
+                        "category": "CPU",
+                        "unit": "%",
+                        "description": "Overall processor utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 16.7,
+                            "average": 7.93,
+                            "samples": 10
+                        },
+                        "status": "Healthy"
+                    },
+                    "gpu_temp": {
+                        "display": "GPU Temperature",
+                        "category": "GPU",
+                        "unit": "\u00b0C",
+                        "description": "GPU core temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 34.3,
+                            "average": 29.25,
+                            "samples": 10
+                        },
+                        "status": "Excellent"
+                    },
+                    "gpu_usage": {
+                        "display": "GPU Usage",
+                        "category": "GPU",
+                        "unit": "%",
+                        "description": "GPU utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 3.0,
+                            "average": 1.0,
+                            "samples": 10
+                        },
+                        "status": "Healthy"
+                    },
+                    "memory_usage": {
+                        "display": "Memory Usage",
+                        "category": "Memory",
+                        "unit": "%",
+                        "description": "System memory utilization.",
+                        "stats": {
+                            "current": 25.0,
+                            "minimum": 25.0,
+                            "maximum": 54.0,
+                            "average": 50.89,
+                            "samples": 10
+                        },
+                        "status": "Healthy"
+                    },
+                    "fps": {
+                        "display": "Average FPS",
+                        "category": "Performance",
+                        "unit": "FPS",
+                        "description": "Average displayed framerate.",
+                        "stats": {
+                            "current": 19.4,
+                            "minimum": 19.4,
+                            "maximum": 74.6,
+                            "average": 68.47,
+                            "samples": 9
+                        },
+                        "status": "Playable"
+                    }
+                }
+            }
         },
-        "report": {
-            "filename": "Test.CSV",
-            "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\Test.CSV",
-            "samples": 8,
-            "results": {
-                "cpu_temp": {
-                    "display": "CPU Temperature",
-                    "category": "CPU",
-                    "unit": "\u00b0C",
-                    "description": "Overall CPU package temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 78.2,
-                        "average": 62.96,
-                        "samples": 7
+        {
+            "id": "1d4c59cc-eb5d-4a31-aa65-eb9647ea340b",
+            "game": {
+                "name": "StarCraft II",
+                "session": 1
+            },
+            "source": {
+                "filename": "SC2 Run 1.CSV",
+                "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\StarCraft II\\SC2 Run 1.CSV",
+                "hash": "73947ca7fe7f4e4b7c4e1728b6147b2b36334165ae9c2628524349db898f350a"
+            },
+            "analysis": {
+                "created": "2026-06-30T20:15:36",
+                "version": "0.1.0",
+                "engine": "Legacy Database"
+            },
+            "report": {
+                "filename": "SC2 Run 1.CSV",
+                "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\SC2 Run 1.CSV",
+                "samples": 3768,
+                "results": {
+                    "cpu_temp": {
+                        "display": "CPU Temperature",
+                        "category": "CPU",
+                        "unit": "\u00b0C",
+                        "description": "Overall CPU package temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 88.5,
+                            "average": 72.39,
+                            "samples": 3767
+                        },
+                        "status": "Healthy"
                     },
-                    "status": "Excellent"
-                },
-                "cpu_usage": {
-                    "display": "CPU Usage",
-                    "category": "CPU",
-                    "unit": "%",
-                    "description": "Overall processor utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 31.8,
-                        "average": 18.04,
-                        "samples": 7
+                    "cpu_usage": {
+                        "display": "CPU Usage",
+                        "category": "CPU",
+                        "unit": "%",
+                        "description": "Overall processor utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 87.7,
+                            "average": 28.96,
+                            "samples": 3767
+                        },
+                        "status": "Healthy"
                     },
-                    "status": "Healthy"
-                },
-                "gpu_temp": {
-                    "display": "GPU Temperature",
-                    "category": "GPU",
-                    "unit": "\u00b0C",
-                    "description": "GPU core temperature.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 38.4,
-                        "average": 32.9,
-                        "samples": 7
+                    "gpu_temp": {
+                        "display": "GPU Temperature",
+                        "category": "GPU",
+                        "unit": "\u00b0C",
+                        "description": "GPU core temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 67.2,
+                            "average": 48.48,
+                            "samples": 3767
+                        },
+                        "status": "Excellent"
                     },
-                    "status": "Excellent"
-                },
-                "gpu_usage": {
-                    "display": "GPU Usage",
-                    "category": "GPU",
-                    "unit": "%",
-                    "description": "GPU utilization.",
-                    "stats": {
-                        "current": 0.0,
-                        "minimum": 0.0,
-                        "maximum": 39.0,
-                        "average": 27.86,
-                        "samples": 7
+                    "gpu_usage": {
+                        "display": "GPU Usage",
+                        "category": "GPU",
+                        "unit": "%",
+                        "description": "GPU utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 68.0,
+                            "average": 36.08,
+                            "samples": 3767
+                        },
+                        "status": "Healthy"
                     },
-                    "status": "Healthy"
-                },
-                "memory_usage": {
-                    "display": "Memory Usage",
-                    "category": "Memory",
-                    "unit": "%",
-                    "description": "System memory utilization.",
-                    "stats": {
-                        "current": 25.0,
-                        "minimum": 25.0,
-                        "maximum": 88.8,
-                        "average": 79.53,
-                        "samples": 7
+                    "memory_usage": {
+                        "display": "Memory Usage",
+                        "category": "Memory",
+                        "unit": "%",
+                        "description": "System memory utilization.",
+                        "stats": {
+                            "current": 25.0,
+                            "minimum": 25.0,
+                            "maximum": 73.8,
+                            "average": 67.34,
+                            "samples": 3767
+                        },
+                        "status": "Healthy"
                     },
-                    "status": "High"
-                },
-                "fps": {
-                    "display": "Average FPS",
-                    "category": "Performance",
-                    "unit": "FPS",
-                    "description": "Average displayed framerate.",
-                    "stats": {
-                        "current": 60.0,
-                        "minimum": 58.9,
-                        "maximum": 80.9,
-                        "average": 63.3,
-                        "samples": 6
+                    "fps": {
+                        "display": "Average FPS",
+                        "category": "Performance",
+                        "unit": "FPS",
+                        "description": "Average displayed framerate.",
+                        "stats": {
+                            "current": 9.3,
+                            "minimum": 0.0,
+                            "maximum": 239.8,
+                            "average": 49.6,
+                            "samples": 3766
+                        },
+                        "status": "Poor"
+                    }
+                }
+            }
+        },
+        {
+            "id": "0285096c-b969-4cd3-aba2-6060db33c36b",
+            "game": {
+                "name": "idle",
+                "session": 1
+            },
+            "source": {
+                "filename": "idle.CSV",
+                "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\idle\\idle.CSV",
+                "hash": "b04b602f8d6b1e94ced9b34c18367911f2b51d955f4d0a57fa0abf924082ae56"
+            },
+            "analysis": {
+                "created": "2026-07-01T19:35:07",
+                "version": "0.2.0",
+                "engine": "Sentinel Analysis Engine"
+            },
+            "report": {
+                "filename": "idle.CSV",
+                "filepath": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\incoming\\idle.CSV",
+                "samples": 70,
+                "results": {
+                    "cpu_temp": {
+                        "display": "CPU Temperature",
+                        "category": "CPU",
+                        "unit": "\u00b0C",
+                        "description": "Overall CPU package temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 73.0,
+                            "average": 61.68,
+                            "samples": 69
+                        },
+                        "status": "Excellent"
                     },
-                    "status": "Playable"
+                    "cpu_usage": {
+                        "display": "CPU Usage",
+                        "category": "CPU",
+                        "unit": "%",
+                        "description": "Overall processor utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 19.3,
+                            "average": 8.87,
+                            "samples": 69
+                        },
+                        "status": "Healthy"
+                    },
+                    "gpu_temp": {
+                        "display": "GPU Temperature",
+                        "category": "GPU",
+                        "unit": "\u00b0C",
+                        "description": "GPU core temperature.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 37.7,
+                            "average": 34.98,
+                            "samples": 69
+                        },
+                        "status": "Excellent"
+                    },
+                    "gpu_usage": {
+                        "display": "GPU Usage",
+                        "category": "GPU",
+                        "unit": "%",
+                        "description": "GPU utilization.",
+                        "stats": {
+                            "current": 0.0,
+                            "minimum": 0.0,
+                            "maximum": 35.0,
+                            "average": 11.93,
+                            "samples": 69
+                        },
+                        "status": "Healthy"
+                    },
+                    "memory_usage": {
+                        "display": "Memory Usage",
+                        "category": "Memory",
+                        "unit": "%",
+                        "description": "System memory utilization.",
+                        "stats": {
+                            "current": 25.0,
+                            "minimum": 25.0,
+                            "maximum": 95.9,
+                            "average": 93.45,
+                            "samples": 69
+                        },
+                        "status": "Critical"
+                    },
+                    "fps": {
+                        "display": "Average FPS",
+                        "category": "Performance",
+                        "unit": "FPS",
+                        "description": "Average displayed framerate.",
+                        "stats": {
+                            "current": 5.1,
+                            "minimum": 0.2,
+                            "maximum": 230.1,
+                            "average": 37.76,
+                            "samples": 68
+                        },
+                        "status": "Poor"
+                    }
                 }
             }
         }
-    }
-]
+    ]
+}

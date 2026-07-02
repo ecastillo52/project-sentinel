@@ -5,7 +5,7 @@ Project Sentinel
 
 Database Layer
 
-Responsible for storing and retrieving Sentinel Sessions.
+Responsible for storing and retrieving analyzed sessions.
 """
 
 import json
@@ -15,9 +15,11 @@ from datetime import datetime
 from pathlib import Path
 
 from core.config import DATABASE_FILE
-
+from core.models.session import Session
 from .hashing import file_hash
-from ..models.session import Session
+
+
+DATABASE_VERSION = "0.2.0"
 
 
 # ==========================================================
@@ -36,10 +38,7 @@ def _ensure_database():
 
     if not DATABASE_FILE.exists():
 
-        DATABASE_FILE.write_text(
-            "[]",
-            encoding="utf-8"
-        )
+        save_database([])
 
 
 # ==========================================================
@@ -47,6 +46,9 @@ def _ensure_database():
 # ==========================================================
 
 def load_database():
+    """
+    Returns the raw database dictionary.
+    """
 
     _ensure_database()
 
@@ -58,16 +60,68 @@ def load_database():
             encoding="utf-8"
         ) as f:
 
-            return json.load(f)
+            data = json.load(f)
 
     except json.JSONDecodeError:
 
-        return []
+        data = None
+
+    #
+    # Brand new database
+    #
+    if not data:
+
+        data = {
+            "version": DATABASE_VERSION,
+            "sessions": []
+        }
+
+    #
+    # Legacy database (0.1.x)
+    #
+    elif isinstance(data, list):
+
+        data = {
+            "version": "0.1.0",
+            "sessions": data
+        }
+
+    #
+    # Safety
+    #
+    data.setdefault(
+        "version",
+        DATABASE_VERSION
+    )
+
+    data.setdefault(
+        "sessions",
+        []
+    )
+
+    return data
 
 
-def save_database(database):
+def save_database(sessions):
+    """
+    Save Session objects back to disk.
+    """
 
-    _ensure_database()
+    database = {
+
+        "version": DATABASE_VERSION,
+
+        "sessions": [
+
+            session.to_dict()
+
+            if isinstance(session, Session)
+
+            else session
+
+            for session in sessions
+        ]
+    }
 
     with open(
         DATABASE_FILE,
@@ -88,30 +142,38 @@ def clear_database():
 
 
 # ==========================================================
-# Session Queries
+# Queries
 # ==========================================================
+
+def get_database_version():
+
+    return load_database()["version"]
+
 
 def get_all_sessions():
     """
-    Returns every session as Session objects.
+    Returns Session objects.
     """
+
+    database = load_database()
 
     sessions = [
 
         Session.from_dict(record)
 
-        for record in load_database()
+        for record in database["sessions"]
 
     ]
 
-    return sorted(
-        sessions,
-        key=lambda s: s.date,
+    sessions.sort(
+        key=lambda s: s.analyzed_at,
         reverse=True
     )
 
+    return sessions
 
-def get_session_by_id(session_id):
+
+def get_session(session_id):
 
     for session in get_all_sessions():
 
@@ -148,55 +210,36 @@ def record_exists(file_path):
 
 
 # ==========================================================
-# Session Numbering
+# Helpers
 # ==========================================================
 
-def get_next_session_number(game):
+def next_session_number(game):
     """
-    Returns the next session number
-    for a particular game.
+    Determine the next session number
+    for a given game.
     """
 
     sessions = [
 
-        session
+        s
 
-        for session in get_all_sessions()
+        for s in get_all_sessions()
 
-        if session.game.lower() == game.lower()
+        if s.game == game
 
     ]
 
     if not sessions:
-
         return 1
 
     return max(
-
-        session.session_number
-
-        for session in sessions
-
+        s.session_number
+        for s in sessions
     ) + 1
 
 
 # ==========================================================
 # Insert
-# ==========================================================
-
-def insert_session(session):
-
-    database = load_database()
-
-    database.append(
-        session.to_dict()
-    )
-
-    save_database(database)
-
-
-# ==========================================================
-# Public API
 # ==========================================================
 
 def add_analysis(
@@ -207,21 +250,19 @@ def add_analysis(
     report
 ):
     """
-    Create and store a Session.
-
-    Returns
-    -------
-    Session | None
+    Save one completed Sentinel analysis.
     """
 
     archive_path = Path(archive_path)
 
-    archive_hash = file_hash(archive_path)
+    archive_hash = file_hash(
+        archive_path
+    )
 
     if get_session_by_hash(
         archive_hash
     ):
-        return None
+        return False
 
     session = Session(
 
@@ -229,7 +270,7 @@ def add_analysis(
 
         game=game,
 
-        session_number=get_next_session_number(
+        session_number=next_session_number(
             game
         ),
 
@@ -247,10 +288,13 @@ def add_analysis(
             timespec="seconds"
         ),
 
-        report=report
-
+        report=report,
     )
 
-    insert_session(session)
+    sessions = get_all_sessions()
 
-    return session
+    sessions.append(session)
+
+    save_database(sessions)
+
+    return True

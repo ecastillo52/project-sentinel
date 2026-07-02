@@ -1,88 +1,150 @@
-# core/reporter.py
+# core/engine/reporter.py
 
 """
 Project Sentinel
 
-Console Reporter
+Report Renderer
+
+Responsible for rendering analysis reports to the console.
 """
 
-from datetime import datetime
+from collections import OrderedDict
+
+from core.models.session import Session
 
 
-DIVIDER = "=" * 70
-SECTION = "-" * 70
+# ==========================================================
+# Helpers
+# ==========================================================
+
+def divider():
+
+    print("-" * 70)
 
 
-def _value(value, unit):
+def heading(title):
 
-    if isinstance(value, float):
+    print()
+    print("=" * 70)
+    print(title)
+    print("=" * 70)
 
-        return f"{value:.2f} {unit}"
 
-    return f"{value} {unit}"
+def section(title):
+
+    print()
+    print(f"[ {title} ]")
+    print()
 
 
-def format_sensor(sensor):
+# ==========================================================
+# Sensor Rendering
+# ==========================================================
+
+def print_sensor(sensor):
+    """
+    Render one analyzed sensor.
+    """
 
     stats = sensor["stats"]
 
-    if stats is None:
+    divider()
 
-        return (
-            f"{sensor['display']}\n"
-            f"{SECTION}\n"
-            "No data available.\n"
-        )
+    print(sensor["display"])
 
-    return (
-        f"{sensor['display']}\n"
-        f"{SECTION}\n"
-        f"Current : {_value(stats['current'], sensor['unit'])}\n"
-        f"Minimum : {_value(stats['minimum'], sensor['unit'])}\n"
-        f"Maximum : {_value(stats['maximum'], sensor['unit'])}\n"
-        f"Average : {_value(stats['average'], sensor['unit'])}\n"
-        f"Samples : {stats['samples']}\n"
-        f"Status  : {sensor['status']}\n"
+    divider()
+
+    print(
+        f"Current : "
+        f"{stats['current']:.2f} {sensor['unit']}"
+    )
+
+    print(
+        f"Minimum : "
+        f"{stats['minimum']:.2f} {sensor['unit']}"
+    )
+
+    print(
+        f"Maximum : "
+        f"{stats['maximum']:.2f} {sensor['unit']}"
+    )
+
+    print(
+        f"Average : "
+        f"{stats['average']:.2f} {sensor['unit']}"
+    )
+
+    print(
+        f"Samples : "
+        f"{stats['samples']}"
+    )
+
+    print(
+        f"Status  : "
+        f"{sensor['status']}"
     )
 
 
+# ==========================================================
+# Report Rendering
+# ==========================================================
+
 def print_report(report):
+    """
+    Render an analysis report.
+    """
 
-    print()
-
-    print(DIVIDER)
-    print("PROJECT SENTINEL")
-    print(DIVIDER)
+    heading("PROJECT SENTINEL")
 
     print(f"File     : {report['filename']}")
     print(f"Samples  : {report['samples']}")
-    print(
-        f"Generated: "
-        f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    )
 
-    current_category = None
+    categories = OrderedDict()
 
     for sensor in report["results"].values():
 
-        if sensor["category"] != current_category:
+        category = sensor["category"]
 
-            current_category = sensor["category"]
+        categories.setdefault(
+            category,
+            []
+        ).append(sensor)
 
-            print()
-            print(f"[ {current_category} ]")
-            print()
+    for category, sensors in categories.items():
 
-        print(
-            format_sensor(sensor)
-        )
+        section(category)
 
-    print(DIVIDER)
+        for sensor in sensors:
+
+            print_sensor(sensor)
 
 
-def print_saved_session(session):
+# ==========================================================
+# Saved Sessions
+# ==========================================================
+
+def print_saved_session(session: Session):
     """
-    Display a previously saved Session.
+    Render a saved Sentinel session.
     """
+
+    heading(session.game)
+
+    print(f"Session : {session.session_number}")
+
+    print(
+        "Analyzed: "
+        f"{session.date.strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+
+    print(f"Source  : {session.filename}")
+
+    print(f"Archive : {session.archive}")
+
+    print(f"Version : {session.version}")
+
+    print(f"Engine  : {session.engine}")
+
+    print()
 
     print_report(session.report)

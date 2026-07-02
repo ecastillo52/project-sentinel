@@ -26,7 +26,7 @@ from pathlib import Path
 
 APP_NAME = "Project Sentinel"
 
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0 - UI is born"
 
 AUTHOR = "Erik Castillo"
 
