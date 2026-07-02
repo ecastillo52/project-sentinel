@@ -14,6 +14,7 @@ Each function returns a list of intelligence statements
 for a specific report section.
 """
 
+from core.models.session import Session
 from core.history import insights
 
 
@@ -21,7 +22,9 @@ from core.history import insights
 # Performance
 # ==========================================================
 
-def performance(history) -> list[str]:
+def performance(
+    history: list[Session],
+) -> list[str]:
     """
     Generate performance intelligence.
     """
@@ -58,7 +61,9 @@ def performance(history) -> list[str]:
 # CPU
 # ==========================================================
 
-def cpu(history) -> list[str]:
+def cpu(
+    history: list[Session],
+) -> list[str]:
     """
     Generate CPU intelligence.
     """
@@ -97,7 +102,9 @@ def cpu(history) -> list[str]:
 # GPU
 # ==========================================================
 
-def gpu(history) -> list[str]:
+def gpu(
+    history: list[Session],
+) -> list[str]:
     """
     Generate GPU intelligence.
     """
@@ -109,7 +116,9 @@ def gpu(history) -> list[str]:
 # Memory
 # ==========================================================
 
-def memory(history) -> list[str]:
+def memory(
+    history: list[Session],
+) -> list[str]:
     """
     Generate memory intelligence.
     """

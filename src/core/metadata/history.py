@@ -11,13 +11,17 @@ Responsible for browsing previously analyzed Sentinel sessions.
 from core.metadata.database import get_all_sessions
 
 
+HEADER = "=" * 70
+DIVIDER = "-" * 70
+
+
 # ==========================================================
 # Session Queries
 # ==========================================================
 
 def get_sessions():
     """
-    Returns every stored Session.
+    Return every stored Session.
     """
 
     return get_all_sessions()
@@ -25,7 +29,7 @@ def get_sessions():
 
 def get_session(index):
     """
-    Returns a Session by list index.
+    Return a Session by list index.
     """
 
     sessions = get_sessions()
@@ -38,7 +42,7 @@ def get_session(index):
 
 def get_sessions_for_game(game):
     """
-    Returns every session for a specific game.
+    Return every session for a specific game.
     """
 
     return [
@@ -54,18 +58,16 @@ def get_sessions_for_game(game):
 
 def get_games():
     """
-    Returns every game currently stored.
+    Return every stored game.
     """
 
-    games = {
+    return sorted({
 
         session.game
 
         for session in get_sessions()
 
-    }
-
-    return sorted(games)
+    })
 
 
 # ==========================================================
@@ -75,20 +77,6 @@ def get_games():
 def build_history_tree():
     """
     Build a grouped history structure.
-
-    Returns:
-
-    {
-        "Fortnite": [
-            Session,
-            Session,
-            Session
-        ],
-
-        "StarCraft II": [
-            Session
-        ]
-    }
     """
 
     tree = {}
@@ -110,13 +98,36 @@ def build_history_tree():
         sorted(tree.items())
     )
 
+
+# ==========================================================
+# Printing
+# ==========================================================
+
+def _print_session(index, session):
+
+    print(
+        f"{index:>2}. "
+        f"Session {session.session_number}"
+    )
+
+    print(
+        f"    {session.date.strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+
+    print(
+        f"    {session.filename}"
+    )
+
+    print()
+
+
 def print_history():
 
     tree = build_history_tree()
 
-    print("=" * 70)
+    print(HEADER)
     print("Sentinel History")
-    print("=" * 70)
+    print(HEADER)
     print()
 
     if not tree:
@@ -129,23 +140,13 @@ def print_history():
     for game, sessions in tree.items():
 
         print(game)
-        print("-" * 70)
+        print(DIVIDER)
 
         for session in sessions:
 
-            print(
-                f"{index:>2}. "
-                f"Session {session.session_number}"
+            _print_session(
+                index,
+                session
             )
-
-            print(
-                f"    {session.date.strftime('%Y-%m-%d %H:%M:%S')}"
-            )
-
-            print(
-                f"    {session.filename}"
-            )
-
-            print()
 
             index += 1

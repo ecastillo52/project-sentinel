@@ -1,33 +1,65 @@
 # core/ingest.py
 
-from datetime import datetime
-from Programming.Sentinel.src.core.engine.reader import load_hwinfo_log
-from ..engine.sensors import get_sensor
-from database import insert_record
+"""
+Project Sentinel
 
+Ingestion Pipeline
+
+Coordinates the complete processing of a single HWiNFO log.
+
+Pipeline
+
+    Detect Game
+        ↓
+    Analyze Log
+        ↓
+    Archive Log
+        ↓
+    Store Session
+"""
+
+from pathlib import Path
+
+from .archive import archive_log
+from .database import add_analysis
+from .game_detector import prompt_for_game
+
+from ..engine.processor import run
+
+
+# ==========================================================
+# Public API
+# ==========================================================
 
 def process_file(file_path):
     """
-    Reads + analyzes + stores ONE CSV file.
+    Process one HWiNFO log from start to finish.
+
+    Returns
+    -------
+    dict
+        Completed Sentinel report.
     """
 
-    log = load_hwinfo_log(file_path)
+    file_path = Path(file_path)
 
-    record = {
-        "filename": log["filename"],
-        "filepath": log["filepath"],
-        "timestamp": datetime.utcnow().isoformat(),
+    game = prompt_for_game(file_path.name)
 
-        "metrics": {
-            "cpu_temp": get_sensor(log, "cpu_temp"),
-            "cpu_usage": get_sensor(log, "cpu_usage"),
-            "gpu_temp": get_sensor(log, "gpu_temp"),
-            "gpu_usage": get_sensor(log, "gpu_usage"),
-            "ram_usage": get_sensor(log, "ram_usage"),
-            "fps": get_sensor(log, "fps"),
-        }
-    }
+    report = run(
+        file_path,
+        game=game,
+    )
 
-    insert_record(record)
+    archived_path = archive_log(
+        file_path,
+        game,
+    )
 
-    return record
+    add_analysis(
+        original_path=file_path,
+        archive_path=archived_path,
+        game=game,
+        report=report,
+    )
+
+    return report

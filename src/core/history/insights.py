@@ -5,11 +5,12 @@ Project Sentinel
 
 History Insights
 
-Generates high-level observations from
-historical Sentinel data.
+Generates high-level observations from historical
+Sentinel data.
 
 This module performs no rendering.
-It only produces human-readable insights.
+It only produces high-level observations derived from
+saved Session objects.
 """
 
 from core.models.session import Session
@@ -18,20 +19,63 @@ from . import metrics
 from . import trends
 
 
+# ==========================================================
+# Internal Helpers
+# ==========================================================
+
+def _sensor_stat(
+    session: Session,
+    sensor_id: str,
+    statistic: str,
+) -> float | None:
+    """
+    Safely retrieve a sensor statistic.
+    """
+
+    sensors = session.report.get("sensors", {})
+
+    sensor = sensors.get(sensor_id)
+
+    if sensor is None:
+        return None
+
+    stats = sensor.get("stats", {})
+
+    return stats.get(statistic)
+
+
+# ==========================================================
+# Session Insights
+# ==========================================================
+
 def hottest_cpu_session(
     sessions: list[Session],
 ) -> Session | None:
     """
-    Return the session with the hottest CPU.
+    Return the session with the highest CPU temperature.
     """
 
-    if not sessions:
+    valid = [
+        session
+        for session in sessions
+        if _sensor_stat(
+            session,
+            "cpu_temp",
+            "maximum",
+        )
+        is not None
+    ]
+
+    if not valid:
         return None
 
     return max(
-        sessions,
-        key=lambda session:
-        session.report["sensors"]["cpu_temp"]["stats"]["maximum"]
+        valid,
+        key=lambda session: _sensor_stat(
+            session,
+            "cpu_temp",
+            "maximum",
+        ),
     )
 
 
@@ -39,18 +83,36 @@ def best_fps_session(
     sessions: list[Session],
 ) -> Session | None:
     """
-    Return the session with the highest FPS.
+    Return the session with the highest average FPS.
     """
 
-    if not sessions:
+    valid = [
+        session
+        for session in sessions
+        if _sensor_stat(
+            session,
+            "fps",
+            "average",
+        )
+        is not None
+    ]
+
+    if not valid:
         return None
 
     return max(
-        sessions,
-        key=lambda session:
-        session.report["sensors"]["fps"]["stats"]["average"]
+        valid,
+        key=lambda session: _sensor_stat(
+            session,
+            "fps",
+            "average",
+        ),
     )
 
+
+# ==========================================================
+# Trend Insights
+# ==========================================================
 
 def cpu_temperature_direction(
     sessions: list[Session],
@@ -87,6 +149,10 @@ def fps_direction(
 
     return trends.direction(trend)
 
+
+# ==========================================================
+# Historical Metrics
+# ==========================================================
 
 def historical_average_fps(
     sessions: list[Session],

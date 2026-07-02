@@ -151,7 +151,7 @@ def print_sensors(report):
     print("Sensor Reports")
     blank()
 
-    categories = OrderedDict()
+    categories = {}
 
     for sensor in report["sensors"].values():
         categories.setdefault(
@@ -179,7 +179,12 @@ def print_sensor(sensor):
     section()
     blank()
 
-    stats = sensor["stats"]
+    stats = sensor.get("stats")
+
+    if not stats:
+        field("Status", "Unavailable")
+        blank()
+        return
 
     field("Current", format_value(stats["current"], sensor["unit"]))
     field("Average", format_value(stats["average"], sensor["unit"]))

@@ -13,12 +13,28 @@ This module performs no analysis.
 It summarizes data that has already been analyzed.
 """
 
+from typing import Any
+
+
+# ==========================================================
+# Constants
+# ==========================================================
+
+HEALTH_PRIORITY = (
+    "Critical",
+    "Poor",
+    "High",
+    "Warm",
+    "Healthy",
+    "Excellent",
+)
+
 
 # ==========================================================
 # Public API
 # ==========================================================
 
-def build_summary(report):
+def build_summary(report: dict[str, Any]) -> dict[str, Any]:
     """
     Build the session summary.
 
@@ -46,31 +62,31 @@ def build_summary(report):
 # Summary Builders
 # ==========================================================
 
-def _average_fps(report):
+def _average_fps(report: dict[str, Any]) -> float | None:
     """Return the average FPS."""
 
-    return _sensor_average(report, "fps")
+    return _sensor_stat(report, "fps", "average")
 
 
-def _peak_cpu_temp(report):
+def _peak_cpu_temp(report: dict[str, Any]) -> float | None:
     """Return the peak CPU temperature."""
 
-    return _sensor_maximum(report, "cpu_temp")
+    return _sensor_stat(report, "cpu_temp", "maximum")
 
 
-def _peak_gpu_temp(report):
+def _peak_gpu_temp(report: dict[str, Any]) -> float | None:
     """Return the peak GPU temperature."""
 
-    return _sensor_maximum(report, "gpu_temp")
+    return _sensor_stat(report, "gpu_temp", "maximum")
 
 
-def _peak_ram_usage(report):
+def _peak_ram_usage(report: dict[str, Any]) -> float | None:
     """Return the peak memory load."""
 
-    return _sensor_maximum(report, "memory_load")
+    return _sensor_stat(report, "memory_load", "maximum")
 
 
-def _overall_health(report):
+def _overall_health(report: dict[str, Any]) -> str:
     """
     Determine overall session health.
 
@@ -84,28 +100,16 @@ def _overall_health(report):
         Excellent
     """
 
-    priorities = [
-        "Critical",
-        "Poor",
-        "High",
-        "Warm",
-        "Healthy",
-        "Excellent",
-    ]
+    statuses = {
+        (
+            sensor["status"]
+            if not isinstance(sensor["status"], dict)
+            else sensor["status"].get("status", "Unknown")
+        )
+        for sensor in report["sensors"].values()
+    }
 
-    statuses = []
-
-    for sensor in report["sensors"].values():
-
-        status = sensor["status"]
-
-        if isinstance(status, dict):
-            status = status.get("status", "Unknown")
-
-        statuses.append(status)
-
-    for level in priorities:
-
+    for level in HEALTH_PRIORITY:
         if level in statuses:
             return level
 
@@ -116,23 +120,26 @@ def _overall_health(report):
 # Helpers
 # ==========================================================
 
-def _sensor_average(report, sensor_id):
-    """Return a sensor's average value."""
+def _sensor_stat(
+    report: dict[str, Any],
+    sensor_id: str,
+    stat: str,
+) -> float | None:
+    """
+    Return a statistic from a sensor.
+
+    Returns None if the sensor or its statistics
+    are unavailable.
+    """
 
     sensor = report["sensors"].get(sensor_id)
 
     if sensor is None:
         return None
 
-    return sensor["stats"]["average"]
+    stats = sensor.get("stats")
 
-
-def _sensor_maximum(report, sensor_id):
-    """Return a sensor's maximum value."""
-
-    sensor = report["sensors"].get(sensor_id)
-
-    if sensor is None:
+    if stats is None:
         return None
 
-    return sensor["stats"]["maximum"]
+    return stats.get(stat)

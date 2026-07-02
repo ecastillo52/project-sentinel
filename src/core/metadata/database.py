@@ -37,8 +37,43 @@ def _ensure_database():
     )
 
     if not DATABASE_FILE.exists():
-
         save_database([])
+
+
+def _create_session(
+    *,
+    original_path,
+    archive_path,
+    game,
+    report,
+    archive_hash,
+):
+    """
+    Build a Session object.
+    """
+
+    return Session(
+
+        id=str(uuid.uuid4()),
+
+        game=game,
+
+        session_number=next_session_number(game),
+
+        filename=Path(original_path).name,
+
+        archive_path=str(
+            archive_path.resolve()
+        ),
+
+        hash=archive_hash,
+
+        analyzed_at=datetime.now().isoformat(
+            timespec="seconds"
+        ),
+
+        report=report,
+    )
 
 
 # ==========================================================
@@ -47,7 +82,7 @@ def _ensure_database():
 
 def load_database():
     """
-    Returns the raw database dictionary.
+    Return the raw database dictionary.
     """
 
     _ensure_database()
@@ -66,9 +101,6 @@ def load_database():
 
         data = None
 
-    #
-    # Brand new database
-    #
     if not data:
 
         data = {
@@ -76,9 +108,6 @@ def load_database():
             "sessions": []
         }
 
-    #
-    # Legacy database (0.1.x)
-    #
     elif isinstance(data, list):
 
         data = {
@@ -86,9 +115,6 @@ def load_database():
             "sessions": data
         }
 
-    #
-    # Safety
-    #
     data.setdefault(
         "version",
         DATABASE_VERSION
@@ -152,16 +178,14 @@ def get_database_version():
 
 def get_all_sessions():
     """
-    Returns Session objects.
+    Return Session objects sorted newest first.
     """
-
-    database = load_database()
 
     sessions = [
 
         Session.from_dict(record)
 
-        for record in database["sessions"]
+        for record in load_database()["sessions"]
 
     ]
 
@@ -197,12 +221,9 @@ def record_exists(file_path):
 
     try:
 
-        return (
-            get_session_by_hash(
-                file_hash(file_path)
-            )
-            is not None
-        )
+        return get_session_by_hash(
+            file_hash(file_path)
+        ) is not None
 
     except FileNotFoundError:
 
@@ -215,26 +236,22 @@ def record_exists(file_path):
 
 def next_session_number(game):
     """
-    Determine the next session number
-    for a given game.
+    Determine the next session number for a game.
     """
 
-    sessions = [
+    numbers = [
 
-        s
+        session.session_number
 
-        for s in get_all_sessions()
+        for session in get_all_sessions()
 
-        if s.game == game
+        if session.game == game
 
     ]
 
-    if not sessions:
-        return 1
-
     return max(
-        s.session_number
-        for s in sessions
+        numbers,
+        default=0
     ) + 1
 
 
@@ -264,31 +281,12 @@ def add_analysis(
     ):
         return False
 
-    session = Session(
-
-        id=str(uuid.uuid4()),
-
+    session = _create_session(
+        original_path=original_path,
+        archive_path=archive_path,
         game=game,
-
-        session_number=next_session_number(
-            game
-        ),
-
-        filename=Path(
-            original_path
-        ).name,
-
-        archive_path=str(
-            archive_path.resolve()
-        ),
-
-        hash=archive_hash,
-
-        analyzed_at=datetime.now().isoformat(
-            timespec="seconds"
-        ),
-
         report=report,
+        archive_hash=archive_hash,
     )
 
     sessions = get_all_sessions()

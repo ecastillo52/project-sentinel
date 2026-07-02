@@ -19,6 +19,14 @@ from core.models.session import Session
 
 
 # ==========================================================
+# Constants
+# ==========================================================
+
+MENU_WIDTH = 54
+INVALID_SELECTION = "\nInvalid selection."
+
+
+# ==========================================================
 # Public API
 # ==========================================================
 
@@ -35,56 +43,30 @@ def select_game(
         Selected game name or None if cancelled.
     """
 
-    games = game_counts(history)
+    names = get_games(history)
 
-    if not games:
-
+    if not names:
         print("No historical sessions found.")
         return None
 
-    print("=" * 54)
-    print("Choose a Game")
-    print("=" * 54)
-    print()
-
-    names = sorted(games.keys())
-
-    for index, game in enumerate(names, start=1):
-
-        count = games[game]
-
-        session_text = (
-            "session"
-            if count == 1
-            else "sessions"
-        )
-
-        print(
-            f"{index}. "
-            f"{game} "
-            f"({count} {session_text})"
-        )
-
-    print()
+    print_menu(names, game_counts(history))
 
     selection = input(
         "Selection (Enter to return): "
     ).strip()
 
-    if selection == "":
+    if not selection:
         return None
 
     try:
         selection = int(selection)
 
     except ValueError:
-
-        print("\nInvalid selection.")
+        print(INVALID_SELECTION)
         return None
 
     if not 1 <= selection <= len(names):
-
-        print("\nInvalid selection.")
+        print(INVALID_SELECTION)
         return None
 
     return names[selection - 1]
@@ -108,3 +90,47 @@ def game_counts(
             for session in history
         )
     )
+
+
+def get_games(
+    history: list[Session],
+) -> list[str]:
+    """
+    Return all games in alphabetical order.
+    """
+
+    return sorted(
+        game_counts(history)
+    )
+
+
+def print_menu(
+    names: list[str],
+    counts: dict[str, int],
+) -> None:
+    """
+    Display the game selection menu.
+    """
+
+    print("=" * MENU_WIDTH)
+    print("Choose a Game")
+    print("=" * MENU_WIDTH)
+    print()
+
+    for index, game in enumerate(names, start=1):
+
+        count = counts[game]
+
+        session_text = (
+            "session"
+            if count == 1
+            else "sessions"
+        )
+
+        print(
+            f"{index}. "
+            f"{game} "
+            f"({count} {session_text})"
+        )
+
+    print()

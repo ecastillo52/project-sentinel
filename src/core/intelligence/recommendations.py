@@ -14,21 +14,33 @@ It only produces recommendations.
 
 
 # ==========================================================
+# Helpers
+# ==========================================================
+
+def _safe(report: dict, *path, default=None):
+    """
+    Safely traverse nested dictionaries.
+    """
+    current = report
+
+    for key in path:
+        if not isinstance(current, dict):
+            return default
+        current = current.get(key)
+
+        if current is None:
+            return default
+
+    return current
+
+
+# ==========================================================
 # Public API
 # ==========================================================
 
-def generate(report):
+def generate(report: dict) -> list[dict]:
     """
     Generate recommendations from a historical report.
-
-    Parameters
-    ----------
-    report : dict
-
-    Returns
-    -------
-    list[dict]
-        Recommendation objects.
     """
 
     recommendations = []
@@ -45,43 +57,29 @@ def generate(report):
 # CPU
 # ==========================================================
 
-def cpu_recommendations(report):
-    """
-    Generate CPU recommendations.
-    """
-
+def cpu_recommendations(report: dict) -> list[dict]:
     recommendations = []
 
-    cpu = report["cpu"]
+    cpu_peak = _safe(report, "cpu", "highest_temperature")
 
-    if cpu["highest_temperature"] is None:
+    if cpu_peak is None:
         return recommendations
 
-    if cpu["highest_temperature"] >= 90:
-
+    if cpu_peak >= 90:
         recommendations.append({
-
             "level": "Critical",
-
             "title": "CPU Running Extremely Hot",
-
-            "message":
+            "message": (
                 "CPU temperatures exceeded 90°C. "
-                "Inspect cooling immediately.",
-
+                "Inspect cooling immediately."
+            ),
         })
 
-    elif cpu["highest_temperature"] >= 80:
-
+    elif cpu_peak >= 80:
         recommendations.append({
-
             "level": "Warning",
-
             "title": "CPU Temperature Elevated",
-
-            "message":
-                "Monitor CPU cooling performance.",
-
+            "message": "Monitor CPU cooling performance.",
         })
 
     return recommendations
@@ -91,29 +89,19 @@ def cpu_recommendations(report):
 # GPU
 # ==========================================================
 
-def gpu_recommendations(report):
-    """
-    Generate GPU recommendations.
-    """
-
+def gpu_recommendations(report: dict) -> list[dict]:
     recommendations = []
 
-    gpu = report["gpu"]
+    gpu_peak = _safe(report, "gpu", "highest_temperature")
 
-    if gpu["highest_temperature"] is None:
+    if gpu_peak is None:
         return recommendations
 
-    if gpu["highest_temperature"] >= 85:
-
+    if gpu_peak >= 85:
         recommendations.append({
-
             "level": "Warning",
-
             "title": "GPU Temperature Elevated",
-
-            "message":
-                "Monitor GPU temperatures during gaming.",
-
+            "message": "Monitor GPU temperatures during gaming.",
         })
 
     return recommendations
@@ -123,30 +111,22 @@ def gpu_recommendations(report):
 # Memory
 # ==========================================================
 
-def memory_recommendations(report):
-    """
-    Generate memory recommendations.
-    """
-
+def memory_recommendations(report: dict) -> list[dict]:
     recommendations = []
 
-    memory = report["memory"]
+    memory_peak = _safe(report, "memory", "highest_load")
 
-    if memory["highest_load"] is None:
+    if memory_peak is None:
         return recommendations
 
-    if memory["highest_load"] >= 90:
-
+    if memory_peak >= 90:
         recommendations.append({
-
             "level": "Warning",
-
             "title": "High Memory Usage",
-
-            "message":
+            "message": (
                 "Applications are consuming most of "
-                "available system memory.",
-
+                "available system memory."
+            ),
         })
 
     return recommendations
@@ -156,27 +136,19 @@ def memory_recommendations(report):
 # Performance
 # ==========================================================
 
-def performance_recommendations(report):
-    """
-    Generate performance recommendations.
-    """
-
+def performance_recommendations(report: dict) -> list[dict]:
     recommendations = []
 
-    performance = report["performance"]
+    trend = _safe(report, "performance", "trend")
 
-    if performance["trend"] == "Decreasing":
-
+    if trend == "Decreasing":
         recommendations.append({
-
             "level": "Information",
-
             "title": "Performance Trending Downward",
-
-            "message":
+            "message": (
                 "Average FPS has decreased over time. "
-                "Monitor future sessions.",
-
+                "Monitor future sessions."
+            ),
         })
 
     return recommendations

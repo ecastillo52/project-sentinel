@@ -67,59 +67,51 @@ def render(report: dict) -> None:
 # ==========================================================
 
 def print_header() -> None:
-    """
-    Print report header.
-    """
-
     divider()
-
     print("SENTINEL INTELLIGENCE".center(REPORT_WIDTH))
-
     divider()
     blank()
 
 
 # ==========================================================
-# Formatting
+# Safe formatting helpers (NEW)
 # ==========================================================
 
-def format_fps(value) -> str:
+def format_session(session) -> str:
     """
-    Format an FPS value.
+    Convert session objects/dicts into display string.
     """
 
-    if value is None:
+    if session is None:
         return "--"
 
+    if isinstance(session, dict):
+        return session.get("display_name") or f"{session.get('game')} Session"
+
+    return str(session)
+
+
+def format_fps(value):
+    if value is None:
+        return "--"
     return f"{round(value)} FPS"
 
 
-def format_temperature(value) -> str:
-    """
-    Format a temperature.
-    """
-
+def format_temperature(value):
     if value is None:
         return "--"
-
     return f"{value:.1f} °C"
 
 
-def format_percent(value) -> str:
-    """
-    Format a percentage.
-    """
-
+def format_percent(value):
     if value is None:
         return "--"
-
     return f"{value:.1f} %"
 
 
 def truncate(text: str, width: int) -> str:
-    """
-    Truncate text to a fixed width.
-    """
+    if not isinstance(text, str):
+        text = str(text)
 
     if len(text) <= width:
         return text
@@ -132,30 +124,19 @@ def truncate(text: str, width: int) -> str:
 # ==========================================================
 
 def print_game(game: dict) -> None:
-    """
-    Render selected game summary.
-    """
-
     heading("Game")
 
-    field(
-        "Name",
-        game.get("name"),
-    )
-
-    field(
-        "Sessions Recorded",
-        game.get("sessions"),
-    )
+    field("Name", game.get("name"))
+    field("Sessions Recorded", game.get("sessions"))
 
     field(
         "First Session",
-        game.get("first_session"),
+        format_session(game.get("first_session")),
     )
 
     field(
         "Latest Session",
-        game.get("latest_session"),
+        format_session(game.get("latest_session")),
     )
 
     blank()
@@ -166,10 +147,6 @@ def print_game(game: dict) -> None:
 # ==========================================================
 
 def print_performance(performance: dict) -> None:
-    """
-    Render performance statistics.
-    """
-
     heading("Performance")
 
     field(
@@ -181,18 +158,12 @@ def print_performance(performance: dict) -> None:
 
     field(
         "Best Session",
-        str(best) if best else "--",
+        format_session(best),
     )
 
-    field(
-        "Trend",
-        performance.get("trend"),
-    )
+    field("Trend", performance.get("trend"))
 
-    print_intelligence(
-        performance.get("intelligence", [])
-    )
-
+    print_intelligence(performance.get("intelligence", []))
     blank()
 
 
@@ -201,10 +172,6 @@ def print_performance(performance: dict) -> None:
 # ==========================================================
 
 def print_cpu(cpu: dict) -> None:
-    """
-    Render CPU statistics.
-    """
-
     heading("CPU")
 
     field(
@@ -217,15 +184,9 @@ def print_cpu(cpu: dict) -> None:
         format_temperature(cpu.get("highest_temperature")),
     )
 
-    field(
-        "Trend",
-        cpu.get("trend"),
-    )
+    field("Trend", cpu.get("trend"))
 
-    print_intelligence(
-        cpu.get("intelligence", [])
-    )
-
+    print_intelligence(cpu.get("intelligence", []))
     blank()
 
 
@@ -234,10 +195,6 @@ def print_cpu(cpu: dict) -> None:
 # ==========================================================
 
 def print_gpu(gpu: dict) -> None:
-    """
-    Render GPU statistics.
-    """
-
     heading("GPU")
 
     field(
@@ -250,15 +207,9 @@ def print_gpu(gpu: dict) -> None:
         format_temperature(gpu.get("highest_temperature")),
     )
 
-    field(
-        "Trend",
-        gpu.get("trend"),
-    )
+    field("Trend", gpu.get("trend"))
 
-    print_intelligence(
-        gpu.get("intelligence", [])
-    )
-
+    print_intelligence(gpu.get("intelligence", []))
     blank()
 
 
@@ -267,10 +218,6 @@ def print_gpu(gpu: dict) -> None:
 # ==========================================================
 
 def print_memory(memory: dict) -> None:
-    """
-    Render memory statistics.
-    """
-
     heading("Memory")
 
     field(
@@ -283,29 +230,17 @@ def print_memory(memory: dict) -> None:
         format_percent(memory.get("highest_load")),
     )
 
-    field(
-        "Trend",
-        memory.get("trend"),
-    )
+    field("Trend", memory.get("trend"))
 
-    print_intelligence(
-        memory.get("intelligence", [])
-    )
-
+    print_intelligence(memory.get("intelligence", []))
     blank()
 
 
 # ==========================================================
-# Historical Intelligence
+# Intelligence
 # ==========================================================
 
-def print_intelligence(
-    statements: list[str],
-) -> None:
-    """
-    Render historical intelligence statements.
-    """
-
+def print_intelligence(statements: list[str]) -> None:
     if not statements:
         return
 
@@ -313,14 +248,12 @@ def print_intelligence(
     print()
 
     for statement in statements:
-
         wrapped = fill(
             statement,
             width=REPORT_WIDTH - 4,
             initial_indent="• ",
             subsequent_indent="  ",
         )
-
         print(wrapped)
 
     blank()
@@ -330,26 +263,19 @@ def print_intelligence(
 # Recommendations
 # ==========================================================
 
-def print_recommendations(
-    recommendations: list[dict],
-) -> None:
-    """
-    Render Sentinel recommendations.
-    """
-
+def print_recommendations(recommendations: list[dict]) -> None:
     heading("Recommendations")
 
     if not recommendations:
-
         print("No recommendations.")
         blank()
         return
 
-    for recommendation in recommendations:
+    for rec in recommendations:
 
-        level = recommendation.get("level", "")
-        title = recommendation.get("title", "")
-        message = recommendation.get("message", "")
+        level = rec.get("level", "")
+        title = rec.get("title", "")
+        message = rec.get("message", "")
 
         icon = ICONS.get(level, "•")
 
@@ -374,24 +300,13 @@ def print_recommendations(
 # ==========================================================
 
 def heading(title: str) -> None:
-    """
-    Print a section heading.
-    """
-
     divider()
     print(title)
     divider()
     blank()
 
 
-def field(
-    label: str,
-    value,
-) -> None:
-    """
-    Print an aligned label/value pair.
-    """
-
+def field(label: str, value) -> None:
     if value is None:
         value = "--"
 
@@ -399,16 +314,8 @@ def field(
 
 
 def divider() -> None:
-    """
-    Print divider.
-    """
-
     print(LINE)
 
 
 def blank() -> None:
-    """
-    Print blank line.
-    """
-
     print()

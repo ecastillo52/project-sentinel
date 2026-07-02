@@ -4,60 +4,6 @@
 Project Sentinel
 
 Game Detection
-"""
-
-import json
-
-from core.config import ALIASES_FILE
-
-
-# ==========================================================
-# Alias Storage
-# ==========================================================
-
-def load_aliases():
-
-    if not ALIASES_FILE.exists():
-
-        ALIASES_FILE.parent.mkdir(
-            parents=True,
-            exist_ok=True
-        )
-
-        with open(ALIASES_FILE, "w") as f:
-            json.dump({}, f, indent=4)
-
-    with open(ALIASES_FILE, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def save_aliases(data):
-
-    with open(ALIASES_FILE, "w", encoding="utf-8") as f:
-
-        json.dump(
-            data,
-            f,
-            indent=4
-        )
-
-
-# ==========================================================
-# Detection
-# ==========================================================
-
-def detect_game(filename):
-
-    aliases = load_aliases()
-
-    lower = filename.lower()
-
-    for keyword, game in aliases.items():
-
-        if keyword in lower:"""
-Project Sentinel
-
-Game Detection
 
 Responsible for identifying games from filenames
 and remembering user-defined aliases.
@@ -69,7 +15,7 @@ from core.config import ALIASES_FILE
 
 
 # ==========================================================
-# Alias Storage
+# Internal Helpers
 # ==========================================================
 
 def _ensure_alias_file():
@@ -84,11 +30,28 @@ def _ensure_alias_file():
 
     if not ALIASES_FILE.exists():
 
-        with open(ALIASES_FILE, "w", encoding="utf-8") as f:
+        with open(
+            ALIASES_FILE,
+            "w",
+            encoding="utf-8"
+        ) as f:
+
             json.dump({}, f, indent=4)
 
 
+# ==========================================================
+# Alias Storage
+# ==========================================================
+
 def load_aliases():
+    """
+    Load all known filename aliases.
+
+    Returns
+    -------
+    dict
+        Mapping of filename keyword -> game name.
+    """
 
     _ensure_alias_file()
 
@@ -108,6 +71,9 @@ def load_aliases():
 
 
 def save_aliases(aliases):
+    """
+    Save aliases in alphabetical order.
+    """
 
     _ensure_alias_file()
 
@@ -137,14 +103,21 @@ def save_aliases(aliases):
 
 def detect_game(filename):
     """
-    Attempt to identify a game from the filename.
+    Attempt to identify a game from a filename.
+
+    Parameters
+    ----------
+    filename : str
+
+    Returns
+    -------
+    str | None
+        Detected game name or None.
     """
 
     filename = filename.lower()
 
-    aliases = load_aliases()
-
-    for keyword, game in aliases.items():
+    for keyword, game in load_aliases().items():
 
         if keyword.lower() in filename:
 
@@ -163,7 +136,6 @@ def learn_alias(keyword, game):
     """
 
     keyword = keyword.strip().lower()
-
     game = game.strip()
 
     aliases = load_aliases()
@@ -174,12 +146,15 @@ def learn_alias(keyword, game):
 
 
 # ==========================================================
-# User Prompt
+# User Interaction
 # ==========================================================
 
 def prompt_for_game(filename):
     """
-    Ask the user to identify an unknown game.
+    Prompt the user to identify an unknown game.
+
+    If a matching alias already exists, it is returned
+    immediately without prompting.
     """
 
     detected = detect_game(filename)
@@ -204,8 +179,7 @@ def prompt_for_game(filename):
         game = "Unknown"
 
     keyword = input(
-        "Keyword to remember "
-        f"[{game}]: "
+        f"Keyword to remember [{game}]: "
     ).strip()
 
     if not keyword:
@@ -217,6 +191,8 @@ def prompt_for_game(filename):
         game
     )
 
-    print(f'\n✓ Learned "{keyword}" → "{game}"\n')
+    print()
+    print(f'✓ Learned "{keyword}" → "{game}"')
+    print()
 
     return game

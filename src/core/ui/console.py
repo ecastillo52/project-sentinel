@@ -30,12 +30,10 @@ TITLE = "Project Sentinel"
 # ==========================================================
 
 def divider():
-
     print("=" * WIDTH)
 
 
 def blank():
-
     print()
 
 
@@ -49,11 +47,8 @@ def header(title=TITLE):
     """
 
     blank()
-
     divider()
-
     print(title)
-
     divider()
 
 
@@ -63,11 +58,8 @@ def section(title):
     """
 
     blank()
-
     print("-" * WIDTH)
-
     print(title)
-
     print("-" * WIDTH)
 
 
@@ -85,11 +77,13 @@ def main_menu():
 
 
 def prompt(message):
+    """Prompt the user for input."""
 
     return input(f"\n{message}").strip()
 
 
 def pause():
+    """Pause until the user presses Enter."""
 
     input("\nPress Enter to continue...")
 
@@ -99,63 +93,47 @@ def pause():
 # ==========================================================
 
 def show_no_logs():
-
     print("\nNo new logs found.")
 
 
 def show_log_count(count):
-
     print(f"\nFound {count} new log(s).\n")
 
 
 def show_analysis_start(filename):
-
     divider()
-
     print(f"Analyzing: {filename}")
-
     divider()
 
 
 def show_saved(archive_path):
-
     print()
-
     print("✓ Analysis saved.")
-
-    print()
-
-    print("Archived to:")
-
-    print(f"  {archive_path}")
-
+    print(f"✓ Archived to:\n  {archive_path}")
     print()
 
 
 def show_duplicate():
-
-    print("\nLog already exists in database.\n")
+    print("\nSession already exists.")
 
 
 def show_invalid_selection():
-
     print("\nInvalid selection.")
 
 
 def show_session_not_found():
-
     print("\nSession not found.")
 
 
+def show_no_history():
+    print("No historical sessions found.")
+
+
 def show_processed(count):
-
     divider()
-
     print(f"Processed {count} log(s).")
-
     divider()
 
 
 def goodbye():
-
     print("\nGoodbye.\n")

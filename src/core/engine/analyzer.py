@@ -1,47 +1,87 @@
 # core/analyzer.py
 
+"""
+Project Sentinel
+
+Analysis Engine
+
+Responsible for:
+
+    Header Matching
+        ↓
+    Data Extraction
+        ↓
+    Value Cleaning
+        ↓
+    Statistics
+
+This module knows how to analyze a sensor definition but
+contains no health or reporting logic.
+"""
+
 import re
+from typing import Any
 
 NUMBER_PATTERN = re.compile(r"-?\d+(?:,\d{3})*(?:\.\d+)?")
 
+Log = dict[str, Any]
+Sensor = dict[str, Any]
+
 
 # ==========================================================
-# HEADER MATCHING ENGINE
+# Header Matching
 # ==========================================================
 
-def normalize(text):
+
+def normalize(text: Any) -> str:
+    """
+    Normalize text for case-insensitive matching.
+    """
+
     return str(text).lower().strip()
 
 
-def score_header(header, keyword):
+def score_header(
+    header: str,
+    keyword: str,
+) -> int:
+    """
+    Score how closely a header matches a sensor keyword.
+    """
 
-    h = normalize(header)
-    k = normalize(keyword)
+    header = normalize(header)
+    keyword = normalize(keyword)
 
-    if k not in h:
+    if keyword not in header:
         return 0
 
     score = 5
 
-    if "avg" in h:
+    if "avg" in header:
         score += 2
 
-    if "package" in h:
+    if "package" in header:
         score += 3
 
-    if "total" in h:
+    if "total" in header:
         score += 1
 
-    if "core" in h:
+    if "core" in header:
         score -= 2
 
-    if "thread" in h:
+    if "thread" in header:
         score -= 2
 
     return score
 
 
-def find_best_match(log, keyword):
+def find_best_match(
+    log: Log,
+    keyword: str,
+) -> str | None:
+    """
+    Find the highest-scoring header.
+    """
 
     scored = []
 
@@ -61,10 +101,17 @@ def find_best_match(log, keyword):
 
 
 # ==========================================================
-# DATA EXTRACTION
+# Data Extraction
 # ==========================================================
 
-def extract_column(log, header):
+
+def extract_column(
+    log: Log,
+    header: str,
+) -> list[str]:
+    """
+    Extract a column from the log.
+    """
 
     index = log["header_map"][header]
 
@@ -74,7 +121,13 @@ def extract_column(log, header):
     ]
 
 
-def clean_values(values, value_type):
+def clean_values(
+    values: list[Any],
+    value_type: str,
+) -> list[Any]:
+    """
+    Convert raw CSV values into Python values.
+    """
 
     cleaned = []
 
@@ -85,9 +138,9 @@ def clean_values(values, value_type):
             if value is None:
                 continue
 
-            text = str(value).replace(",", "")
-
-            match = NUMBER_PATTERN.search(text)
+            match = NUMBER_PATTERN.search(
+                str(value).replace(",", "")
+            )
 
             if match:
                 cleaned.append(float(match.group()))
@@ -112,42 +165,58 @@ def clean_values(values, value_type):
 
 
 # ==========================================================
-# STATISTICS
+# Statistics
 # ==========================================================
 
-def calculate_statistics(numbers):
+
+def calculate_statistics(
+    numbers: list[float],
+) -> dict[str, Any] | None:
+    """
+    Calculate descriptive statistics.
+    """
 
     if not numbers:
         return None
 
     return {
-
         "current": numbers[-1],
-
         "minimum": min(numbers),
-
         "maximum": max(numbers),
-
         "average": round(sum(numbers) / len(numbers), 2),
-
-        "samples": len(numbers)
-
+        "samples": len(numbers),
     }
 
 
 # ==========================================================
-# ANALYSIS
+# Analysis
 # ==========================================================
 
-def analyze_sensor(log, keyword, value_type="float"):
 
-    header = find_best_match(log, keyword)
+def analyze_sensor(
+    log: Log,
+    sensor: Sensor,
+) -> dict[str, Any] | None:
+    """
+    Analyze a sensor definition against a HWiNFO log.
+    """
+
+    header = find_best_match(
+        log,
+        sensor["keyword"],
+    )
 
     if header is None:
         return None
 
-    values = extract_column(log, header)
+    values = extract_column(
+        log,
+        header,
+    )
 
-    numbers = clean_values(values, value_type)
+    numbers = clean_values(
+        values,
+        sensor["value_type"],
+    )
 
     return calculate_statistics(numbers)

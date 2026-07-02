@@ -2,18 +2,21 @@
 
 """
 Project Sentinel
-----------------
 
 Sensor Registry
 
-This file contains ONLY metadata.
+This module contains ONLY sensor metadata.
 
-No imports.
-No analysis.
+No imports from the analysis engine.
+No business logic.
 No execution.
 
-Every sensor that Sentinel supports should be registered here.
+Every sensor supported by Sentinel is registered here.
 """
+
+from typing import Any
+
+Sensor = dict[str, Any]
 
 SENSORS = {
 
@@ -30,7 +33,7 @@ SENSORS = {
         "category": "CPU",
         "priority": 1,
         "description": "Overall CPU package temperature.",
-        "health": "cpu_temperature_status"
+        "health": "cpu_temperature_status",
     },
 
     "cpu_usage": {
@@ -42,7 +45,7 @@ SENSORS = {
         "category": "CPU",
         "priority": 2,
         "description": "Overall processor utilization.",
-        "health": "cpu_usage_status"
+        "health": "cpu_usage_status",
     },
 
     # ==========================================================
@@ -58,7 +61,7 @@ SENSORS = {
         "category": "GPU",
         "priority": 1,
         "description": "GPU core temperature.",
-        "health": "gpu_temperature_status"
+        "health": "gpu_temperature_status",
     },
 
     "gpu_usage": {
@@ -70,7 +73,7 @@ SENSORS = {
         "category": "GPU",
         "priority": 2,
         "description": "GPU utilization.",
-        "health": "gpu_usage_status"
+        "health": "gpu_usage_status",
     },
 
     # ==========================================================
@@ -86,7 +89,7 @@ SENSORS = {
         "category": "Memory",
         "priority": 1,
         "description": "Amount of physical memory currently in use.",
-        "health": "memory_usage_status"
+        "health": "memory_usage_status",
     },
 
     "memory_available": {
@@ -98,7 +101,7 @@ SENSORS = {
         "category": "Memory",
         "priority": 2,
         "description": "Amount of available physical memory.",
-        "health": "memory_usage_status"
+        "health": "memory_usage_status",
     },
 
     "memory_load": {
@@ -110,7 +113,7 @@ SENSORS = {
         "category": "Memory",
         "priority": 3,
         "description": "Overall physical memory utilization.",
-        "health": "memory_usage_status"
+        "health": "memory_usage_status",
     },
 
     # ==========================================================
@@ -126,46 +129,62 @@ SENSORS = {
         "category": "Performance",
         "priority": 1,
         "description": "Average displayed framerate.",
-        "health": "fps_status"
-    }
+        "health": "fps_status",
+    },
 
 }
 
 
-def get_sensor(sensor_name):
-    sensor = SENSORS[sensor_name].copy()
-    sensor["id"] = sensor_name
+def _build_sensor(sensor_id: str) -> Sensor:
+    """
+    Return a copy of a sensor definition with its ID attached.
+    """
+
+    sensor = SENSORS[sensor_id].copy()
+    sensor["id"] = sensor_id
+
     return sensor
 
 
-def get_all_sensors():
-    sensors = []
+def get_sensor(sensor_name: str) -> Sensor:
+    """
+    Return a single sensor definition.
+    """
 
-    for sensor_id, sensor in SENSORS.items():
-        s = sensor.copy()
-        s["id"] = sensor_id
-        sensors.append(s)
+    return _build_sensor(sensor_name)
+
+
+def get_all_sensors() -> list[Sensor]:
+    """
+    Return every registered sensor sorted by category and priority.
+    """
+
+    sensors = [
+        _build_sensor(sensor_id)
+        for sensor_id in SENSORS
+    ]
 
     return sorted(
         sensors,
-        key=lambda s: (s["category"], s["priority"])
+        key=lambda sensor: (
+            sensor["category"],
+            sensor["priority"],
+        ),
     )
 
 
-def get_category(category):
+def get_category(category: str) -> list[Sensor]:
+    """
+    Return every sensor belonging to a category.
+    """
 
-    sensors = []
-
-    for sensor_id, sensor in SENSORS.items():
-
-        if sensor["category"] == category:
-
-            s = sensor.copy()
-            s["id"] = sensor_id
-
-            sensors.append(s)
+    sensors = [
+        _build_sensor(sensor_id)
+        for sensor_id, sensor in SENSORS.items()
+        if sensor["category"] == category
+    ]
 
     return sorted(
         sensors,
-        key=lambda s: s["priority"]
+        key=lambda sensor: sensor["priority"],
     )

@@ -13,13 +13,15 @@ This module contains application flow only.
 All printing is delegated to console.py.
 """
 
-from core.intelligence.engine import run as run_intelligence
-from core.intelligence.renderer import render as render_intelligence
 from core.config import INCOMING_FOLDER
 
 from core.engine.processor import run
-from core.report.renderer import render
 from core.engine.scanner import get_new_logs
+
+from core.history.loader import load_history
+
+from core.intelligence.engine import run as run_intelligence
+from core.intelligence.renderer import render as render_intelligence
 
 from core.metadata.archive import archive_log
 from core.metadata.database import add_analysis
@@ -29,13 +31,25 @@ from core.metadata.history import (
     print_history,
 )
 
-from core.history.loader import load_history
+from core.report.renderer import render
 
 from .console import (
+    goodbye,
     header,
-    pause,
     main_menu,
+    pause,
+    prompt,
+    show_analysis_start,
+    show_duplicate,
+    show_invalid_selection,
+    show_log_count,
+    show_no_history,
+    show_no_logs,
+    show_processed,
+    show_saved,
+    show_session_not_found,
 )
+
 from .game_selector import select_game
 
 
@@ -50,76 +64,47 @@ def analyze_logs():
     logs = get_new_logs(INCOMING_FOLDER)
 
     if not logs:
-
-        print("\nNo new logs found.")
-
+        show_no_logs()
         pause()
-
         return
 
-    print(f"\nFound {len(logs)} new log(s).\n")
+    show_log_count(len(logs))
 
     processed = 0
 
     for log in logs:
 
-        print("=" * 70)
-        print(f"Analyzing: {log.name}")
-        print("=" * 70)
-
-        #
-        # Detect Game
-        #
+        show_analysis_start(log.name)
 
         game = prompt_for_game(log.name)
-
-        #
-        # Analyze
-        #
 
         report = run(log, game)
 
         render(report)
 
-        #
-        # Archive
-        #
-
         archive_path = archive_log(
             log,
-            game
+            game,
         )
-
-        #
-        # Save
-        #
 
         saved = add_analysis(
             original_path=log,
             archive_path=archive_path,
             game=game,
-            report=report
+            report=report,
         )
 
         if saved:
 
             processed += 1
 
-            print()
-
-            print("✓ Analysis saved.")
-
-            print(f"✓ Archived to:\n  {archive_path}")
+            show_saved(archive_path)
 
         else:
 
-            print("\nSession already exists.")
+            show_duplicate()
 
-        print()
-
-    print("=" * 70)
-    print(f"Processed {processed} log(s).")
-    print("=" * 70)
+    show_processed(processed)
 
     pause()
 
@@ -136,17 +121,16 @@ def view_history():
 
         print_history()
 
-        choice = input(
-            "\nSelect a session "
-            "(Enter to return): "
-        ).strip()
+        choice = prompt(
+            "Select a session (Enter to return): "
+        )
 
-        if choice == "":
+        if not choice:
             return
 
         if not choice.isdigit():
 
-            print("\nInvalid selection.")
+            show_invalid_selection()
 
             pause()
 
@@ -158,7 +142,7 @@ def view_history():
 
         if session is None:
 
-            print("\nSession not found.")
+            show_session_not_found()
 
             pause()
 
@@ -168,7 +152,7 @@ def view_history():
 
         render(
             session.report,
-            session=session
+            session=session,
         )
 
         pause()
@@ -179,9 +163,6 @@ def view_history():
 # ==========================================================
 
 def historical_intelligence():
-    """
-    Display Sentinel's historical analysis.
-    """
 
     history = load_history()
 
@@ -189,7 +170,7 @@ def historical_intelligence():
 
         header()
 
-        print("No historical sessions found.")
+        show_no_history()
 
         pause()
 
@@ -221,9 +202,7 @@ def run_menu():
 
         main_menu()
 
-        choice = input(
-            "\nSelection: "
-        ).strip()
+        choice = prompt("Selection: ")
 
         if choice == "1":
 
@@ -239,12 +218,12 @@ def run_menu():
 
         elif choice == "4":
 
-            print("\nGoodbye.\n")
+            goodbye()
 
             break
 
         else:
 
-            print("\nInvalid selection.")
+            show_invalid_selection()
 
             pause()

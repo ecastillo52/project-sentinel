@@ -5,9 +5,9 @@ Project Sentinel
 
 Health Engine
 
-Every function receives a statistics dictionary.
+Determines health classifications from analyzed statistics.
 
-Expected format:
+Every function receives a statistics dictionary:
 
 {
     "current": ...,
@@ -18,8 +18,15 @@ Expected format:
 }
 """
 
+from typing import Any
 
-def average(stats):
+Stats = dict[str, Any] | None
+
+
+def average(stats: Stats) -> float | None:
+    """
+    Return the average value from a statistics dictionary.
+    """
 
     if stats is None:
         return None
@@ -31,7 +38,8 @@ def average(stats):
 # CPU
 # ==========================================================
 
-def cpu_temperature_status(stats):
+
+def cpu_temperature_status(stats: Stats) -> str:
 
     avg = average(stats)
 
@@ -50,7 +58,7 @@ def cpu_temperature_status(stats):
     return "Critical"
 
 
-def cpu_usage_status(stats):
+def cpu_usage_status(stats: Stats) -> str:
 
     avg = average(stats)
 
@@ -70,7 +78,8 @@ def cpu_usage_status(stats):
 # GPU
 # ==========================================================
 
-def gpu_temperature_status(stats):
+
+def gpu_temperature_status(stats: Stats) -> str:
 
     avg = average(stats)
 
@@ -89,7 +98,7 @@ def gpu_temperature_status(stats):
     return "Critical"
 
 
-def gpu_usage_status(stats):
+def gpu_usage_status(stats: Stats) -> str:
 
     avg = average(stats)
 
@@ -109,7 +118,8 @@ def gpu_usage_status(stats):
 # Memory
 # ==========================================================
 
-def memory_usage_status(stats):
+
+def memory_usage_status(stats: Stats) -> str:
 
     avg = average(stats)
 
@@ -129,7 +139,8 @@ def memory_usage_status(stats):
 # Performance
 # ==========================================================
 
-def fps_status(stats):
+
+def fps_status(stats: Stats) -> str:
 
     avg = average(stats)
 

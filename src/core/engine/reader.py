@@ -10,17 +10,29 @@ Responsible ONLY for loading HWiNFO CSV logs.
 Returns a normalized log object for the analyzer.
 """
 
-from pathlib import Path
 import csv
+from pathlib import Path
+from typing import Any
 
 
-def _read_csv(path, encoding):
+def _read_csv(
+    path: Path,
+    encoding: str,
+) -> list[list[str]]:
+    """
+    Read a CSV file using the specified encoding.
+    """
 
-    with open(path, newline="", encoding=encoding) as f:
-        return list(csv.reader(f))
+    with path.open(
+        newline="",
+        encoding=encoding,
+    ) as file:
+        return list(csv.reader(file))
 
 
-def load_hwinfo_log(file_path):
+def load_hwinfo_log(
+    file_path: str | Path,
+) -> dict[str, Any]:
     """
     Load a HWiNFO CSV log.
 
@@ -43,20 +55,20 @@ def load_hwinfo_log(file_path):
 
     # Try UTF-8 first, then Windows encoding.
     try:
-        reader = _read_csv(path, "utf-8")
+        csv_rows = _read_csv(path, "utf-8")
 
     except UnicodeDecodeError:
-        reader = _read_csv(path, "cp1252")
+        csv_rows = _read_csv(path, "cp1252")
 
-    if not reader:
+    if not csv_rows:
         raise ValueError("CSV file is empty.")
 
     headers = [
         header.strip()
-        for header in reader[0]
+        for header in csv_rows[0]
     ]
 
-    rows = reader[1:]
+    data_rows = csv_rows[1:]
 
     header_map = {
         header: index
@@ -64,17 +76,10 @@ def load_hwinfo_log(file_path):
     }
 
     return {
-
         "headers": headers,
-
         "header_map": header_map,
-
-        "rows": rows,
-
+        "rows": data_rows,
         "filename": path.name,
-
         "filepath": str(path.resolve()),
-
-        "sample_count": len(rows)
-
+        "sample_count": len(data_rows),
     }

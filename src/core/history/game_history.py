@@ -44,7 +44,7 @@ def sessions_for_game(
 
         for session in history
 
-        if session.game == game
+        if session.game.lower() == game.lower()
 
     ]
 

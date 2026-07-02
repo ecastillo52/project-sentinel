@@ -35,18 +35,13 @@ def recent_sessions(history, limit=10):
         history,
         key=lambda session: session.date,
         reverse=True,
-    )
-
-    newest = newest[:limit]
+    )[:limit]
 
     return [
-
         {
             "game": session.game,
             "session": session.session_number,
             "date": session.date,
         }
-
         for session in newest
-
     ]

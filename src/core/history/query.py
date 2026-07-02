@@ -32,7 +32,7 @@ def newest(
 
     return max(
         history,
-        key=lambda session: session.date
+        key=lambda session: session.date,
     )
 
 
@@ -48,7 +48,7 @@ def oldest(
 
     return min(
         history,
-        key=lambda session: session.date
+        key=lambda session: session.date,
     )
 
 
@@ -79,14 +79,12 @@ def game(
     Return every session for a game.
     """
 
+    name = name.lower()
+
     return [
-
         session
-
         for session in history
-
-        if session.game.lower() == name.lower()
-
+        if session.game.lower() == name
     ]
 
 
@@ -104,13 +102,9 @@ def between(
     """
 
     return [
-
         session
-
         for session in history
-
         if start <= session.date <= end
-
     ]
 
 
@@ -123,13 +117,9 @@ def after(
     """
 
     return [
-
         session
-
         for session in history
-
         if session.date >= date
-
     ]
 
 
@@ -142,13 +132,9 @@ def before(
     """
 
     return [
-
         session
-
         for session in history
-
         if session.date <= date
-
     ]
 
 
@@ -164,14 +150,12 @@ def cpu(
     Return sessions recorded on a CPU.
     """
 
+    cpu_name = cpu_name.lower()
+
     return [
-
         session
-
         for session in history
-
-        if session.report["machine"]["cpu"] == cpu_name
-
+        if session.report.get("machine", {}).get("cpu", "").lower() == cpu_name
     ]
 
 
@@ -183,12 +167,10 @@ def gpu(
     Return sessions recorded on a GPU.
     """
 
+    gpu_name = gpu_name.lower()
+
     return [
-
         session
-
         for session in history
-
-        if session.report["machine"]["gpu"] == gpu_name
-
+        if session.report.get("machine", {}).get("gpu", "").lower() == gpu_name
     ]

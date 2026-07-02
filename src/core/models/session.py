@@ -56,7 +56,7 @@ class Session:
     version: str = "0.2.0"
     engine: str = "Sentinel Analysis Engine"
 
-    report: list[dict[str, Any]] = field(default_factory=list)
+    report: dict[str, Any] = field(default_factory=dict)
 
     # ======================================================
     # Convenience Properties
@@ -149,7 +149,7 @@ class Session:
                     "engine",
                     "Sentinel Analysis Engine",
                 ),
-                report=data.get("report", []),
+                report=data.get("report", {}),
             )
 
         # --------------------------------------------------
@@ -169,7 +169,7 @@ class Session:
             analyzed_at=data["analyzed_at"],
             version="0.1.0",
             engine="Legacy Database",
-            report=data.get("report", []),
+            report=data.get("report", {}),
         )
 
     # ======================================================

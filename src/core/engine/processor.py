@@ -14,51 +14,49 @@ Health Engine
 
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from core.config import REPORT_SCHEMA
 from core.engine.reader import load_hwinfo_log
-from core.metadata.machine import get_machine_info
 from core.engine.summary import build_summary
+from core.metadata.machine import get_machine_info
 
-from .sensors import get_all_sensors
+from . import health
 from .analyzer import analyze_sensor
-from ..engine import health
+from .sensors import get_all_sensors
 
 
-def run(file_path, game="Unknown"):
+def run(
+    file_path: str | Path,
+    game: str = "Unknown",
+) -> dict[str, Any]:
     """
     Analyze one HWiNFO log.
 
     Returns a structured report dictionary.
     """
 
-    # Load the log
     log = load_hwinfo_log(file_path)
 
-    # Build the report object
-    report = {
+    report: dict[str, Any] = {
         "schema": REPORT_SCHEMA,
         "session": build_session(file_path, game),
         "machine": get_machine_info(),
         "sensors": {},
-        "summary": {}
+        "summary": {},
     }
 
-    # Analyze each configured sensor
     for sensor in get_all_sensors():
 
         stats = analyze_sensor(
             log,
-            sensor["keyword"],
-            sensor["value_type"]
+            sensor,
         )
 
         health_function = getattr(
             health,
-            sensor["health"]
+            sensor["health"],
         )
-
-        status = health_function(stats)
 
         report["sensors"][sensor["id"]] = {
             "display": sensor["display"],
@@ -66,10 +64,9 @@ def run(file_path, game="Unknown"):
             "unit": sensor["unit"],
             "description": sensor["description"],
             "stats": stats,
-            "status": status
+            "status": health_function(stats),
         }
 
-    # Build the executive summary
     report["summary"] = build_summary(report)
 
     return report
@@ -79,7 +76,10 @@ def run(file_path, game="Unknown"):
 # Builders
 # ==========================================================
 
-def build_session(file_path, game):
+def build_session(
+    file_path: str | Path,
+    game: str,
+) -> dict[str, str]:
     """
     Build the Session Information section.
     """
@@ -87,5 +87,5 @@ def build_session(file_path, game):
     return {
         "game": game,
         "log_file": Path(file_path).name,
-        "date": datetime.now().strftime("%Y-%m-%d")
+        "date": datetime.now().strftime("%Y-%m-%d"),
     }
