@@ -1,5 +1,7 @@
 # core/models/session.py
 
+# core/models/session.py
+
 """
 Project Sentinel
 
@@ -14,10 +16,15 @@ Future versions may extend this class with comparison,
 trend analysis, HTML export, charts, and SQLite support.
 """
 
+from __future__ import annotations
+
+import json
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+
+from core.models.report import Report
 
 
 @dataclass(slots=True)
@@ -56,7 +63,7 @@ class Session:
     version: str = "0.2.0"
     engine: str = "Sentinel Analysis Engine"
 
-    report: dict[str, Any] = field(default_factory=dict)
+    report: Report = field(default_factory=Report)
 
     # ======================================================
     # Convenience Properties
@@ -88,9 +95,23 @@ class Session:
     def display_name(self) -> str:
         """
         Example:
-            Fortnite - Session 3
+            Cyberpunk - Session 5
         """
         return f"{self.game} - {self.label}"
+
+    @property
+    def json_filename(self) -> str:
+        """
+        Filename used when saving this session.
+        """
+        return f"{self.id}.json"
+
+    @property
+    def age(self):
+        """
+        Time elapsed since analysis.
+        """
+        return datetime.now() - self.date
 
     # ======================================================
     # Serialization
@@ -117,8 +138,27 @@ class Session:
                 "version": self.version,
                 "engine": self.engine,
             },
-            "report": self.report,
+            "report": self.report.to_dict(),
         }
+
+    def to_json(self, *, indent: int = 4) -> str:
+        """
+        Serialize the session as JSON.
+        """
+        return json.dumps(
+            self.to_dict(),
+            indent=indent,
+            ensure_ascii=False,
+        )
+
+    def save(self, path: Path) -> None:
+        """
+        Save this session to disk.
+        """
+        path.write_text(
+            self.to_json(),
+            encoding="utf-8",
+        )
 
     @classmethod
     def from_dict(cls, data: dict) -> "Session":
@@ -149,7 +189,9 @@ class Session:
                     "engine",
                     "Sentinel Analysis Engine",
                 ),
-                report=data.get("report", {}),
+                report=Report.from_dict(
+                    data.get("report", {})
+                ),
             )
 
         # --------------------------------------------------
@@ -169,8 +211,42 @@ class Session:
             analyzed_at=data["analyzed_at"],
             version="0.1.0",
             engine="Legacy Database",
-            report=data.get("report", {}),
+            report=Report.from_dict(
+                data.get("report", {})
+            ),
         )
+
+    @classmethod
+    def from_json(cls, text: str) -> "Session":
+        """
+        Build a Session from a JSON string.
+        """
+        return cls.from_dict(json.loads(text))
+
+    @classmethod
+    def load(cls, path: Path) -> "Session":
+        """
+        Load a Session from disk.
+        """
+        return cls.from_json(
+            path.read_text(encoding="utf-8")
+        )
+
+    # ======================================================
+    # Comparisons
+    # ======================================================
+
+    def __eq__(self, other):
+        if not isinstance(other, Session):
+            return NotImplemented
+
+        return self.id == other.id
+
+    def __lt__(self, other):
+        if not isinstance(other, Session):
+            return NotImplemented
+
+        return self.date < other.date
 
     # ======================================================
     # Display
@@ -182,6 +258,7 @@ class Session:
     def __repr__(self) -> str:
         return (
             f"Session("
+            f"id='{self.id}', "
             f"game='{self.game}', "
             f"session={self.session_number})"
         )

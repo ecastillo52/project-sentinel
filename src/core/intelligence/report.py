@@ -5,115 +5,194 @@ Project Sentinel
 
 Historical Intelligence Report
 
-Builds the final historical intelligence report.
+Builds the complete historical intelligence report.
 
-This module performs no rendering.
-It assembles historical intelligence from the
-history analysis modules.
+This module coordinates the intelligence pipeline.
+It performs no calculations itself.
 """
 
-from . import (
-    historical,
-    recommendations,
-)
+from __future__ import annotations
 
-from core.history import (
-    statistics,
-    metrics,
-    insights,
-)
+from core.models.session import Session
+
+from . import historical
+from . import insights
+from . import metrics
+from . import recommendations
 
 
 # ==========================================================
 # Helpers
 # ==========================================================
 
-def _session_safe(session):
+def _session(
+    session: Session | None,
+) -> dict | None:
     """
-    Convert Session objects into safe primitives for reporting.
+    Convert a Session into report-safe primitives.
     """
 
     if session is None:
         return None
 
     return {
-        "game": getattr(session, "game", None),
-        "session_number": getattr(session, "session_number", None),
-        "date": getattr(session, "date", None),
-        "display_name": getattr(session, "display_name", None),
+        "game": session.game,
+        "session_number": session.session_number,
+        "display_name": session.display_name,
+        "date": session.analyzed_at,
     }
+
+
+def _oldest_session(
+    history: list[Session],
+) -> Session | None:
+    """
+    Return the oldest session.
+    """
+
+    if not history:
+        return None
+
+    return min(
+        history,
+        key=lambda session: session.analyzed_at,
+    )
+
+
+def _latest_session(
+    history: list[Session],
+) -> Session | None:
+    """
+    Return the most recent session.
+    """
+
+    if not history:
+        return None
+
+    return max(
+        history,
+        key=lambda session: session.analyzed_at,
+    )
 
 
 # ==========================================================
 # Public API
 # ==========================================================
 
-def build_report(history, game: str) -> dict:
+def build_report(
+    history: list[Session],
+    game: str,
+) -> dict:
     """
-    Build the historical intelligence report.
+    Build the complete historical intelligence report.
     """
 
     report = {
+
         # --------------------------------------------------
-        # Game Overview
+        # Game
         # --------------------------------------------------
+
         "game": {
+
             "name": game,
-            "sessions": statistics.total_sessions(history),
-            "first_session": _session_safe(statistics.oldest_session(history)),
-            "latest_session": _session_safe(statistics.latest_session(history)),
+
+            "sessions": len(history),
+
+            "first_session": _session(
+                _oldest_session(history)
+            ),
+
+            "latest_session": _session(
+                _latest_session(history)
+            ),
         },
 
         # --------------------------------------------------
         # Performance
         # --------------------------------------------------
+
         "performance": {
-            "average_fps": metrics.average_fps(history),
-            "best_session": _session_safe(insights.best_fps_session(history)),
-            "trend": insights.fps_direction(history),
-            "intelligence": historical.performance(history),
+
+            "average_fps":
+                metrics.average_fps(history),
+
+            "best_session":
+                _session(
+                    insights.best_fps_session(history)
+                ),
+
+            "trend":
+                insights.fps_direction(history),
+
+            "intelligence":
+                historical.performance(history),
         },
 
         # --------------------------------------------------
         # CPU
         # --------------------------------------------------
+
         "cpu": {
-            "average_temperature": metrics.average_cpu_temperature(history),
-            "highest_temperature": metrics.highest_cpu_temperature(history),
-            "trend": insights.cpu_temperature_direction(history),
-            "intelligence": historical.cpu(history),
+
+            "average_temperature":
+                metrics.average_cpu_temperature(history),
+
+            "highest_temperature":
+                metrics.highest_cpu_temperature(history),
+
+            "trend":
+                insights.cpu_temperature_direction(history),
+
+            "intelligence":
+                historical.cpu(history),
         },
 
         # --------------------------------------------------
         # GPU
         # --------------------------------------------------
+
         "gpu": {
-            "average_temperature": metrics.average_gpu_temperature(history),
-            "highest_temperature": metrics.highest_gpu_temperature(history),
 
-            # FIX: GPU does NOT reuse CPU trend
-            "trend": "Unknown",
+            "average_temperature":
+                metrics.average_gpu_temperature(history),
 
-            "intelligence": historical.gpu(history),
+            "highest_temperature":
+                metrics.highest_gpu_temperature(history),
+
+            "trend":
+                insights.gpu_temperature_direction(history),
+
+            "intelligence":
+                historical.gpu(history),
         },
 
         # --------------------------------------------------
         # Memory
         # --------------------------------------------------
+
         "memory": {
-            "average_load": metrics.average_memory_load(history),
-            "highest_load": metrics.highest_memory_load(history),
 
-            # FIX: Memory does NOT reuse CPU trend
-            "trend": "Unknown",
+            "average_load":
+                metrics.average_memory_load(history),
 
-            "intelligence": historical.memory(history),
+            "highest_load":
+                metrics.highest_memory_load(history),
+
+            "trend":
+                insights.memory_usage_direction(history),
+
+            "intelligence":
+                historical.memory(history),
         },
     }
 
     # ------------------------------------------------------
-    # Recommendations (post-processing step)
+    # Recommendations
     # ------------------------------------------------------
-    report["recommendations"] = recommendations.generate(report)
+
+    report["recommendations"] = (
+        recommendations.generate(report)
+    )
 
     return report

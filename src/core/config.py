@@ -26,9 +26,9 @@ from pathlib import Path
 
 APP_NAME = "Project Sentinel"
 
-APP_VERSION = "0.5.2 - The IRS is here! RUN!!! #AUDIT"
+APP_VERSION = "0.5.3 - Rebuild completed. Lets fix the final small bugs!"
 
-REPORT_SCHEMA = 1
+REPORT_SCHEMA = 2
 
 AUTHOR = "Erik Castillo"
 
@@ -76,7 +76,6 @@ TESTS_FOLDER = PROJECT_ROOT / "tests"
 # Configuration Files
 # ==========================================================
 
-DATABASE_FILE = PROCESSED_FOLDER / "sentinel_db.json"
 
 ALIASES_FILE = CONFIG_FOLDER / "game_aliases.json"
 

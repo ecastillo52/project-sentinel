@@ -5,26 +5,19 @@ Project Sentinel
 
 Console Report Renderer
 
-Responsible for displaying a completed Sentinel report.
+Renders completed Sentinel reports.
 
 This module performs no analysis.
-It only formats and displays data produced by the engine.
-
-Report Flow
-
-    Header
-        ↓
-    Session Information
-        ↓
-    Machine Information
-        ↓
-    Sensor Reports
-        ↓
-    Session Summary
+It only displays Report and Session models.
 """
 
-from collections import OrderedDict
+from __future__ import annotations
+
 from core.config import APP_NAME, APP_VERSION
+from core.models.report import Report
+from core.models.session import Session
+from core.models.sensor import Sensor
+
 
 # ==========================================================
 # Constants
@@ -33,15 +26,20 @@ from core.config import APP_NAME, APP_VERSION
 REPORT_WIDTH = 52
 LABEL_WIDTH = 20
 
-
 LINE = "=" * REPORT_WIDTH
 SECTION = "-" * REPORT_WIDTH
 
 HEALTH_ICONS = {
+    "GOOD": "✓",
+    "PASS": "✓",
     "Healthy": "✓",
-    "Warm": "⚠",
-    "Critical": "✗",
     "Excellent": "✓",
+    "WARNING": "⚠",
+    "WARN": "⚠",
+    "Warm": "⚠",
+    "CRITICAL": "✗",
+    "FAIL": "✗",
+    "Critical": "✗",
 }
 
 
@@ -49,43 +47,50 @@ HEALTH_ICONS = {
 # Public API
 # ==========================================================
 
-def render(report, session=None):
-    """Render a complete Sentinel report."""
+def render(
+    report: Report,
+    *,
+    session: Session | None = None,
+) -> None:
+    """
+    Render a completed Sentinel report.
+    """
 
     if session is not None:
         print_saved_session_header(session)
 
     print_header()
-    print_session(report)
     print_machine(report)
     print_sensors(report)
     print_summary(report)
 
-def print_saved_session_header(session):
-    """Print metadata for a saved session."""
+
+# ==========================================================
+# Saved Session Header
+# ==========================================================
+
+def print_saved_session_header(
+    session: Session,
+) -> None:
 
     divider()
-
     print(session.game.center(REPORT_WIDTH))
-
     divider()
     blank()
 
     field("Session", session.session_number)
-    field("Analyzed", session.date.strftime("%Y-%m-%d %H:%M:%S"))
+    field("Analyzed", session.analyzed_at)
     field("Source", session.filename)
-    field("Archive", session.archive)
-    field("Version", session.version)
-    field("Engine", session.engine)
+    field("Archive", session.archive_path)
 
     blank()
+
 
 # ==========================================================
 # Header
 # ==========================================================
 
-def print_header():
-    """Print the report header."""
+def print_header() -> None:
 
     divider()
 
@@ -97,42 +102,25 @@ def print_header():
 
 
 # ==========================================================
-# Session Information
-# ==========================================================
-
-def print_session(report):
-    """Print session information."""
-
-    session = report["session"]
-
-    print("Session Information")
-    blank()
-
-    field("Game", session["game"])
-    field("Log File", session["log_file"])
-    field("Date", session["date"])
-
-    blank()
-    divider()
-    blank()
-
-
-# ==========================================================
 # Machine Information
 # ==========================================================
 
-def print_machine(report):
-    """Print machine information."""
+def print_machine(
+    report: Report,
+) -> None:
 
-    machine = report["machine"]
+    machine = report.metadata.get("machine", {})
+
+    if not machine:
+        return
 
     print("Machine Information")
     blank()
 
-    field("CPU", machine["cpu"])
-    field("GPU", machine["gpu"])
-    field("RAM", machine["ram"])
-    field("Motherboard", machine["motherboard"])
+    field("CPU", machine.get("cpu", "--"))
+    field("GPU", machine.get("gpu", "--"))
+    field("RAM", machine.get("ram", "--"))
+    field("Motherboard", machine.get("motherboard", "--"))
 
     blank()
     divider()
@@ -140,23 +128,31 @@ def print_machine(report):
 
 
 # ==========================================================
-# Sensor Reports
+# Sensors
 # ==========================================================
 
-def print_sensors(report):
-    """
-    Print all analyzed sensors grouped by category.
-    """
+def print_sensors(
+    report: Report,
+) -> None:
+
+    if not report.sensors:
+        return
 
     print("Sensor Reports")
     blank()
 
-    categories = {}
+    categories: dict[str, list[Sensor]] = {}
 
-    for sensor in report["sensors"].values():
+    for sensor in report.sensors.values():
+
+        if not isinstance(sensor, Sensor):
+            continue
+
+        category = getattr(sensor, "category", "Other")
+
         categories.setdefault(
-            sensor["category"],
-            []
+            category,
+            [],
         ).append(sensor)
 
     for category, sensors in categories.items():
@@ -169,91 +165,123 @@ def print_sensors(report):
         for sensor in sensors:
             print_sensor(sensor)
 
-def print_sensor(sensor):
-    """Print a single sensor."""
+
+def print_sensor(
+    sensor: Sensor,
+) -> None:
 
     section()
 
-    print(sensor["display"])
+    print(sensor.name)
 
     section()
     blank()
 
-    stats = sensor.get("stats")
+    field(
+        "Current",
+        format_value(sensor.current, sensor.unit),
+    )
 
-    if not stats:
-        field("Status", "Unavailable")
-        blank()
+    field(
+        "Average",
+        format_value(sensor.average, sensor.unit),
+    )
+
+    field(
+        "Minimum",
+        format_value(sensor.minimum, sensor.unit),
+    )
+
+    field(
+        "Maximum",
+        format_value(sensor.maximum, sensor.unit),
+    )
+
+    blank()
+
+    field(
+        "Status",
+        health(sensor.status),
+    )
+
+    blank()
+
+
+# ==========================================================
+# Summary
+# ==========================================================
+
+def print_summary(
+    report: Report,
+) -> None:
+
+    summary = report.summary
+
+    if not summary:
         return
 
-    field("Current", format_value(stats["current"], sensor["unit"]))
-    field("Average", format_value(stats["average"], sensor["unit"]))
-    field("Minimum", format_value(stats["minimum"], sensor["unit"]))
-    field("Maximum", format_value(stats["maximum"], sensor["unit"]))
-
-    blank()
-
-    field("Status", health(sensor["status"]))
-
-    blank()
-
-
-# ==========================================================
-# Session Summary
-# ==========================================================
-
-def print_summary(report):
-    """
-    Print the session summary.
-    """
-
-    summary = report["summary"]
-
     divider()
+
     print("SESSION SUMMARY".center(REPORT_WIDTH))
+
     divider()
     blank()
 
     field(
         "Average FPS",
-        format_value(summary["average_fps"], "FPS")
+        format_value(
+            summary.get("average_fps"),
+            "FPS",
+        ),
     )
 
     field(
         "Peak CPU Temp",
-        format_value(summary["peak_cpu_temp"], "°C")
+        format_value(
+            summary.get("peak_cpu_temp"),
+            "°C",
+        ),
     )
 
     field(
         "Peak GPU Temp",
-        format_value(summary["peak_gpu_temp"], "°C")
+        format_value(
+            summary.get("peak_gpu_temp"),
+            "°C",
+        ),
     )
 
     field(
         "Peak RAM Usage",
-        format_value(summary["peak_ram_usage"], "%")
+        format_value(
+            summary.get("peak_ram_usage"),
+            "%",
+        ),
     )
 
     blank()
 
     field(
         "Overall Health",
-        health(summary["overall_health"])
+        health(
+            summary.get(
+                "overall_health",
+                "Unknown",
+            )
+        ),
     )
 
     blank()
 
 
 # ==========================================================
-# Formatting Helpers
+# Formatting
 # ==========================================================
 
-def format_value(value, unit):
-    """
-    Format a sensor value with its unit.
-
-    Falls back gracefully if data is missing.
-    """
+def format_value(
+    value,
+    unit: str,
+) -> str:
 
     if value is None:
         return "--"
@@ -261,54 +289,55 @@ def format_value(value, unit):
     if unit == "°C":
         return f"{value:.1f} °C"
 
-    if unit == "GB":
-        return f"{value:.1f} GB"
-
     if unit == "%":
         return f"{value:.1f} %"
+
+    if unit == "GB":
+        return f"{value:.1f} GB"
 
     if unit == "FPS":
         return f"{value:.0f} FPS"
 
-    return f"{value:.2f} {unit}".strip()
+    return f"{value} {unit}".strip()
 
 
-def health(status):
-    """
-    Format a health status with an icon.
-    """
+def health(
+    status,
+) -> str:
 
-    if isinstance(status, dict):
-        status = status.get("status", "Unknown")
+    if status is None:
+        status = "Unknown"
 
-    icon = HEALTH_ICONS.get(status, "•")
+    icon = HEALTH_ICONS.get(
+        str(status),
+        "•",
+    )
 
     return f"{icon} {status}"
 
 
 # ==========================================================
-# Printing Helpers
+# Helpers
 # ==========================================================
 
-def field(label, value):
-    """Print an aligned label/value pair."""
+def field(
+    label: str,
+    value,
+) -> None:
+
+    if value is None:
+        value = "--"
 
     print(f"{label:<{LABEL_WIDTH}} {value}")
 
 
-def divider():
-    """Print a major divider."""
-
+def divider() -> None:
     print(LINE)
 
 
-def section():
-    """Print a section divider."""
-
+def section() -> None:
     print(SECTION)
 
 
-def blank():
-    """Print a blank line."""
-
+def blank() -> None:
     print()

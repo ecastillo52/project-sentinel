@@ -5,32 +5,24 @@ Project Sentinel
 
 Menu Controller
 
-Coordinates the console interface and connects the UI
-to Sentinel's analysis engine.
+Coordinates the console interface.
 
-This module contains application flow only.
-
-All printing is delegated to console.py.
+The UI communicates only with the application container.
+Business logic lives inside AnalysisService and the
+database layer.
 """
 
-from core.config import INCOMING_FOLDER
+from __future__ import annotations
 
-from core.engine.processor import run
-from core.engine.scanner import get_new_logs
-
-from core.history.loader import load_history
+from core.app import App
+from core.engine.scanner import find_logs
 
 from core.intelligence.engine import run as run_intelligence
-from core.intelligence.renderer import render as render_intelligence
-
-from core.metadata.archive import archive_log
-from core.metadata.database import add_analysis
-from core.metadata.game_detector import prompt_for_game
-from core.metadata.history import (
-    get_session,
-    print_history,
+from core.intelligence.renderer import (
+    render as render_intelligence,
 )
 
+from core.metadata.game_detector import prompt_for_game
 from core.report.renderer import render
 
 from .console import (
@@ -40,13 +32,11 @@ from .console import (
     pause,
     prompt,
     show_analysis_start,
-    show_duplicate,
     show_invalid_selection,
     show_log_count,
     show_no_history,
     show_no_logs,
     show_processed,
-    show_saved,
     show_session_not_found,
 )
 
@@ -57,11 +47,14 @@ from .game_selector import select_game
 # Analysis
 # ==========================================================
 
-def analyze_logs():
+def analyze_logs(app: App) -> None:
+    """
+    Analyze every newly discovered HWiNFO log.
+    """
 
     header()
 
-    logs = get_new_logs(INCOMING_FOLDER)
+    logs = find_logs(app.incoming_folder)
 
     if not logs:
         show_no_logs()
@@ -78,31 +71,21 @@ def analyze_logs():
 
         game = prompt_for_game(log.name)
 
-        report = run(log, game)
-
-        render(report)
-
-        archive_path = archive_log(
-            log,
-            game,
-        )
-
-        saved = add_analysis(
-            original_path=log,
-            archive_path=archive_path,
+        session = app.analysis.analyze(
+            csv_path=log,
             game=game,
-            report=report,
         )
 
-        if saved:
+        if session is None:
+            print(f"Skipped duplicate log: {log.name}")
+            continue
 
-            processed += 1
+        render(
+            session.report,
+            session=session,
+        )
 
-            show_saved(archive_path)
-
-        else:
-
-            show_duplicate()
+        processed += 1
 
     show_processed(processed)
 
@@ -113,13 +96,42 @@ def analyze_logs():
 # History
 # ==========================================================
 
-def view_history():
+def view_history(app: App) -> None:
+    """
+    Browse previously analyzed sessions.
+    """
 
     while True:
 
         header()
 
-        print_history()
+        sessions = app.sessions.all()
+
+        if not sessions:
+
+            show_no_history()
+            pause()
+            return
+
+        print("=" * 70)
+        print("Sentinel History")
+        print("=" * 70)
+        print()
+
+        for index, session in enumerate(
+            sessions,
+            start=1,
+        ):
+
+            print(
+                f"{index:>2}. "
+                f"{session.game} "
+                f"(Session {session.session_number})"
+            )
+
+            print(f"    {session.analyzed_at}")
+            print(f"    {session.filename}")
+            print()
 
         choice = prompt(
             "Select a session (Enter to return): "
@@ -131,22 +143,18 @@ def view_history():
         if not choice.isdigit():
 
             show_invalid_selection()
-
             pause()
-
             continue
 
-        session = get_session(
-            int(choice) - 1
-        )
+        index = int(choice) - 1
 
-        if session is None:
+        if index < 0 or index >= len(sessions):
 
             show_session_not_found()
-
             pause()
-
             continue
+
+        session = sessions[index]
 
         header()
 
@@ -162,9 +170,12 @@ def view_history():
 # Historical Intelligence
 # ==========================================================
 
-def historical_intelligence():
+def historical_intelligence(app: App) -> None:
+    """
+    Launch the historical intelligence engine.
+    """
 
-    history = load_history()
+    history = app.sessions.all()
 
     if not history:
 
@@ -183,7 +194,10 @@ def historical_intelligence():
 
     header()
 
-    report = run_intelligence(game)
+    report = run_intelligence(
+        sessions=history,
+        game=game,
+    )
 
     render_intelligence(report)
 
@@ -194,7 +208,10 @@ def historical_intelligence():
 # Main Menu
 # ==========================================================
 
-def run_menu():
+def run_menu(app: App) -> None:
+    """
+    Launch the Sentinel main menu.
+    """
 
     while True:
 
@@ -206,24 +223,22 @@ def run_menu():
 
         if choice == "1":
 
-            analyze_logs()
+            analyze_logs(app)
 
         elif choice == "2":
 
-            view_history()
+            view_history(app)
 
         elif choice == "3":
 
-            historical_intelligence()
+            historical_intelligence(app)
 
         elif choice == "4":
 
             goodbye()
-
             break
 
         else:
 
             show_invalid_selection()
-
             pause()

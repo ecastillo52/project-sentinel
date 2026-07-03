@@ -7,17 +7,16 @@ Historical Intelligence Engine
 
 Coordinates the historical intelligence pipeline.
 
-History
+Sessions
     ↓
 Game Filter
     ↓
 Historical Report
-    ↓
-Renderer
 """
 
-from core.history.loader import load_history
-from core.history.game_history import sessions_for_game
+from __future__ import annotations
+
+from core.models.session import Session
 
 from .report import build_report
 
@@ -27,30 +26,21 @@ from .report import build_report
 # ==========================================================
 
 def run(
+    sessions: list[Session],
     game: str,
 ) -> dict:
     """
     Execute the historical intelligence pipeline for a
     single game.
-
-    Parameters
-    ----------
-    game : str
-
-    Returns
-    -------
-    dict
-        Historical intelligence report.
     """
 
-    history = load_history()
-
-    history = sessions_for_game(
-        history,
-        game,
-    )
+    history = [
+        session
+        for session in sessions
+        if session.game == game
+    ]
 
     return build_report(
-        history,
-        game,
+        history=history,
+        game=game,
     )

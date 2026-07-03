@@ -1,57 +1,99 @@
-# core/scanner.py
+# core/engine/scanner.py
 
 """
 Project Sentinel
 
 Log Scanner
 
-Responsible ONLY for discovering new HWiNFO logs.
+Responsible only for discovering HWiNFO log files.
+
+The scanner performs no duplicate detection, validation,
+or analysis. It simply locates supported log files on disk.
 """
 
-from pathlib import Path
+from __future__ import annotations
 
-from ..metadata.database import record_exists
+from pathlib import Path
 
 SUPPORTED_EXTENSIONS = (
     ".csv",
 )
 
 
+class LogScanner:
+    """
+    Discovers HWiNFO log files.
+    """
+
+    def find_logs(
+        self,
+        folder: str | Path,
+        *,
+        recursive: bool = False,
+    ) -> list[Path]:
+        """
+        Discover every supported log file.
+        """
+
+        folder = Path(folder)
+
+        if not folder.exists():
+            return []
+
+        iterator = (
+            folder.rglob("*")
+            if recursive
+            else folder.iterdir()
+        )
+
+        return sorted(
+            file
+            for file in iterator
+            if (
+                file.is_file()
+                and file.suffix.lower() in SUPPORTED_EXTENSIONS
+            )
+        )
+
+
+# ==========================================================
+# Module Singleton
+# ==========================================================
+
+_scanner = LogScanner()
+
+
+# ==========================================================
+# Backwards-Compatible API
+# ==========================================================
+
 def find_logs(
     folder: str | Path,
     recursive: bool = False,
 ) -> list[Path]:
     """
-    Find every supported log file.
+    Discover every supported log file.
     """
 
-    folder = Path(folder)
-
-    iterator = (
-        folder.rglob("*")
-        if recursive
-        else folder.iterdir()
-    )
-
-    return sorted(
-        file
-        for file in iterator
-        if (
-            file.is_file()
-            and file.suffix.lower() in SUPPORTED_EXTENSIONS
-        )
+    return _scanner.find_logs(
+        folder,
+        recursive=recursive,
     )
 
 
 def get_new_logs(
     folder: str | Path,
+    recursive: bool = False,
 ) -> list[Path]:
     """
-    Return only logs that have not yet been recorded.
+    Backwards-compatible alias.
+
+    Duplicate detection is now handled by AnalysisService,
+    so every discovered log is considered a candidate for
+    analysis.
     """
 
-    return [
-        log
-        for log in find_logs(folder)
-        if not record_exists(log)
-    ]
+    return find_logs(
+        folder,
+        recursive=recursive,
+    )

@@ -4,19 +4,20 @@
 Project Sentinel
 
 Main Entry Point
-
-The only responsibility of this module is to launch
-the Sentinel user interface.
 """
 
+from core.app import App
 from core.ui.menu import run_menu
 
-def main():
+
+def main() -> None:
     """
-    Launch Sentinel.
+    Launch Project Sentinel.
     """
 
-    run_menu()
+    app = App()
+
+    run_menu(app)
 
 
 if __name__ == "__main__":

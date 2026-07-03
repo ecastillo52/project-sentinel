@@ -15,17 +15,59 @@ Responsible for:
         ↓
     Statistics
 
-This module knows how to analyze a sensor definition but
-contains no health or reporting logic.
+This module performs sensor analysis only.
+
+It contains no health evaluation or report construction.
 """
+
+from __future__ import annotations
 
 import re
 from typing import Any
 
-NUMBER_PATTERN = re.compile(r"-?\d+(?:,\d{3})*(?:\.\d+)?")
+from .sensors import get_all_sensors
+
+NUMBER_PATTERN = re.compile(
+    r"-?\d+(?:,\d{3})*(?:\.\d+)?"
+)
 
 Log = dict[str, Any]
-Sensor = dict[str, Any]
+SensorDefinition = dict[str, Any]
+
+
+class Analyzer:
+    """
+    Analyzes every configured sensor within a HWiNFO log.
+    """
+
+    def analyze(
+        self,
+        log: Log,
+    ) -> dict[str, dict[str, Any]]:
+        """
+        Analyze every configured sensor.
+        """
+
+        results: dict[str, dict[str, Any]] = {}
+
+        for sensor in get_all_sensors():
+
+            stats = analyze_sensor(
+                log,
+                sensor,
+            )
+
+            results[sensor["id"]] = {
+                "display": sensor["display"],
+                "description": sensor["description"],
+                "category": sensor["category"],
+                "type": sensor.get("type", ""),
+                "unit": sensor["unit"],
+                "stats": stats,
+                "health": sensor["health"],
+            }
+
+        return results
 
 
 # ==========================================================
@@ -34,9 +76,6 @@ Sensor = dict[str, Any]
 
 
 def normalize(text: Any) -> str:
-    """
-    Normalize text for case-insensitive matching.
-    """
 
     return str(text).lower().strip()
 
@@ -45,9 +84,6 @@ def score_header(
     header: str,
     keyword: str,
 ) -> int:
-    """
-    Score how closely a header matches a sensor keyword.
-    """
 
     header = normalize(header)
     keyword = normalize(keyword)
@@ -79,18 +115,20 @@ def find_best_match(
     log: Log,
     keyword: str,
 ) -> str | None:
-    """
-    Find the highest-scoring header.
-    """
 
     scored = []
 
     for header in log["header_map"]:
 
-        score = score_header(header, keyword)
+        score = score_header(
+            header,
+            keyword,
+        )
 
         if score > 0:
-            scored.append((score, header))
+            scored.append(
+                (score, header)
+            )
 
     if not scored:
         return None
@@ -101,7 +139,7 @@ def find_best_match(
 
 
 # ==========================================================
-# Data Extraction
+# Extraction
 # ==========================================================
 
 
@@ -109,9 +147,6 @@ def extract_column(
     log: Log,
     header: str,
 ) -> list[str]:
-    """
-    Extract a column from the log.
-    """
 
     index = log["header_map"][header]
 
@@ -125,9 +160,6 @@ def clean_values(
     values: list[Any],
     value_type: str,
 ) -> list[Any]:
-    """
-    Convert raw CSV values into Python values.
-    """
 
     cleaned = []
 
@@ -143,7 +175,9 @@ def clean_values(
             )
 
             if match:
-                cleaned.append(float(match.group()))
+                cleaned.append(
+                    float(match.group())
+                )
 
     elif value_type == "bool":
 
@@ -172,9 +206,6 @@ def clean_values(
 def calculate_statistics(
     numbers: list[float],
 ) -> dict[str, Any] | None:
-    """
-    Calculate descriptive statistics.
-    """
 
     if not numbers:
         return None
@@ -183,23 +214,23 @@ def calculate_statistics(
         "current": numbers[-1],
         "minimum": min(numbers),
         "maximum": max(numbers),
-        "average": round(sum(numbers) / len(numbers), 2),
+        "average": round(
+            sum(numbers) / len(numbers),
+            2,
+        ),
         "samples": len(numbers),
     }
 
 
 # ==========================================================
-# Analysis
+# Sensor Analysis
 # ==========================================================
 
 
 def analyze_sensor(
     log: Log,
-    sensor: Sensor,
+    sensor: SensorDefinition,
 ) -> dict[str, Any] | None:
-    """
-    Analyze a sensor definition against a HWiNFO log.
-    """
 
     header = find_best_match(
         log,
@@ -219,4 +250,6 @@ def analyze_sensor(
         sensor["value_type"],
     )
 
-    return calculate_statistics(numbers)
+    return calculate_statistics(
+        numbers,
+    )

@@ -5,81 +5,98 @@ Project Sentinel
 
 HWiNFO Reader
 
-Responsible ONLY for loading HWiNFO CSV logs.
+Responsible only for loading HWiNFO CSV logs.
 
-Returns a normalized log object for the analyzer.
+Returns a normalized log object for the Analyzer.
 """
+
+from __future__ import annotations
 
 import csv
 from pathlib import Path
 from typing import Any
 
 
-def _read_csv(
-    path: Path,
-    encoding: str,
-) -> list[list[str]]:
+class Reader:
     """
-    Read a CSV file using the specified encoding.
+    Loads HWiNFO CSV logs.
     """
 
-    with path.open(
-        newline="",
-        encoding=encoding,
-    ) as file:
-        return list(csv.reader(file))
+    def read(
+        self,
+        file_path: str | Path,
+    ) -> dict[str, Any]:
+        """
+        Load a HWiNFO CSV log.
 
+        Returns
+        -------
+        dict
+            Normalized log object.
+        """
 
-def load_hwinfo_log(
-    file_path: str | Path,
-) -> dict[str, Any]:
-    """
-    Load a HWiNFO CSV log.
+        path = Path(file_path)
 
-    Returns:
+        if not path.exists():
+            raise FileNotFoundError(path)
 
-    {
-        headers,
-        header_map,
-        rows,
-        filename,
-        filepath,
-        sample_count
-    }
-    """
+        try:
+            csv_rows = self._read_csv(
+                path,
+                "utf-8",
+            )
 
-    path = Path(file_path)
+        except UnicodeDecodeError:
 
-    if not path.exists():
-        raise FileNotFoundError(path)
+            csv_rows = self._read_csv(
+                path,
+                "cp1252",
+            )
 
-    # Try UTF-8 first, then Windows encoding.
-    try:
-        csv_rows = _read_csv(path, "utf-8")
+        if not csv_rows:
+            raise ValueError(
+                "CSV file is empty."
+            )
 
-    except UnicodeDecodeError:
-        csv_rows = _read_csv(path, "cp1252")
+        headers = [
+            header.strip()
+            for header in csv_rows[0]
+        ]
 
-    if not csv_rows:
-        raise ValueError("CSV file is empty.")
+        rows = csv_rows[1:]
 
-    headers = [
-        header.strip()
-        for header in csv_rows[0]
-    ]
+        header_map = {
+            header: index
+            for index, header in enumerate(headers)
+        }
 
-    data_rows = csv_rows[1:]
+        return {
+            "headers": headers,
+            "header_map": header_map,
+            "rows": rows,
+            "filename": path.name,
+            "filepath": str(path.resolve()),
+            "sample_count": len(rows),
+        }
 
-    header_map = {
-        header: index
-        for index, header in enumerate(headers)
-    }
+    # ======================================================
+    # Internal
+    # ======================================================
 
-    return {
-        "headers": headers,
-        "header_map": header_map,
-        "rows": data_rows,
-        "filename": path.name,
-        "filepath": str(path.resolve()),
-        "sample_count": len(data_rows),
-    }
+    @staticmethod
+    def _read_csv(
+        path: Path,
+        encoding: str,
+    ) -> list[list[str]]:
+        """
+        Read a CSV using the specified encoding.
+        """
+
+        with path.open(
+            newline="",
+            encoding=encoding,
+        ) as file:
+
+            return list(
+                csv.reader(file)
+            )
