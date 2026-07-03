@@ -28,7 +28,7 @@ LABEL_WIDTH = 24
 LINE = "=" * REPORT_WIDTH
 
 ICONS = {
-    "Critical": "✖",
+    "CRITICAL": "✖",
     "Warning": "⚠",
     "Information": "ℹ",
 }

@@ -3,52 +3,51 @@
 """
 Project Sentinel
 
-Recommendations Engine
+Historical Recommendations
 
-Generates maintenance and performance recommendations
-from historical Sentinel analysis.
+Generates long-term recommendations from historical
+Sentinel sessions.
 
-This module performs no rendering.
-It only produces recommendations.
+Unlike the engine recommendation system, this module
+analyzes trends across multiple sessions rather than
+individual sensor readings from a single report.
 """
 
 from __future__ import annotations
+
+from core.models.session import Session
+
+from . import insights
+from . import metrics
 
 
 # ==========================================================
 # Public API
 # ==========================================================
 
-def generate(report: dict) -> list[dict]:
+def generate(
+    history: list[Session],
+) -> list[dict[str, str]]:
     """
-    Generate recommendations from a historical report.
+    Generate historical recommendations.
+
+    Parameters
+    ----------
+    history
+        Historical Sentinel sessions.
+
+    Returns
+    -------
+    list[dict[str, str]]
+        Historical recommendations.
     """
 
-    recommendations: list[dict] = []
+    recommendations: list[dict[str, str]] = []
 
-    recommendations.extend(
-        cpu_recommendations(
-            report.get("cpu", {}),
-        )
-    )
-
-    recommendations.extend(
-        gpu_recommendations(
-            report.get("gpu", {}),
-        )
-    )
-
-    recommendations.extend(
-        memory_recommendations(
-            report.get("memory", {}),
-        )
-    )
-
-    recommendations.extend(
-        performance_recommendations(
-            report.get("performance", {}),
-        )
-    )
+    recommendations.extend(cpu(history))
+    recommendations.extend(gpu(history))
+    recommendations.extend(memory(history))
+    recommendations.extend(performance(history))
 
     return recommendations
 
@@ -57,39 +56,42 @@ def generate(report: dict) -> list[dict]:
 # CPU
 # ==========================================================
 
-def cpu_recommendations(
-    cpu: dict,
-) -> list[dict]:
+def cpu(
+    history: list[Session],
+) -> list[dict[str, str]]:
 
-    recommendations = []
+    recommendations: list[dict[str, str]] = []
 
-    peak = cpu.get("highest_temperature")
+    average = metrics.average_cpu_temperature(history)
+    trend = insights.cpu_temperature_direction(history)
 
-    if peak is None:
+    if average is None:
         return recommendations
 
-    if peak >= 90:
-
-        recommendations.append(
-            {
-                "level": "Critical",
-                "title": "CPU Running Extremely Hot",
-                "message": (
-                    "CPU temperatures exceeded 90 °C. "
-                    "Inspect the cooling system immediately."
-                ),
-            }
-        )
-
-    elif peak >= 80:
+    if average >= 80:
 
         recommendations.append(
             {
                 "level": "Warning",
-                "title": "CPU Temperature Elevated",
+                "title": "CPU Temperatures Consistently High",
                 "message": (
-                    "CPU temperatures are higher than ideal. "
-                    "Monitor cooling performance and airflow."
+                    "Historical sessions show consistently "
+                    "elevated CPU temperatures. Inspect cooling "
+                    "performance and system airflow."
+                ),
+            }
+        )
+
+    if trend == "Increasing":
+
+        recommendations.append(
+            {
+                "level": "Information",
+                "title": "CPU Temperatures Trending Upward",
+                "message": (
+                    "CPU temperatures have increased over recent "
+                    "sessions. Monitor for continued thermal "
+                    "degradation."
                 ),
             }
         )
@@ -101,27 +103,40 @@ def cpu_recommendations(
 # GPU
 # ==========================================================
 
-def gpu_recommendations(
-    gpu: dict,
-) -> list[dict]:
+def gpu(
+    history: list[Session],
+) -> list[dict[str, str]]:
 
-    recommendations = []
+    recommendations: list[dict[str, str]] = []
 
-    peak = gpu.get("highest_temperature")
+    average = metrics.average_gpu_temperature(history)
+    trend = insights.gpu_temperature_direction(history)
 
-    if peak is None:
+    if average is None:
         return recommendations
 
-    if peak >= 85:
+    if average >= 75:
 
         recommendations.append(
             {
                 "level": "Warning",
-                "title": "GPU Temperature Elevated",
+                "title": "GPU Temperatures Consistently High",
                 "message": (
-                    "GPU temperatures reached elevated levels "
-                    "during gameplay. Monitor cooling and fan "
-                    "performance."
+                    "Historical GPU temperatures remain elevated. "
+                    "Consider inspecting cooling performance."
+                ),
+            }
+        )
+
+    if trend == "Increasing":
+
+        recommendations.append(
+            {
+                "level": "Information",
+                "title": "GPU Temperatures Trending Upward",
+                "message": (
+                    "GPU temperatures have gradually increased "
+                    "across recent sessions."
                 ),
             }
         )
@@ -133,27 +148,40 @@ def gpu_recommendations(
 # Memory
 # ==========================================================
 
-def memory_recommendations(
-    memory: dict,
-) -> list[dict]:
+def memory(
+    history: list[Session],
+) -> list[dict[str, str]]:
 
-    recommendations = []
+    recommendations: list[dict[str, str]] = []
 
-    peak = memory.get("highest_load")
+    average = metrics.average_memory_load(history)
+    trend = insights.memory_usage_direction(history)
 
-    if peak is None:
+    if average is None:
         return recommendations
 
-    if peak >= 90:
+    if average >= 85:
 
         recommendations.append(
             {
                 "level": "Warning",
-                "title": "High Memory Usage",
+                "title": "Memory Usage Remains High",
                 "message": (
-                    "System memory usage exceeded 90%. "
-                    "Consider closing background applications "
-                    "or upgrading system memory."
+                    "Memory utilization has remained consistently "
+                    "high across multiple sessions."
+                ),
+            }
+        )
+
+    if trend == "Increasing":
+
+        recommendations.append(
+            {
+                "level": "Information",
+                "title": "Memory Usage Trending Upward",
+                "message": (
+                    "Memory usage has steadily increased over time. "
+                    "Monitor background applications."
                 ),
             }
         )
@@ -165,24 +193,54 @@ def memory_recommendations(
 # Performance
 # ==========================================================
 
-def performance_recommendations(
-    performance: dict,
-) -> list[dict]:
+def performance(
+    history: list[Session],
+) -> list[dict[str, str]]:
 
-    recommendations = []
+    recommendations: list[dict[str, str]] = []
 
-    trend = performance.get("trend")
+    average = metrics.average_fps(history)
+    trend = insights.fps_direction(history)
+
+    if average is None:
+        return recommendations
+
+    if average < 60:
+
+        recommendations.append(
+            {
+                "level": "Warning",
+                "title": "Performance Below Target",
+                "message": (
+                    "Average FPS has remained below 60 across "
+                    "historical sessions."
+                ),
+            }
+        )
+
+    elif average < 120:
+
+        recommendations.append(
+            {
+                "level": "Information",
+                "title": "Performance Can Be Improved",
+                "message": (
+                    "Historical performance is stable but below "
+                    "high-refresh gaming targets."
+                ),
+            }
+        )
 
     if trend == "Decreasing":
 
         recommendations.append(
             {
-                "level": "Information",
+                "level": "Warning",
                 "title": "Performance Trending Downward",
                 "message": (
-                    "Average FPS has declined across historical "
-                    "sessions. Continue monitoring future runs "
-                    "for consistency."
+                    "Average FPS has declined over recent sessions. "
+                    "Investigate possible hardware or software "
+                    "changes."
                 ),
             }
         )

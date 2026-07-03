@@ -5,15 +5,8 @@ Project Sentinel
 
 Historical Insights
 
-Produces observations from historical metrics.
-
-Input:
-    list[Session]
-
-Output:
-    trends
-    best sessions
-    worst sessions
+Produces historical trends and identifies notable
+sessions from Sentinel history.
 """
 
 from __future__ import annotations
@@ -27,191 +20,117 @@ from . import metrics
 # Helpers
 # ==========================================================
 
-
 def _direction(
     values: list[float],
 ) -> str:
     """
-    Determine the direction of a historical series.
+    Determine the direction of a series.
     """
 
     if len(values) < 2:
         return "Unknown"
 
-    first = values[0]
-    last = values[-1]
-
-    difference = last - first
+    difference = values[-1] - values[0]
 
     if abs(difference) < 1:
         return "Stable"
 
-    if difference > 0:
-        return "Increasing"
-
-    return "Decreasing"
-
-
-def _sensor_average(
-    session: Session,
-    sensor_id: str,
-):
-    sensor = session.report.sensors.get(sensor_id)
-
-    if sensor is None:
-        return None
-
-    return sensor.average
+    return "Increasing" if difference > 0 else "Decreasing"
 
 
 def _trend(
-    history,
-    sensor_id,
-):
+    history: list[Session],
+    sensor_id: str,
+) -> str:
+    """
+    Determine the historical trend for a sensor.
+    """
 
-    values = []
+    return _direction(
+        metrics.sensor_values(
+            history,
+            sensor_id,
+        )
+    )
+
+
+def _best_session(
+    history: list[Session],
+    sensor_id: str,
+) -> Session | None:
+    """
+    Return the session with the highest average value
+    for a sensor.
+    """
+
+    best = None
+    highest = None
 
     for session in history:
 
-        value = _sensor_average(
+        value = metrics.sensor_average(
             session,
             sensor_id,
         )
 
-        if value is not None:
-            values.append(value)
+        if value is None:
+            continue
 
-    return _direction(values)
+        if highest is None or value > highest:
+
+            highest = value
+            best = session
+
+    return best
 
 
 # ==========================================================
 # Trends
 # ==========================================================
 
-
 def fps_direction(history):
-
-    return _trend(
-        history,
-        "fps",
-    )
+    return _trend(history, metrics.FPS)
 
 
 def cpu_temperature_direction(history):
-
-    return _trend(
-        history,
-        "cpu_temperature",
-    )
+    return _trend(history, metrics.CPU_TEMPERATURE)
 
 
 def gpu_temperature_direction(history):
-
-    return _trend(
-        history,
-        "gpu_temperature",
-    )
+    return _trend(history, metrics.GPU_TEMPERATURE)
 
 
 def memory_usage_direction(history):
-
-    return _trend(
-        history,
-        "memory_usage",
-    )
+    return _trend(history, metrics.MEMORY_USAGE)
 
 
 # ==========================================================
 # Best Sessions
 # ==========================================================
 
-
 def best_fps_session(history):
-
-    best = None
-    best_value = None
-
-    for session in history:
-
-        value = _sensor_average(
-            session,
-            "fps",
-        )
-
-        if value is None:
-            continue
-
-        if best_value is None or value > best_value:
-
-            best_value = value
-            best = session
-
-    return best
+    return _best_session(
+        history,
+        metrics.FPS,
+    )
 
 
 def hottest_cpu_session(history):
-
-    hottest = None
-    highest = None
-
-    for session in history:
-
-        value = _sensor_average(
-            session,
-            "cpu_temperature",
-        )
-
-        if value is None:
-            continue
-
-        if highest is None or value > highest:
-
-            highest = value
-            hottest = session
-
-    return hottest
+    return _best_session(
+        history,
+        metrics.CPU_TEMPERATURE,
+    )
 
 
 def hottest_gpu_session(history):
+    return _best_session(
+        history,
+        metrics.GPU_TEMPERATURE,
+    )
 
-    hottest = None
-    highest = None
-
-    for session in history:
-
-        value = _sensor_average(
-            session,
-            "gpu_temperature",
-        )
-
-        if value is None:
-            continue
-
-        if highest is None or value > highest:
-
-            highest = value
-            hottest = session
-
-    return hottest
 
 def highest_memory_session(history):
-
-    hottest = None
-    highest = None
-
-    for session in history:
-
-        value = _sensor_average(
-            session,
-            "Physical Memory Load",
-        )
-
-        if value is None:
-            continue
-
-        if highest is None or value > highest:
-
-            highest = value
-            hottest = session
-
-    return hottest
+    return _best_session(
+        history,
+        metrics.MEMORY_USAGE,
+    )

@@ -1,7 +1,5 @@
 # core/models/session.py
 
-# core/models/session.py
-
 """
 Project Sentinel
 

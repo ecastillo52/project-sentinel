@@ -1,4 +1,4 @@
-# core/sensors.py
+# core/engine/sensors.py
 
 """
 Project Sentinel
@@ -16,7 +16,7 @@ Every sensor supported by Sentinel is registered here.
 
 from typing import Any
 
-Sensor = dict[str, Any]
+SensorDefinition = dict[str, Any]
 
 SENSORS = {
 
@@ -131,38 +131,27 @@ SENSORS = {
         "description": "Average displayed framerate.",
         "health": "fps_status",
     },
-
 }
 
 
-def _build_sensor(sensor_id: str) -> Sensor:
-    """
-    Return a copy of a sensor definition with its ID attached.
-    """
+def _build_sensor(sensor_id: str) -> SensorDefinition:
+    """Return a copy of a sensor definition with its ID attached."""
 
     sensor = SENSORS[sensor_id].copy()
     sensor["id"] = sensor_id
-
     return sensor
 
 
-def get_sensor(sensor_name: str) -> Sensor:
-    """
-    Return a single sensor definition.
-    """
+def get_sensor(sensor_id: str) -> SensorDefinition:
+    """Return a single sensor definition."""
 
-    return _build_sensor(sensor_name)
+    return _build_sensor(sensor_id)
 
 
-def get_all_sensors() -> list[Sensor]:
-    """
-    Return every registered sensor sorted by category and priority.
-    """
+def get_all_sensors() -> list[SensorDefinition]:
+    """Return every registered sensor sorted by category and priority."""
 
-    sensors = [
-        _build_sensor(sensor_id)
-        for sensor_id in SENSORS
-    ]
+    sensors = [_build_sensor(sensor_id) for sensor_id in SENSORS]
 
     return sorted(
         sensors,
@@ -173,10 +162,8 @@ def get_all_sensors() -> list[Sensor]:
     )
 
 
-def get_category(category: str) -> list[Sensor]:
-    """
-    Return every sensor belonging to a category.
-    """
+def get_category(category: str) -> list[SensorDefinition]:
+    """Return every sensor belonging to a category."""
 
     sensors = [
         _build_sensor(sensor_id)

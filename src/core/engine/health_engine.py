@@ -1,30 +1,16 @@
 # core/engine/health_engine.py
 
-"""
-Project Sentinel
-
-Health Engine
-
-Evaluates analyzed sensor statistics and determines
-hardware health classifications.
-"""
-
 from __future__ import annotations
 
-from typing import Any
-
-from .sensors import get_all_sensors
-
-Stats = dict[str, Any] | None
+from core.models.sensor import Sensor
 
 
 class HealthEngine:
     """
-    Determines health classifications for analyzed sensors.
+    Mutates Sensor objects with health status.
     """
 
     def __init__(self) -> None:
-
         self._rules = {
             "cpu_temperature_status": self.cpu_temperature_status,
             "cpu_usage_status": self.cpu_usage_status,
@@ -38,191 +24,103 @@ class HealthEngine:
     # Public
     # ======================================================
 
-    def evaluate(
-        self,
-        analysis: dict[str, dict[str, Any]],
-    ) -> dict[str, str]:
-        """
-        Evaluate every analyzed sensor.
-        """
+    def evaluate(self, sensors: list[Sensor]) -> list[Sensor]:
+        for sensor in sensors:
 
-        results: dict[str, str] = {}
-
-        for sensor in get_all_sensors():
-
-            sensor_id = sensor["id"]
-
-            sensor_result = analysis.get(
-                sensor_id
-            )
-
-            if sensor_result is None:
-
-                results[sensor_id] = "Unknown"
-                continue
-
-            stats = sensor_result["stats"]
-
-            evaluator = self._rules.get(
-                sensor["health"]
-            )
+            evaluator = self._rules.get(sensor.health_rule)
 
             if evaluator is None:
-
-                results[sensor_id] = "Unknown"
+                sensor.status = "UNKNOWN"
                 continue
 
-            results[sensor_id] = evaluator(
-                stats
-            )
+            sensor.status = evaluator(sensor)
 
-        return results
-
-    # ======================================================
-    # Helpers
-    # ======================================================
-
-    @staticmethod
-    def average(
-        stats: Stats,
-    ) -> float | None:
-
-        if stats is None:
-            return None
-
-        return stats.get(
-            "average"
-        )
+        return sensors
 
     # ======================================================
     # CPU
     # ======================================================
 
-    def cpu_temperature_status(
-        self,
-        stats: Stats,
-    ) -> str:
-
-        avg = self.average(stats)
+    def cpu_temperature_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
 
         if avg is None:
-            return "Unknown"
-
+            return "UNKNOWN"
         if avg < 65:
-            return "Excellent"
-
+            return "EXCELLENT"
         if avg < 75:
-            return "Healthy"
-
+            return "HEALTHY"
         if avg < 85:
-            return "Warm"
+            return "WARM"
+        return "CRITICAL"
 
-        return "Critical"
-
-    def cpu_usage_status(
-        self,
-        stats: Stats,
-    ) -> str:
-
-        avg = self.average(stats)
+    def cpu_usage_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
 
         if avg is None:
-            return "Unknown"
-
+            return "UNKNOWN"
         if avg < 70:
-            return "Healthy"
-
+            return "HEALTHY"
         if avg < 95:
-            return "Busy"
-
-        return "Maxed"
+            return "BUSY"
+        return "MAXED"
 
     # ======================================================
     # GPU
     # ======================================================
 
-    def gpu_temperature_status(
-        self,
-        stats: Stats,
-    ) -> str:
-
-        avg = self.average(stats)
+    def gpu_temperature_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
 
         if avg is None:
-            return "Unknown"
-
+            return "UNKNOWN"
         if avg < 60:
-            return "Excellent"
-
+            return "EXCELLENT"
         if avg < 70:
-            return "Healthy"
-
+            return "HEALTHY"
         if avg < 82:
-            return "Warm"
+            return "WARM"
+        return "CRITICAL"
 
-        return "Critical"
-
-    def gpu_usage_status(
-        self,
-        stats: Stats,
-    ) -> str:
-
-        avg = self.average(stats)
+    def gpu_usage_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
 
         if avg is None:
-            return "Unknown"
-
+            return "UNKNOWN"
         if avg < 85:
-            return "Healthy"
-
+            return "HEALTHY"
         if avg < 97:
-            return "Busy"
-
-        return "Maxed"
+            return "BUSY"
+        return "MAXED"
 
     # ======================================================
     # Memory
     # ======================================================
 
-    def memory_usage_status(
-        self,
-        stats: Stats,
-    ) -> str:
-
-        avg = self.average(stats)
+    def memory_usage_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
 
         if avg is None:
-            return "Unknown"
-
+            return "UNKNOWN"
         if avg < 70:
-            return "Healthy"
-
+            return "HEALTHY"
         if avg < 90:
-            return "High"
-
-        return "Critical"
+            return "HIGH"
+        return "CRITICAL"
 
     # ======================================================
     # Performance
     # ======================================================
 
-    def fps_status(
-        self,
-        stats: Stats,
-    ) -> str:
-
-        avg = self.average(stats)
+    def fps_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
 
         if avg is None:
-            return "Unknown"
-
+            return "UNKNOWN"
         if avg >= 144:
-            return "Excellent"
-
+            return "EXCELLENT"
         if avg >= 120:
-            return "Healthy"
-
+            return "HEALTHY"
         if avg >= 60:
-            return "Playable"
-
-        return "Poor"
+            return "PLAYABLE"
+        return "POOR"

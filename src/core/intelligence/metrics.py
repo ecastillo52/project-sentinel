@@ -9,28 +9,47 @@ Computes numerical metrics from historical Sentinel
 sessions.
 
 This module performs no interpretation.
-
-Input:
-    list[Session]
-
-Output:
-    numbers
 """
 
 from __future__ import annotations
 
 from statistics import mean
-from typing import Any
 
+from core.models.sensor import Sensor
 from core.models.session import Session
+
+
+# ==========================================================
+# Sensor Registry IDs
+# ==========================================================
+
+CPU_TEMPERATURE = "cpu_temp"
+GPU_TEMPERATURE = "gpu_temp"
+MEMORY_USAGE = "memory_load"
+FPS = "fps"
 
 
 # ==========================================================
 # Helpers
 # ==========================================================
 
+def _sensor(
+    session: Session,
+    sensor_id: str,
+) -> Sensor | None:
+    """
+    Return a sensor from a session.
+    """
 
-def _sensor_average(
+    sensor = session.report.sensors.get(sensor_id)
+
+    if isinstance(sensor, Sensor):
+        return sensor
+
+    return None
+
+
+def sensor_average(
     session: Session,
     sensor_id: str,
 ) -> float | None:
@@ -38,27 +57,24 @@ def _sensor_average(
     Return the average value recorded for a sensor.
     """
 
-    sensor = session.report.sensors.get(sensor_id)
+    sensor = _sensor(session, sensor_id)
 
-    if sensor is None:
-        return None
-
-    return sensor.average
+    return None if sensor is None else sensor.average
 
 
-def _values(
+def sensor_values(
     history: list[Session],
     sensor_id: str,
 ) -> list[float]:
     """
-    Return all historical averages for a sensor.
+    Return all recorded averages for a sensor.
     """
 
-    values = []
+    values: list[float] = []
 
     for session in history:
 
-        value = _sensor_average(
+        value = sensor_average(
             session,
             sensor_id,
         )
@@ -73,13 +89,12 @@ def _values(
 # Generic Metrics
 # ==========================================================
 
-
 def average_sensor(
     history: list[Session],
     sensor_id: str,
 ) -> float | None:
 
-    values = _values(history, sensor_id)
+    values = sensor_values(history, sensor_id)
 
     if not values:
         return None
@@ -92,12 +107,9 @@ def highest_sensor(
     sensor_id: str,
 ) -> float | None:
 
-    values = _values(history, sensor_id)
+    values = sensor_values(history, sensor_id)
 
-    if not values:
-        return None
-
-    return max(values)
+    return max(values) if values else None
 
 
 def lowest_sensor(
@@ -105,93 +117,42 @@ def lowest_sensor(
     sensor_id: str,
 ) -> float | None:
 
-    values = _values(history, sensor_id)
+    values = sensor_values(history, sensor_id)
 
-    if not values:
-        return None
-
-    return min(values)
+    return min(values) if values else None
 
 
 # ==========================================================
-# CPU
+# Convenience Wrappers
 # ==========================================================
-
 
 def average_cpu_temperature(history):
-
-    return average_sensor(
-        history,
-        "cpu_temperature",
-    )
+    return average_sensor(history, CPU_TEMPERATURE)
 
 
 def highest_cpu_temperature(history):
-
-    return highest_sensor(
-        history,
-        "cpu_temperature",
-    )
-
-
-# ==========================================================
-# GPU
-# ==========================================================
+    return highest_sensor(history, CPU_TEMPERATURE)
 
 
 def average_gpu_temperature(history):
-
-    return average_sensor(
-        history,
-        "gpu_temperature",
-    )
+    return average_sensor(history, GPU_TEMPERATURE)
 
 
 def highest_gpu_temperature(history):
-
-    return highest_sensor(
-        history,
-        "gpu_temperature",
-    )
-
-
-# ==========================================================
-# Memory
-# ==========================================================
+    return highest_sensor(history, GPU_TEMPERATURE)
 
 
 def average_memory_load(history):
-
-    return average_sensor(
-        history,
-        "memory_usage",
-    )
+    return average_sensor(history, MEMORY_USAGE)
 
 
 def highest_memory_load(history):
-
-    return highest_sensor(
-        history,
-        "memory_usage",
-    )
-
-
-# ==========================================================
-# FPS
-# ==========================================================
+    return highest_sensor(history, MEMORY_USAGE)
 
 
 def average_fps(history):
-
-    return average_sensor(
-        history,
-        "fps",
-    )
+    return average_sensor(history, FPS)
 
 
 def highest_fps(history):
-
-    return highest_sensor(
-        history,
-        "fps",
-    )
+    return highest_sensor(history, FPS)

@@ -32,14 +32,14 @@ SECTION = "-" * REPORT_WIDTH
 HEALTH_ICONS = {
     "GOOD": "✓",
     "PASS": "✓",
-    "Healthy": "✓",
-    "Excellent": "✓",
+    "HEALTHY": "✓",
+    "EXCELLENT": "✓",
     "WARNING": "⚠",
     "WARN": "⚠",
-    "Warm": "⚠",
+    "WARM": "⚠",
     "CRITICAL": "✗",
     "FAIL": "✗",
-    "Critical": "✗",
+    "CRITICAL": "✗",
 }
 
 

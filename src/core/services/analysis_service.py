@@ -78,8 +78,10 @@ class AnalysisService:
 
         file_hash = sha256(csv_path)
 
-        if self.database.contains_hash(file_hash):
-            return None
+        existing = self.database.find_by_hash(file_hash)
+
+        if existing:
+            return existing
 
         # --------------------------------------------------
         # Read Log
@@ -91,13 +93,13 @@ class AnalysisService:
         # Analyze Sensor Data
         # --------------------------------------------------
 
-        analysis = self.analyzer.analyze(log)
+        sensors = self.analyzer.analyze(log)
 
         # --------------------------------------------------
         # Evaluate Hardware Health
         # --------------------------------------------------
 
-        health = self.health_engine.evaluate(analysis)
+        sensors = self.health_engine.evaluate(sensors)
 
         # --------------------------------------------------
         # Gather Machine Metadata
@@ -110,8 +112,7 @@ class AnalysisService:
         # --------------------------------------------------
 
         report = self.report_builder.build(
-            analysis=analysis,
-            health=health,
+            sensors=sensors,
             machine=machine,
         )
 

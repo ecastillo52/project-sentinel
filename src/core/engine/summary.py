@@ -5,15 +5,17 @@ Project Sentinel
 
 Session Summary
 
-Build the executive summary displayed at the end
-of every Sentinel report.
+Builds the executive summary for a completed Report.
 
 This module performs no analysis.
 
 It summarizes data that has already been analyzed.
 """
 
-from typing import Any
+from __future__ import annotations
+
+from core.models.report import Report
+from core.models.sensor import Sensor
 
 
 # ==========================================================
@@ -21,12 +23,12 @@ from typing import Any
 # ==========================================================
 
 HEALTH_PRIORITY = (
-    "Critical",
-    "Poor",
-    "High",
-    "Warm",
-    "Healthy",
-    "Excellent",
+    "CRITICAL",
+    "POOR",
+    "HIGH",
+    "WARM",
+    "HEALTHY",
+    "EXCELLENT",
 )
 
 
@@ -34,19 +36,9 @@ HEALTH_PRIORITY = (
 # Public API
 # ==========================================================
 
-def build_summary(report: dict[str, Any]) -> dict[str, Any]:
+def build_summary(report: Report) -> dict[str, float | str | None]:
     """
-    Build the session summary.
-
-    Parameters
-    ----------
-    report : dict
-        Completed Sentinel report.
-
-    Returns
-    -------
-    dict
-        Executive summary.
+    Build an executive summary from a completed Report.
     """
 
     return {
@@ -62,51 +54,34 @@ def build_summary(report: dict[str, Any]) -> dict[str, Any]:
 # Summary Builders
 # ==========================================================
 
-def _average_fps(report: dict[str, Any]) -> float | None:
-    """Return the average FPS."""
-
+def _average_fps(report: Report) -> float | None:
     return _sensor_stat(report, "fps", "average")
 
 
-def _peak_cpu_temp(report: dict[str, Any]) -> float | None:
-    """Return the peak CPU temperature."""
-
+def _peak_cpu_temp(report: Report) -> float | None:
     return _sensor_stat(report, "cpu_temp", "maximum")
 
 
-def _peak_gpu_temp(report: dict[str, Any]) -> float | None:
-    """Return the peak GPU temperature."""
-
+def _peak_gpu_temp(report: Report) -> float | None:
     return _sensor_stat(report, "gpu_temp", "maximum")
 
 
-def _peak_ram_usage(report: dict[str, Any]) -> float | None:
-    """Return the peak memory load."""
-
+def _peak_ram_usage(report: Report) -> float | None:
     return _sensor_stat(report, "memory_load", "maximum")
 
 
-def _overall_health(report: dict[str, Any]) -> str:
+def _overall_health(report: Report) -> str:
     """
-    Determine overall session health.
+    Determine the overall health of the session.
 
-    Priority (worst to best):
-
-        Critical
-        Poor
-        High
-        Warm
-        Healthy
-        Excellent
+    The worst health classification found among all sensors
+    becomes the overall session health.
     """
 
     statuses = {
-        (
-            sensor["status"]
-            if not isinstance(sensor["status"], dict)
-            else sensor["status"].get("status", "Unknown")
-        )
-        for sensor in report["sensors"].values()
+        (sensor.status or "").upper()
+        for sensor in report.sensors.values()
+        if isinstance(sensor, Sensor)
     }
 
     for level in HEALTH_PRIORITY:
@@ -121,25 +96,28 @@ def _overall_health(report: dict[str, Any]) -> str:
 # ==========================================================
 
 def _sensor_stat(
-    report: dict[str, Any],
+    report: Report,
     sensor_id: str,
-    stat: str,
+    attribute: str,
 ) -> float | None:
     """
     Return a statistic from a sensor.
 
-    Returns None if the sensor or its statistics
-    are unavailable.
+    Parameters
+    ----------
+    report
+        Completed Report.
+
+    sensor_id
+        Sensor registry identifier.
+
+    attribute
+        Sensor attribute (average, maximum, minimum, current).
     """
 
-    sensor = report["sensors"].get(sensor_id)
+    sensor = report.sensors.get(sensor_id)
 
-    if sensor is None:
+    if not isinstance(sensor, Sensor):
         return None
 
-    stats = sensor.get("stats")
-
-    if stats is None:
-        return None
-
-    return stats.get(stat)
+    return getattr(sensor, attribute, None)

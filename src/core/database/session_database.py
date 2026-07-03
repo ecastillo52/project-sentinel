@@ -104,6 +104,30 @@ class SessionDatabase:
     # Queries
     # ======================================================
 
+    def find_by_hash(
+            self,
+            file_hash: str,
+    ) -> Session | None:
+        """
+        Find a session by its file hash.
+        """
+
+        for session in self._sessions.values():
+            if session.hash == file_hash:
+                return session
+
+        return None
+
+    def contains_hash(
+            self,
+            file_hash: str,
+    ) -> bool:
+        """
+        Determine whether a session with the given file hash exists.
+        """
+
+        return self.find_by_hash(file_hash) is not None
+
     def by_game(self, game: str) -> list[Session]:
         """
         Return every session for a game.
@@ -172,26 +196,6 @@ class SessionDatabase:
 
         return not self._sessions
 
-    def __contains__(self, session_id: str) -> bool:
-        """
-        Determine whether a session exists.
-        """
-
-        return session_id in self._sessions
-
-    def contains_hash(
-            self,
-            file_hash: str,
-    ) -> bool:
-        """
-        Determine whether a session already exists for a file hash.
-        """
-
-        return any(
-            session.hash == file_hash
-            for session in self._sessions.values()
-        )
-
     # ======================================================
     # Python Protocols
     # ======================================================
@@ -203,7 +207,7 @@ class SessionDatabase:
 
         return len(self._sessions)
 
-    def __iter__(self):
+    def __iter__(self) -> iter[Session]:
         """
         Iterate over all sessions.
         """

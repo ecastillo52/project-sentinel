@@ -28,6 +28,12 @@ class Report:
     summary: dict[str, Any] = field(default_factory=dict)
 
     health: dict[str, Any] = field(default_factory=dict)
+    # NOTE:
+    # This is legacy/derived metadata.
+    # Sensor.status is the authoritative health source.health: dict[str, Any] = field(default_factory=dict)
+    # # NOTE:
+    # # This is legacy/derived metadata.
+    # # Sensor.status is the authoritative health source.
 
     sensors: dict[str, Sensor | dict[str, Any]] = field(
         default_factory=dict
@@ -122,7 +128,21 @@ class Report:
 
     @property
     def health_score(self) -> int | None:
-        return self.health.get("score")
+        """
+        Return overall health score if present.
+
+        This is optional metadata and may not exist.
+        """
+
+        if not isinstance(self.health, dict):
+            return None
+
+        score = self.health.get("score")
+
+        if isinstance(score, (int, float)):
+            return int(score)
+
+        return None
 
     @property
     def passed(self) -> bool:

@@ -48,6 +48,8 @@ class Sensor:
     # Health
     # ======================================================
 
+    health_rule: str = ""
+
     status: str = "UNKNOWN"
 
     # ======================================================
@@ -55,6 +57,10 @@ class Sensor:
     # ======================================================
 
     def to_dict(self) -> dict:
+        """
+        Serialize this Sensor into a dictionary.
+        """
+
         return {
             "id": self.id,
             "name": self.name,
@@ -66,6 +72,7 @@ class Sensor:
             "maximum": self.maximum,
             "average": self.average,
             "unit": self.unit,
+            "health_rule": self.health_rule,
             "status": self.status,
         }
 
@@ -74,6 +81,10 @@ class Sensor:
         cls,
         data: dict,
     ) -> "Sensor":
+        """
+        Construct a Sensor from a serialized dictionary.
+        """
+
         return cls(
             id=data.get("id", ""),
             name=data.get("name", ""),
@@ -94,6 +105,7 @@ class Sensor:
             maximum=data.get("maximum"),
             average=data.get("average"),
             unit=data.get("unit", ""),
+            health_rule=data.get("health_rule", ""),
             status=data.get(
                 "status",
                 "UNKNOWN",
@@ -134,6 +146,16 @@ class Sensor:
             )
         )
 
+    @property
+    def value(self) -> float | int | None:
+        """
+        Return the sensor's primary value.
+
+        By convention this is the current reading.
+        """
+
+        return self.current
+
     # ======================================================
     # Display
     # ======================================================
@@ -147,5 +169,6 @@ class Sensor:
             f"id={self.id!r}, "
             f"display={self.display!r}, "
             f"average={self.average}, "
-            f"status={self.status!r})"
+            f"status={self.status!r}, "
+            f"health_rule={self.health_rule!r})"
         )

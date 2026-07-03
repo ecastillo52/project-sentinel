@@ -192,7 +192,7 @@ def build_report(
     # ------------------------------------------------------
 
     report["recommendations"] = (
-        recommendations.generate(report)
+        recommendations.generate(history)
     )
 
     return report
