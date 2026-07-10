@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>idle - Sentinel Trends</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --text: #16202a;
+  --muted: #66717f;
+  --line: #d9e0e8;
+  --good: #2f9e44;
+  --warning: #f08c00;
+  --critical: #d9480f;
+  --unknown: #687385;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
+}
+
+.page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+.report-header,
+section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  padding: 28px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+
+section {
+  padding: 24px;
+}
+
+.eyebrow,
+.metric span,
+dt,
+.muted {
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.session-meta,
+.details {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.details {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.metric span,
+.metric strong {
+  display: block;
+}
+
+.metric strong {
+  font-size: 22px;
+  margin-top: 6px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.trend-grid {
+  grid-template-columns: 1fr;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+}
+
+svg .title {
+  fill: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+svg .label,
+svg .value,
+svg .muted {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+svg .value {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 11px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.pill {
+  border-radius: 999px;
+  color: white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 74px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.pill.good {
+  background: var(--good);
+}
+
+.pill.warning {
+  background: var(--warning);
+}
+
+.pill.critical {
+  background: var(--critical);
+}
+
+.pill.unknown {
+  background: var(--unknown);
+}
+
+.recommendations {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.recommendations li + li {
+  margin-top: 8px;
+}
+
+.print-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.print-actions button {
+  background: var(--text);
+  border: 0;
+  border-radius: 6px;
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+@media (max-width: 860px) {
+  .report-header,
+  .details,
+  .summary-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page {
+    width: min(100% - 20px, 1180px);
+    padding-top: 16px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+
+  body {
+    background: white;
+  }
+
+  .page {
+    width: 100%;
+    padding: 0;
+  }
+
+  .print-actions {
+    display: none;
+  }
+
+  .report-header,
+  section,
+  .metric,
+  .chart-card {
+    border-color: #bfc7d1;
+    break-inside: avoid;
+  }
+
+  .chart-grid,
+  .summary-grid,
+  .details,
+  .report-header {
+    grid-template-columns: 1fr;
+  }
+
+  svg {
+    min-width: 0;
+  }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="report-header">
+  <div>
+    <p class="eyebrow">Project Sentinel 0.6.0 - A Complete Working Model</p>
+    <h1>idle Trends</h1>
+    <p>22 sessions tracked. Latest session: 2026-07-09T16:41:06.477399</p>
+  </div>
+  <dl class="session-meta">
+    <div><dt>Report</dt><dd>Rolling game archive</dd></div>
+    <div><dt>Updated</dt><dd>2026-07-09T16:41:06.477399</dd></div>
+    <div><dt>PDF</dt><dd>Use Print / Save as PDF</dd></div>
+  </dl>
+</header>
+
+
+<div class="print-actions">
+  <button type="button" onclick="window.print()">Print or Save as PDF</button>
+</div>
+
+
+<section>
+  <h2>Current Snapshot</h2>
+  <div class="summary-grid">
+    
+<article class="metric">
+  <span>Sessions</span>
+  <strong>22</strong>
+</article>
+
+<article class="metric">
+  <span>Latest FPS</span>
+  <strong>19 FPS</strong>
+</article>
+
+<article class="metric">
+  <span>Latest CPU Peak</span>
+  <strong>77.6 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Latest GPU Peak</span>
+  <strong>40.8 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Latest RAM Peak</span>
+  <strong>34.5 %</strong>
+</article>
+
+  </div>
+</section>
+
+
+<section>
+  <h2>Session Trends</h2>
+  <div class="chart-grid trend-grid">
+    <article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Average FPS</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">52 FPS</text><text x="12" y="218" class="muted">0 FPS</text><polyline points="58.0,191.6 90.2,189.4 122.4,165.0 154.6,89.5 186.8,123.5 219.0,139.1 251.1,95.1 283.3,189.4 315.5,176.2 347.7,172.7 379.9,172.5 412.1,188.5 444.3,186.7 476.5,155.8 508.7,155.2 540.9,42.0 573.0,195.8 605.2,194.2 637.4,212.0 669.6,193.3 701.8,173.7 734.0,149.5" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="191.6" r="4" fill="#2364aa" /><title>Session 1: 6 FPS</title><circle cx="90.2" cy="189.4" r="4" fill="#2364aa" /><title>Session 2: 7 FPS</title><circle cx="122.4" cy="165.0" r="4" fill="#2364aa" /><title>Session 3: 14 FPS</title><circle cx="154.6" cy="89.5" r="4" fill="#2364aa" /><title>Session 4: 38 FPS</title><circle cx="186.8" cy="123.5" r="4" fill="#2364aa" /><title>Session 5: 27 FPS</title><circle cx="219.0" cy="139.1" r="4" fill="#2364aa" /><title>Session 6: 22 FPS</title><circle cx="251.1" cy="95.1" r="4" fill="#2364aa" /><title>Session 7: 36 FPS</title><circle cx="283.3" cy="189.4" r="4" fill="#2364aa" /><title>Session 8: 7 FPS</title><circle cx="315.5" cy="176.2" r="4" fill="#2364aa" /><title>Session 9: 11 FPS</title><circle cx="347.7" cy="172.7" r="4" fill="#2364aa" /><title>Session 10: 12 FPS</title><circle cx="379.9" cy="172.5" r="4" fill="#2364aa" /><title>Session 11: 12 FPS</title><circle cx="412.1" cy="188.5" r="4" fill="#2364aa" /><title>Session 12: 7 FPS</title><circle cx="444.3" cy="186.7" r="4" fill="#2364aa" /><title>Session 13: 8 FPS</title><circle cx="476.5" cy="155.8" r="4" fill="#2364aa" /><title>Session 14: 17 FPS</title><circle cx="508.7" cy="155.2" r="4" fill="#2364aa" /><title>Session 15: 18 FPS</title><circle cx="540.9" cy="42.0" r="4" fill="#2364aa" /><title>Session 16: 52 FPS</title><circle cx="573.0" cy="195.8" r="4" fill="#2364aa" /><title>Session 17: 5 FPS</title><circle cx="605.2" cy="194.2" r="4" fill="#2364aa" /><title>Session 18: 5 FPS</title><circle cx="637.4" cy="212.0" r="4" fill="#2364aa" /><title>Session 19: 0 FPS</title><circle cx="669.6" cy="193.3" r="4" fill="#2364aa" /><title>Session 20: 6 FPS</title><circle cx="701.8" cy="173.7" r="4" fill="#2364aa" /><title>Session 21: 12 FPS</title><circle cx="734.0" cy="149.5" r="4" fill="#2364aa" /><title>Session 22: 19 FPS</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">19 FPS</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Peak CPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">87.2 °C</text><text x="12" y="218" class="muted">63.0 °C</text><polyline points="58.0,105.9 90.2,105.9 122.4,106.6 154.6,141.8 186.8,85.6 219.0,42.0 251.1,121.4 283.3,212.0 315.5,192.3 347.7,86.3 379.9,86.3 412.1,121.4 444.3,167.0 476.5,105.2 508.7,96.8 540.9,169.9 573.0,112.2 605.2,117.2 637.4,152.3 669.6,70.1 701.8,94.0 734.0,109.4" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="105.9" r="4" fill="#2364aa" /><title>Session 1: 78.1 °C</title><circle cx="90.2" cy="105.9" r="4" fill="#2364aa" /><title>Session 2: 78.1 °C</title><circle cx="122.4" cy="106.6" r="4" fill="#2364aa" /><title>Session 3: 78.0 °C</title><circle cx="154.6" cy="141.8" r="4" fill="#2364aa" /><title>Session 4: 73.0 °C</title><circle cx="186.8" cy="85.6" r="4" fill="#2364aa" /><title>Session 5: 81.0 °C</title><circle cx="219.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 6: 87.2 °C</title><circle cx="251.1" cy="121.4" r="4" fill="#2364aa" /><title>Session 7: 75.9 °C</title><circle cx="283.3" cy="212.0" r="4" fill="#2364aa" /><title>Session 8: 63.0 °C</title><circle cx="315.5" cy="192.3" r="4" fill="#2364aa" /><title>Session 9: 65.8 °C</title><circle cx="347.7" cy="86.3" r="4" fill="#2364aa" /><title>Session 10: 80.9 °C</title><circle cx="379.9" cy="86.3" r="4" fill="#2364aa" /><title>Session 11: 80.9 °C</title><circle cx="412.1" cy="121.4" r="4" fill="#2364aa" /><title>Session 12: 75.9 °C</title><circle cx="444.3" cy="167.0" r="4" fill="#2364aa" /><title>Session 13: 69.4 °C</title><circle cx="476.5" cy="105.2" r="4" fill="#2364aa" /><title>Session 14: 78.2 °C</title><circle cx="508.7" cy="96.8" r="4" fill="#2364aa" /><title>Session 15: 79.4 °C</title><circle cx="540.9" cy="169.9" r="4" fill="#2364aa" /><title>Session 16: 69.0 °C</title><circle cx="573.0" cy="112.2" r="4" fill="#2364aa" /><title>Session 17: 77.2 °C</title><circle cx="605.2" cy="117.2" r="4" fill="#2364aa" /><title>Session 18: 76.5 °C</title><circle cx="637.4" cy="152.3" r="4" fill="#2364aa" /><title>Session 19: 71.5 °C</title><circle cx="669.6" cy="70.1" r="4" fill="#2364aa" /><title>Session 20: 83.2 °C</title><circle cx="701.8" cy="94.0" r="4" fill="#2364aa" /><title>Session 21: 79.8 °C</title><circle cx="734.0" cy="109.4" r="4" fill="#2364aa" /><title>Session 22: 77.6 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">77.6 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Peak GPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">40.8 °C</text><text x="12" y="218" class="muted">33.7 °C</text><polyline points="58.0,113.8 90.2,128.2 122.4,116.2 154.6,116.2 186.8,92.3 219.0,123.4 251.1,200.0 283.3,192.8 315.5,185.7 347.7,116.2 379.9,116.2 412.1,121.0 444.3,209.6 476.5,156.9 508.7,207.2 540.9,212.0 573.0,190.5 605.2,188.1 637.4,164.1 669.6,44.4 701.8,99.5 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="113.8" r="4" fill="#2364aa" /><title>Session 1: 37.8 °C</title><circle cx="90.2" cy="128.2" r="4" fill="#2364aa" /><title>Session 2: 37.2 °C</title><circle cx="122.4" cy="116.2" r="4" fill="#2364aa" /><title>Session 3: 37.7 °C</title><circle cx="154.6" cy="116.2" r="4" fill="#2364aa" /><title>Session 4: 37.7 °C</title><circle cx="186.8" cy="92.3" r="4" fill="#2364aa" /><title>Session 5: 38.7 °C</title><circle cx="219.0" cy="123.4" r="4" fill="#2364aa" /><title>Session 6: 37.4 °C</title><circle cx="251.1" cy="200.0" r="4" fill="#2364aa" /><title>Session 7: 34.2 °C</title><circle cx="283.3" cy="192.8" r="4" fill="#2364aa" /><title>Session 8: 34.5 °C</title><circle cx="315.5" cy="185.7" r="4" fill="#2364aa" /><title>Session 9: 34.8 °C</title><circle cx="347.7" cy="116.2" r="4" fill="#2364aa" /><title>Session 10: 37.7 °C</title><circle cx="379.9" cy="116.2" r="4" fill="#2364aa" /><title>Session 11: 37.7 °C</title><circle cx="412.1" cy="121.0" r="4" fill="#2364aa" /><title>Session 12: 37.5 °C</title><circle cx="444.3" cy="209.6" r="4" fill="#2364aa" /><title>Session 13: 33.8 °C</title><circle cx="476.5" cy="156.9" r="4" fill="#2364aa" /><title>Session 14: 36.0 °C</title><circle cx="508.7" cy="207.2" r="4" fill="#2364aa" /><title>Session 15: 33.9 °C</title><circle cx="540.9" cy="212.0" r="4" fill="#2364aa" /><title>Session 16: 33.7 °C</title><circle cx="573.0" cy="190.5" r="4" fill="#2364aa" /><title>Session 17: 34.6 °C</title><circle cx="605.2" cy="188.1" r="4" fill="#2364aa" /><title>Session 18: 34.7 °C</title><circle cx="637.4" cy="164.1" r="4" fill="#2364aa" /><title>Session 19: 35.7 °C</title><circle cx="669.6" cy="44.4" r="4" fill="#2364aa" /><title>Session 20: 40.7 °C</title><circle cx="701.8" cy="99.5" r="4" fill="#2364aa" /><title>Session 21: 38.4 °C</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 22: 40.8 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">40.8 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Peak RAM Usage</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">95.9 %</text><text x="12" y="218" class="muted">23.5 %</text><polyline points="58.0,70.4 90.2,76.5 122.4,71.8 154.6,42.0 186.8,76.5 219.0,76.8 251.1,102.1 283.3,101.4 315.5,110.1 347.7,62.4 379.9,62.4 412.1,69.2 444.3,66.9 476.5,73.5 508.7,69.9 540.9,74.4 573.0,88.5 605.2,212.0 637.4,150.0 669.6,140.6 701.8,173.5 734.0,186.2" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="70.4" r="4" fill="#2364aa" /><title>Session 1: 83.8 %</title><circle cx="90.2" cy="76.5" r="4" fill="#2364aa" /><title>Session 2: 81.2 %</title><circle cx="122.4" cy="71.8" r="4" fill="#2364aa" /><title>Session 3: 83.2 %</title><circle cx="154.6" cy="42.0" r="4" fill="#2364aa" /><title>Session 4: 95.9 %</title><circle cx="186.8" cy="76.5" r="4" fill="#2364aa" /><title>Session 5: 81.2 %</title><circle cx="219.0" cy="76.8" r="4" fill="#2364aa" /><title>Session 6: 81.1 %</title><circle cx="251.1" cy="102.1" r="4" fill="#2364aa" /><title>Session 7: 70.3 %</title><circle cx="283.3" cy="101.4" r="4" fill="#2364aa" /><title>Session 8: 70.6 %</title><circle cx="315.5" cy="110.1" r="4" fill="#2364aa" /><title>Session 9: 66.9 %</title><circle cx="347.7" cy="62.4" r="4" fill="#2364aa" /><title>Session 10: 87.2 %</title><circle cx="379.9" cy="62.4" r="4" fill="#2364aa" /><title>Session 11: 87.2 %</title><circle cx="412.1" cy="69.2" r="4" fill="#2364aa" /><title>Session 12: 84.3 %</title><circle cx="444.3" cy="66.9" r="4" fill="#2364aa" /><title>Session 13: 85.3 %</title><circle cx="476.5" cy="73.5" r="4" fill="#2364aa" /><title>Session 14: 82.5 %</title><circle cx="508.7" cy="69.9" r="4" fill="#2364aa" /><title>Session 15: 84.0 %</title><circle cx="540.9" cy="74.4" r="4" fill="#2364aa" /><title>Session 16: 82.1 %</title><circle cx="573.0" cy="88.5" r="4" fill="#2364aa" /><title>Session 17: 76.1 %</title><circle cx="605.2" cy="212.0" r="4" fill="#2364aa" /><title>Session 18: 23.5 %</title><circle cx="637.4" cy="150.0" r="4" fill="#2364aa" /><title>Session 19: 49.9 %</title><circle cx="669.6" cy="140.6" r="4" fill="#2364aa" /><title>Session 20: 53.9 %</title><circle cx="701.8" cy="173.5" r="4" fill="#2364aa" /><title>Session 21: 39.9 %</title><circle cx="734.0" cy="186.2" r="4" fill="#2364aa" /><title>Session 22: 34.5 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">34.5 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">CPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">72.3 °C</text><text x="12" y="218" class="muted">58.3 °C</text><polyline points="58.0,166.1 90.2,170.4 122.4,126.2 154.6,160.0 186.8,130.5 219.0,155.8 251.1,212.0 283.3,193.3 315.5,192.3 347.7,157.6 379.9,157.2 412.1,187.8 444.3,131.1 476.5,121.0 508.7,136.9 540.9,169.4 573.0,93.1 605.2,56.8 637.4,115.9 669.6,93.4 701.8,96.0 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="166.1" r="4" fill="#2364aa" /><title>Session 1: 62.1 °C</title><circle cx="90.2" cy="170.4" r="4" fill="#2364aa" /><title>Session 2: 61.7 °C</title><circle cx="122.4" cy="126.2" r="4" fill="#2364aa" /><title>Session 3: 65.4 °C</title><circle cx="154.6" cy="160.0" r="4" fill="#2364aa" /><title>Session 4: 62.6 °C</title><circle cx="186.8" cy="130.5" r="4" fill="#2364aa" /><title>Session 5: 65.0 °C</title><circle cx="219.0" cy="155.8" r="4" fill="#2364aa" /><title>Session 6: 62.9 °C</title><circle cx="251.1" cy="212.0" r="4" fill="#2364aa" /><title>Session 7: 58.3 °C</title><circle cx="283.3" cy="193.3" r="4" fill="#2364aa" /><title>Session 8: 59.9 °C</title><circle cx="315.5" cy="192.3" r="4" fill="#2364aa" /><title>Session 9: 59.9 °C</title><circle cx="347.7" cy="157.6" r="4" fill="#2364aa" /><title>Session 10: 62.8 °C</title><circle cx="379.9" cy="157.2" r="4" fill="#2364aa" /><title>Session 11: 62.8 °C</title><circle cx="412.1" cy="187.8" r="4" fill="#2364aa" /><title>Session 12: 60.3 °C</title><circle cx="444.3" cy="131.1" r="4" fill="#2364aa" /><title>Session 13: 65.0 °C</title><circle cx="476.5" cy="121.0" r="4" fill="#2364aa" /><title>Session 14: 65.8 °C</title><circle cx="508.7" cy="136.9" r="4" fill="#2364aa" /><title>Session 15: 64.5 °C</title><circle cx="540.9" cy="169.4" r="4" fill="#2364aa" /><title>Session 16: 61.8 °C</title><circle cx="573.0" cy="93.1" r="4" fill="#2364aa" /><title>Session 17: 68.1 °C</title><circle cx="605.2" cy="56.8" r="4" fill="#2364aa" /><title>Session 18: 71.1 °C</title><circle cx="637.4" cy="115.9" r="4" fill="#2364aa" /><title>Session 19: 66.2 °C</title><circle cx="669.6" cy="93.4" r="4" fill="#2364aa" /><title>Session 20: 68.1 °C</title><circle cx="701.8" cy="96.0" r="4" fill="#2364aa" /><title>Session 21: 67.8 °C</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 22: 72.3 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">72.3 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">CPU Usage</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">23.7 %</text><text x="12" y="218" class="muted">3.2 %</text><polyline points="58.0,190.7 90.2,196.9 122.4,176.5 154.6,163.8 186.8,172.1 219.0,167.7 251.1,210.5 283.3,212.0 315.5,206.9 347.7,194.6 379.9,194.5 412.1,192.2 444.3,171.7 476.5,171.6 508.7,172.2 540.9,189.0 573.0,156.2 605.2,169.9 637.4,154.0 669.6,157.5 701.8,104.6 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="190.7" r="4" fill="#2364aa" /><title>Session 1: 5.8 %</title><circle cx="90.2" cy="196.9" r="4" fill="#2364aa" /><title>Session 2: 5.0 %</title><circle cx="122.4" cy="176.5" r="4" fill="#2364aa" /><title>Session 3: 7.5 %</title><circle cx="154.6" cy="163.8" r="4" fill="#2364aa" /><title>Session 4: 9.0 %</title><circle cx="186.8" cy="172.1" r="4" fill="#2364aa" /><title>Session 5: 8.0 %</title><circle cx="219.0" cy="167.7" r="4" fill="#2364aa" /><title>Session 6: 8.5 %</title><circle cx="251.1" cy="210.5" r="4" fill="#2364aa" /><title>Session 7: 3.4 %</title><circle cx="283.3" cy="212.0" r="4" fill="#2364aa" /><title>Session 8: 3.2 %</title><circle cx="315.5" cy="206.9" r="4" fill="#2364aa" /><title>Session 9: 3.8 %</title><circle cx="347.7" cy="194.6" r="4" fill="#2364aa" /><title>Session 10: 5.3 %</title><circle cx="379.9" cy="194.5" r="4" fill="#2364aa" /><title>Session 11: 5.3 %</title><circle cx="412.1" cy="192.2" r="4" fill="#2364aa" /><title>Session 12: 5.6 %</title><circle cx="444.3" cy="171.7" r="4" fill="#2364aa" /><title>Session 13: 8.1 %</title><circle cx="476.5" cy="171.6" r="4" fill="#2364aa" /><title>Session 14: 8.1 %</title><circle cx="508.7" cy="172.2" r="4" fill="#2364aa" /><title>Session 15: 8.0 %</title><circle cx="540.9" cy="189.0" r="4" fill="#2364aa" /><title>Session 16: 6.0 %</title><circle cx="573.0" cy="156.2" r="4" fill="#2364aa" /><title>Session 17: 9.9 %</title><circle cx="605.2" cy="169.9" r="4" fill="#2364aa" /><title>Session 18: 8.3 %</title><circle cx="637.4" cy="154.0" r="4" fill="#2364aa" /><title>Session 19: 10.2 %</title><circle cx="669.6" cy="157.5" r="4" fill="#2364aa" /><title>Session 20: 9.8 %</title><circle cx="701.8" cy="104.6" r="4" fill="#2364aa" /><title>Session 21: 16.1 %</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 22: 23.7 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">23.7 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Average FPS</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">52 FPS</text><text x="12" y="218" class="muted">0 FPS</text><polyline points="58.0,191.6 90.2,189.4 122.4,165.0 154.6,89.5 186.8,123.5 219.0,139.1 251.1,95.1 283.3,189.4 315.5,176.2 347.7,172.7 379.9,172.5 412.1,188.5 444.3,186.7 476.5,155.8 508.7,155.2 540.9,42.0 573.0,195.8 605.2,194.2 637.4,212.0 669.6,193.3 701.8,173.7 734.0,149.5" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="191.6" r="4" fill="#2364aa" /><title>Session 1: 6 FPS</title><circle cx="90.2" cy="189.4" r="4" fill="#2364aa" /><title>Session 2: 7 FPS</title><circle cx="122.4" cy="165.0" r="4" fill="#2364aa" /><title>Session 3: 14 FPS</title><circle cx="154.6" cy="89.5" r="4" fill="#2364aa" /><title>Session 4: 38 FPS</title><circle cx="186.8" cy="123.5" r="4" fill="#2364aa" /><title>Session 5: 27 FPS</title><circle cx="219.0" cy="139.1" r="4" fill="#2364aa" /><title>Session 6: 22 FPS</title><circle cx="251.1" cy="95.1" r="4" fill="#2364aa" /><title>Session 7: 36 FPS</title><circle cx="283.3" cy="189.4" r="4" fill="#2364aa" /><title>Session 8: 7 FPS</title><circle cx="315.5" cy="176.2" r="4" fill="#2364aa" /><title>Session 9: 11 FPS</title><circle cx="347.7" cy="172.7" r="4" fill="#2364aa" /><title>Session 10: 12 FPS</title><circle cx="379.9" cy="172.5" r="4" fill="#2364aa" /><title>Session 11: 12 FPS</title><circle cx="412.1" cy="188.5" r="4" fill="#2364aa" /><title>Session 12: 7 FPS</title><circle cx="444.3" cy="186.7" r="4" fill="#2364aa" /><title>Session 13: 8 FPS</title><circle cx="476.5" cy="155.8" r="4" fill="#2364aa" /><title>Session 14: 17 FPS</title><circle cx="508.7" cy="155.2" r="4" fill="#2364aa" /><title>Session 15: 18 FPS</title><circle cx="540.9" cy="42.0" r="4" fill="#2364aa" /><title>Session 16: 52 FPS</title><circle cx="573.0" cy="195.8" r="4" fill="#2364aa" /><title>Session 17: 5 FPS</title><circle cx="605.2" cy="194.2" r="4" fill="#2364aa" /><title>Session 18: 5 FPS</title><circle cx="637.4" cy="212.0" r="4" fill="#2364aa" /><title>Session 19: 0 FPS</title><circle cx="669.6" cy="193.3" r="4" fill="#2364aa" /><title>Session 20: 6 FPS</title><circle cx="701.8" cy="173.7" r="4" fill="#2364aa" /><title>Session 21: 12 FPS</title><circle cx="734.0" cy="149.5" r="4" fill="#2364aa" /><title>Session 22: 19 FPS</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">19 FPS</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">GPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">39.1 °C</text><text x="12" y="218" class="muted">32.9 °C</text><polyline points="58.0,163.5 90.2,164.9 122.4,156.4 154.6,140.3 186.8,106.9 219.0,184.4 251.1,183.0 283.3,167.9 315.5,161.1 347.7,154.2 379.9,154.2 412.1,155.3 444.3,189.8 476.5,186.5 508.7,190.4 540.9,192.6 573.0,212.0 605.2,163.5 637.4,137.8 669.6,146.8 701.8,131.2 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="163.5" r="4" fill="#2364aa" /><title>Session 1: 34.6 °C</title><circle cx="90.2" cy="164.9" r="4" fill="#2364aa" /><title>Session 2: 34.6 °C</title><circle cx="122.4" cy="156.4" r="4" fill="#2364aa" /><title>Session 3: 34.9 °C</title><circle cx="154.6" cy="140.3" r="4" fill="#2364aa" /><title>Session 4: 35.5 °C</title><circle cx="186.8" cy="106.9" r="4" fill="#2364aa" /><title>Session 5: 36.7 °C</title><circle cx="219.0" cy="184.4" r="4" fill="#2364aa" /><title>Session 6: 33.9 °C</title><circle cx="251.1" cy="183.0" r="4" fill="#2364aa" /><title>Session 7: 33.9 °C</title><circle cx="283.3" cy="167.9" r="4" fill="#2364aa" /><title>Session 8: 34.5 °C</title><circle cx="315.5" cy="161.1" r="4" fill="#2364aa" /><title>Session 9: 34.7 °C</title><circle cx="347.7" cy="154.2" r="4" fill="#2364aa" /><title>Session 10: 35.0 °C</title><circle cx="379.9" cy="154.2" r="4" fill="#2364aa" /><title>Session 11: 35.0 °C</title><circle cx="412.1" cy="155.3" r="4" fill="#2364aa" /><title>Session 12: 34.9 °C</title><circle cx="444.3" cy="189.8" r="4" fill="#2364aa" /><title>Session 13: 33.7 °C</title><circle cx="476.5" cy="186.5" r="4" fill="#2364aa" /><title>Session 14: 33.8 °C</title><circle cx="508.7" cy="190.4" r="4" fill="#2364aa" /><title>Session 15: 33.7 °C</title><circle cx="540.9" cy="192.6" r="4" fill="#2364aa" /><title>Session 16: 33.6 °C</title><circle cx="573.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 17: 32.9 °C</title><circle cx="605.2" cy="163.5" r="4" fill="#2364aa" /><title>Session 18: 34.6 °C</title><circle cx="637.4" cy="137.8" r="4" fill="#2364aa" /><title>Session 19: 35.6 °C</title><circle cx="669.6" cy="146.8" r="4" fill="#2364aa" /><title>Session 20: 35.2 °C</title><circle cx="701.8" cy="131.2" r="4" fill="#2364aa" /><title>Session 21: 35.8 °C</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 22: 39.1 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">39.1 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">GPU Usage</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">26.5 %</text><text x="12" y="218" class="muted">0.1 %</text><polyline points="58.0,196.2 90.2,205.3 122.4,187.5 154.6,134.6 186.8,166.1 219.0,182.6 251.1,212.0 283.3,203.3 315.5,170.1 347.7,190.3 379.9,190.1 412.1,193.5 444.3,207.2 476.5,190.0 508.7,187.5 540.9,168.6 573.0,204.3 605.2,79.2 637.4,90.9 669.6,109.2 701.8,42.0 734.0,47.8" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="196.2" r="4" fill="#2364aa" /><title>Session 1: 2.5 %</title><circle cx="90.2" cy="205.3" r="4" fill="#2364aa" /><title>Session 2: 1.1 %</title><circle cx="122.4" cy="187.5" r="4" fill="#2364aa" /><title>Session 3: 3.9 %</title><circle cx="154.6" cy="134.6" r="4" fill="#2364aa" /><title>Session 4: 12.1 %</title><circle cx="186.8" cy="166.1" r="4" fill="#2364aa" /><title>Session 5: 7.2 %</title><circle cx="219.0" cy="182.6" r="4" fill="#2364aa" /><title>Session 6: 4.6 %</title><circle cx="251.1" cy="212.0" r="4" fill="#2364aa" /><title>Session 7: 0.1 %</title><circle cx="283.3" cy="203.3" r="4" fill="#2364aa" /><title>Session 8: 1.4 %</title><circle cx="315.5" cy="170.1" r="4" fill="#2364aa" /><title>Session 9: 6.6 %</title><circle cx="347.7" cy="190.3" r="4" fill="#2364aa" /><title>Session 10: 3.4 %</title><circle cx="379.9" cy="190.1" r="4" fill="#2364aa" /><title>Session 11: 3.5 %</title><circle cx="412.1" cy="193.5" r="4" fill="#2364aa" /><title>Session 12: 2.9 %</title><circle cx="444.3" cy="207.2" r="4" fill="#2364aa" /><title>Session 13: 0.8 %</title><circle cx="476.5" cy="190.0" r="4" fill="#2364aa" /><title>Session 14: 3.5 %</title><circle cx="508.7" cy="187.5" r="4" fill="#2364aa" /><title>Session 15: 3.9 %</title><circle cx="540.9" cy="168.6" r="4" fill="#2364aa" /><title>Session 16: 6.8 %</title><circle cx="573.0" cy="204.3" r="4" fill="#2364aa" /><title>Session 17: 1.2 %</title><circle cx="605.2" cy="79.2" r="4" fill="#2364aa" /><title>Session 18: 20.7 %</title><circle cx="637.4" cy="90.9" r="4" fill="#2364aa" /><title>Session 19: 18.9 %</title><circle cx="669.6" cy="109.2" r="4" fill="#2364aa" /><title>Session 20: 16.1 %</title><circle cx="701.8" cy="42.0" r="4" fill="#2364aa" /><title>Session 21: 26.5 %</title><circle cx="734.0" cy="47.8" r="4" fill="#2364aa" /><title>Session 22: 25.6 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">25.6 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Physical Memory Available</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">24.4 GB</text><text x="12" y="218" class="muted">0.9 GB</text><polyline points="58.0,195.7 90.2,194.6 122.4,197.1 154.6,212.0 186.8,195.1 219.0,178.7 251.1,183.6 283.3,184.3 315.5,180.1 347.7,201.0 379.9,201.0 412.1,197.8 444.3,201.4 476.5,197.9 508.7,198.6 540.9,197.7 573.0,189.5 605.2,42.0 637.4,102.6 669.6,92.0 701.8,68.2 734.0,65.9" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="195.7" r="4" fill="#2364aa" /><title>Session 1: 3.1 GB</title><circle cx="90.2" cy="194.6" r="4" fill="#2364aa" /><title>Session 2: 3.3 GB</title><circle cx="122.4" cy="197.1" r="4" fill="#2364aa" /><title>Session 3: 2.9 GB</title><circle cx="154.6" cy="212.0" r="4" fill="#2364aa" /><title>Session 4: 0.9 GB</title><circle cx="186.8" cy="195.1" r="4" fill="#2364aa" /><title>Session 5: 3.2 GB</title><circle cx="219.0" cy="178.7" r="4" fill="#2364aa" /><title>Session 6: 5.5 GB</title><circle cx="251.1" cy="183.6" r="4" fill="#2364aa" /><title>Session 7: 4.8 GB</title><circle cx="283.3" cy="184.3" r="4" fill="#2364aa" /><title>Session 8: 4.7 GB</title><circle cx="315.5" cy="180.1" r="4" fill="#2364aa" /><title>Session 9: 5.3 GB</title><circle cx="347.7" cy="201.0" r="4" fill="#2364aa" /><title>Session 10: 2.4 GB</title><circle cx="379.9" cy="201.0" r="4" fill="#2364aa" /><title>Session 11: 2.4 GB</title><circle cx="412.1" cy="197.8" r="4" fill="#2364aa" /><title>Session 12: 2.8 GB</title><circle cx="444.3" cy="201.4" r="4" fill="#2364aa" /><title>Session 13: 2.3 GB</title><circle cx="476.5" cy="197.9" r="4" fill="#2364aa" /><title>Session 14: 2.8 GB</title><circle cx="508.7" cy="198.6" r="4" fill="#2364aa" /><title>Session 15: 2.7 GB</title><circle cx="540.9" cy="197.7" r="4" fill="#2364aa" /><title>Session 16: 2.9 GB</title><circle cx="573.0" cy="189.5" r="4" fill="#2364aa" /><title>Session 17: 4.0 GB</title><circle cx="605.2" cy="42.0" r="4" fill="#2364aa" /><title>Session 18: 24.4 GB</title><circle cx="637.4" cy="102.6" r="4" fill="#2364aa" /><title>Session 19: 16.0 GB</title><circle cx="669.6" cy="92.0" r="4" fill="#2364aa" /><title>Session 20: 17.5 GB</title><circle cx="701.8" cy="68.2" r="4" fill="#2364aa" /><title>Session 21: 20.8 GB</title><circle cx="734.0" cy="65.9" r="4" fill="#2364aa" /><title>Session 22: 21.1 GB</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">21.1 GB</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Physical Memory Load</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">94.5 %</text><text x="12" y="218" class="muted">23.5 %</text><polyline points="58.0,75.8 90.2,78.2 122.4,73.0 154.6,42.0 186.8,77.1 219.0,111.3 251.1,101.2 283.3,99.5 315.5,108.3 347.7,64.8 379.9,64.8 412.1,71.5 444.3,64.1 476.5,71.3 508.7,69.9 540.9,71.8 573.0,88.7 605.2,212.0 637.4,149.0 669.6,160.0 701.8,184.8 734.0,187.1" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="75.8" r="4" fill="#2364aa" /><title>Session 1: 80.3 %</title><circle cx="90.2" cy="78.2" r="4" fill="#2364aa" /><title>Session 2: 79.3 %</title><circle cx="122.4" cy="73.0" r="4" fill="#2364aa" /><title>Session 3: 81.5 %</title><circle cx="154.6" cy="42.0" r="4" fill="#2364aa" /><title>Session 4: 94.5 %</title><circle cx="186.8" cy="77.1" r="4" fill="#2364aa" /><title>Session 5: 79.8 %</title><circle cx="219.0" cy="111.3" r="4" fill="#2364aa" /><title>Session 6: 65.5 %</title><circle cx="251.1" cy="101.2" r="4" fill="#2364aa" /><title>Session 7: 69.8 %</title><circle cx="283.3" cy="99.5" r="4" fill="#2364aa" /><title>Session 8: 70.4 %</title><circle cx="315.5" cy="108.3" r="4" fill="#2364aa" /><title>Session 9: 66.8 %</title><circle cx="347.7" cy="64.8" r="4" fill="#2364aa" /><title>Session 10: 84.9 %</title><circle cx="379.9" cy="64.8" r="4" fill="#2364aa" /><title>Session 11: 85.0 %</title><circle cx="412.1" cy="71.5" r="4" fill="#2364aa" /><title>Session 12: 82.1 %</title><circle cx="444.3" cy="64.1" r="4" fill="#2364aa" /><title>Session 13: 85.2 %</title><circle cx="476.5" cy="71.3" r="4" fill="#2364aa" /><title>Session 14: 82.2 %</title><circle cx="508.7" cy="69.9" r="4" fill="#2364aa" /><title>Session 15: 82.8 %</title><circle cx="540.9" cy="71.8" r="4" fill="#2364aa" /><title>Session 16: 82.0 %</title><circle cx="573.0" cy="88.7" r="4" fill="#2364aa" /><title>Session 17: 75.0 %</title><circle cx="605.2" cy="212.0" r="4" fill="#2364aa" /><title>Session 18: 23.5 %</title><circle cx="637.4" cy="149.0" r="4" fill="#2364aa" /><title>Session 19: 49.8 %</title><circle cx="669.6" cy="160.0" r="4" fill="#2364aa" /><title>Session 20: 45.2 %</title><circle cx="701.8" cy="184.8" r="4" fill="#2364aa" /><title>Session 21: 34.9 %</title><circle cx="734.0" cy="187.1" r="4" fill="#2364aa" /><title>Session 22: 33.9 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">33.9 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Physical Memory Used</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">15.9 GB</text><text x="12" y="218" class="muted">7.5 GB</text><polyline points="58.0,105.2 90.2,108.5 122.4,101.4 154.6,59.8 186.8,107.0 219.0,153.0 251.1,139.5 283.3,137.2 315.5,149.0 347.7,90.4 379.9,90.4 412.1,99.5 444.3,89.4 476.5,99.3 508.7,97.3 540.9,99.9 573.0,122.6 605.2,212.0 637.4,42.0 669.6,72.0 701.8,138.7 734.0,145.1" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="105.2" r="4" fill="#2364aa" /><title>Session 1: 12.8 GB</title><circle cx="90.2" cy="108.5" r="4" fill="#2364aa" /><title>Session 2: 12.6 GB</title><circle cx="122.4" cy="101.4" r="4" fill="#2364aa" /><title>Session 3: 13.0 GB</title><circle cx="154.6" cy="59.8" r="4" fill="#2364aa" /><title>Session 4: 15.0 GB</title><circle cx="186.8" cy="107.0" r="4" fill="#2364aa" /><title>Session 5: 12.7 GB</title><circle cx="219.0" cy="153.0" r="4" fill="#2364aa" /><title>Session 6: 10.4 GB</title><circle cx="251.1" cy="139.5" r="4" fill="#2364aa" /><title>Session 7: 11.1 GB</title><circle cx="283.3" cy="137.2" r="4" fill="#2364aa" /><title>Session 8: 11.2 GB</title><circle cx="315.5" cy="149.0" r="4" fill="#2364aa" /><title>Session 9: 10.6 GB</title><circle cx="347.7" cy="90.4" r="4" fill="#2364aa" /><title>Session 10: 13.5 GB</title><circle cx="379.9" cy="90.4" r="4" fill="#2364aa" /><title>Session 11: 13.5 GB</title><circle cx="412.1" cy="99.5" r="4" fill="#2364aa" /><title>Session 12: 13.1 GB</title><circle cx="444.3" cy="89.4" r="4" fill="#2364aa" /><title>Session 13: 13.6 GB</title><circle cx="476.5" cy="99.3" r="4" fill="#2364aa" /><title>Session 14: 13.1 GB</title><circle cx="508.7" cy="97.3" r="4" fill="#2364aa" /><title>Session 15: 13.2 GB</title><circle cx="540.9" cy="99.9" r="4" fill="#2364aa" /><title>Session 16: 13.1 GB</title><circle cx="573.0" cy="122.6" r="4" fill="#2364aa" /><title>Session 17: 11.9 GB</title><circle cx="605.2" cy="212.0" r="4" fill="#2364aa" /><title>Session 18: 7.5 GB</title><circle cx="637.4" cy="42.0" r="4" fill="#2364aa" /><title>Session 19: 15.9 GB</title><circle cx="669.6" cy="72.0" r="4" fill="#2364aa" /><title>Session 20: 14.4 GB</title><circle cx="701.8" cy="138.7" r="4" fill="#2364aa" /><title>Session 21: 11.2 GB</title><circle cx="734.0" cy="145.1" r="4" fill="#2364aa" /><title>Session 22: 10.8 GB</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 22</text><text x="664" y="34" class="value">10.8 GB</text></svg></article>
+  </div>
+</section>
+
+
+<section>
+  <h2>Sessions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>Analyzed</th>
+          <th>Average FPS</th>
+          <th>CPU Peak</th>
+          <th>GPU Peak</th>
+          <th>RAM Peak</th>
+          <th>Health</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr>
+  <td>Session 1</td>
+  <td>2026-07-02T21:30:24.422525</td>
+  <td>6 FPS</td>
+  <td>78.1 °C</td>
+  <td>37.8 °C</td>
+  <td>83.8 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 2</td>
+  <td>2026-07-02T21:30:26.773832</td>
+  <td>7 FPS</td>
+  <td>78.1 °C</td>
+  <td>37.2 °C</td>
+  <td>81.2 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 3</td>
+  <td>2026-07-02T21:30:29.228179</td>
+  <td>14 FPS</td>
+  <td>78.0 °C</td>
+  <td>37.7 °C</td>
+  <td>83.2 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 4</td>
+  <td>2026-07-02T21:30:31.568606</td>
+  <td>38 FPS</td>
+  <td>73.0 °C</td>
+  <td>37.7 °C</td>
+  <td>95.9 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 5</td>
+  <td>2026-07-02T21:30:33.902675</td>
+  <td>27 FPS</td>
+  <td>81.0 °C</td>
+  <td>38.7 °C</td>
+  <td>81.2 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 6</td>
+  <td>2026-07-02T21:30:36.261674</td>
+  <td>22 FPS</td>
+  <td>87.2 °C</td>
+  <td>37.4 °C</td>
+  <td>81.1 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 7</td>
+  <td>2026-07-02T21:30:38.638688</td>
+  <td>36 FPS</td>
+  <td>75.9 °C</td>
+  <td>34.2 °C</td>
+  <td>70.3 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 8</td>
+  <td>2026-07-02T21:30:40.982837</td>
+  <td>7 FPS</td>
+  <td>63.0 °C</td>
+  <td>34.5 °C</td>
+  <td>70.6 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 9</td>
+  <td>2026-07-02T21:30:43.578356</td>
+  <td>11 FPS</td>
+  <td>65.8 °C</td>
+  <td>34.8 °C</td>
+  <td>66.9 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 10</td>
+  <td>2026-07-02T21:30:46.016534</td>
+  <td>12 FPS</td>
+  <td>80.9 °C</td>
+  <td>37.7 °C</td>
+  <td>87.2 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 11</td>
+  <td>2026-07-02T21:30:48.387287</td>
+  <td>12 FPS</td>
+  <td>80.9 °C</td>
+  <td>37.7 °C</td>
+  <td>87.2 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 12</td>
+  <td>2026-07-02T21:30:50.782799</td>
+  <td>7 FPS</td>
+  <td>75.9 °C</td>
+  <td>37.5 °C</td>
+  <td>84.3 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 13</td>
+  <td>2026-07-02T21:30:53.155298</td>
+  <td>8 FPS</td>
+  <td>69.4 °C</td>
+  <td>33.8 °C</td>
+  <td>85.3 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 14</td>
+  <td>2026-07-02T21:30:55.518771</td>
+  <td>17 FPS</td>
+  <td>78.2 °C</td>
+  <td>36.0 °C</td>
+  <td>82.5 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 15</td>
+  <td>2026-07-02T21:30:57.933235</td>
+  <td>18 FPS</td>
+  <td>79.4 °C</td>
+  <td>33.9 °C</td>
+  <td>84.0 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 16</td>
+  <td>2026-07-02T21:31:00.475346</td>
+  <td>52 FPS</td>
+  <td>69.0 °C</td>
+  <td>33.7 °C</td>
+  <td>82.1 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 17</td>
+  <td>2026-07-02T21:31:02.834524</td>
+  <td>5 FPS</td>
+  <td>77.2 °C</td>
+  <td>34.6 °C</td>
+  <td>76.1 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 18</td>
+  <td>2026-07-02T22:41:16.647549</td>
+  <td>5 FPS</td>
+  <td>76.5 °C</td>
+  <td>34.7 °C</td>
+  <td>23.5 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 19</td>
+  <td>2026-07-03T13:19:21.411611</td>
+  <td>0 FPS</td>
+  <td>71.5 °C</td>
+  <td>35.7 °C</td>
+  <td>49.9 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 20</td>
+  <td>2026-07-03T13:19:24.777147</td>
+  <td>6 FPS</td>
+  <td>83.2 °C</td>
+  <td>40.7 °C</td>
+  <td>53.9 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 21</td>
+  <td>2026-07-04T01:11:41.741849</td>
+  <td>12 FPS</td>
+  <td>79.8 °C</td>
+  <td>38.4 °C</td>
+  <td>39.9 %</td>
+  <td>POOR</td>
+</tr>
+
+<tr>
+  <td>Session 22</td>
+  <td>2026-07-09T16:41:06.477399</td>
+  <td>19 FPS</td>
+  <td>77.6 °C</td>
+  <td>40.8 °C</td>
+  <td>34.5 %</td>
+  <td>POOR</td>
+</tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

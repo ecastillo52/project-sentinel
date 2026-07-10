@@ -1,0 +1,152 @@
+{
+    "id": "751e768ae47a4b6a8a6acd41a9829b50",
+    "game": {
+        "name": "idle",
+        "session": 10
+    },
+    "source": {
+        "filename": "idle_2.CSV",
+        "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\idle\\Session_010.csv",
+        "hash": "9f6ea32b5a11ad909b7f1a66702b29233691f186922b0afdcc62d3a01f0df452"
+    },
+    "analysis": {
+        "created": "2026-07-02T21:30:46.016534",
+        "version": "0.2.0",
+        "engine": "Sentinel Analysis Engine"
+    },
+    "report": {
+        "summary": {
+            "average_fps": null,
+            "peak_cpu_temp": null,
+            "peak_gpu_temp": null,
+            "peak_ram_usage": null,
+            "overall_health": "Critical"
+        },
+        "health": {
+            "cpu_temp": "Excellent",
+            "cpu_usage": "Healthy",
+            "gpu_temp": "Excellent",
+            "gpu_usage": "Healthy",
+            "memory_used": "Critical",
+            "memory_available": "Critical",
+            "memory_load": "High",
+            "fps": "Poor"
+        },
+        "sensors": {
+            "cpu_temp": {
+                "id": "cpu_temp",
+                "name": "CPU Temperature",
+                "display": "CPU Temperature",
+                "category": "CPU",
+                "description": "Overall CPU package temperature.",
+                "current": 64.2,
+                "minimum": 48.9,
+                "maximum": 80.9,
+                "average": 62.79,
+                "unit": "°C",
+                "status": "Excellent"
+            },
+            "cpu_usage": {
+                "id": "cpu_usage",
+                "name": "CPU Usage",
+                "display": "CPU Usage",
+                "category": "CPU",
+                "description": "Overall processor utilization.",
+                "current": 4.2,
+                "minimum": 1.8,
+                "maximum": 23.8,
+                "average": 5.28,
+                "unit": "%",
+                "status": "Healthy"
+            },
+            "gpu_temp": {
+                "id": "gpu_temp",
+                "name": "GPU Temperature",
+                "display": "GPU Temperature",
+                "category": "GPU",
+                "description": "GPU core temperature.",
+                "current": 35.2,
+                "minimum": 34.4,
+                "maximum": 37.7,
+                "average": 34.98,
+                "unit": "°C",
+                "status": "Excellent"
+            },
+            "gpu_usage": {
+                "id": "gpu_usage",
+                "name": "GPU Usage",
+                "display": "GPU Usage",
+                "category": "GPU",
+                "description": "GPU utilization.",
+                "current": 0.0,
+                "minimum": 0.0,
+                "maximum": 51.0,
+                "average": 3.43,
+                "unit": "%",
+                "status": "Healthy"
+            },
+            "memory_used": {
+                "id": "memory_used",
+                "name": "Physical Memory Used",
+                "display": "Physical Memory Used",
+                "category": "Memory",
+                "description": "Amount of physical memory currently in use.",
+                "current": 14128.0,
+                "minimum": 13332.0,
+                "maximum": 14224.0,
+                "average": 13852.22,
+                "unit": "GB",
+                "status": "Critical"
+            },
+            "memory_available": {
+                "id": "memory_available",
+                "name": "Physical Memory Available",
+                "display": "Physical Memory Available",
+                "category": "Memory",
+                "description": "Amount of available physical memory.",
+                "current": 2170.0,
+                "minimum": 2074.0,
+                "maximum": 2966.0,
+                "average": 2445.62,
+                "unit": "GB",
+                "status": "Critical"
+            },
+            "memory_load": {
+                "id": "memory_load",
+                "name": "Physical Memory Load",
+                "display": "Physical Memory Load",
+                "category": "Memory",
+                "description": "Overall physical memory utilization.",
+                "current": 86.6,
+                "minimum": 81.8,
+                "maximum": 87.2,
+                "average": 84.94,
+                "unit": "%",
+                "status": "High"
+            },
+            "fps": {
+                "id": "fps",
+                "name": "Average FPS",
+                "display": "Average FPS",
+                "category": "Performance",
+                "description": "Average displayed framerate.",
+                "current": 8.1,
+                "minimum": 0.0,
+                "maximum": 239.8,
+                "average": 12.11,
+                "unit": "FPS",
+                "status": "Poor"
+            }
+        },
+        "warnings": [],
+        "recommendations": [],
+        "metadata": {
+            "machine": {
+                "cpu": "AMD Ryzen 7 3700X 8-Core Processor",
+                "gpu": "NVIDIA GeForce RTX 3070",
+                "ram": "16 GB",
+                "motherboard": "HP 87C3"
+            }
+        }
+    }
+}

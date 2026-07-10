@@ -16,6 +16,7 @@ class HealthEngine:
             "cpu_usage_status": self.cpu_usage_status,
             "gpu_temperature_status": self.gpu_temperature_status,
             "gpu_usage_status": self.gpu_usage_status,
+            "memory_amount_status": self.memory_amount_status,
             "memory_usage_status": self.memory_usage_status,
             "fps_status": self.fps_status,
         }
@@ -96,6 +97,28 @@ class HealthEngine:
     # ======================================================
     # Memory
     # ======================================================
+
+    def memory_amount_status(self, sensor: Sensor) -> str:
+        avg = sensor.average
+
+        if avg is None:
+            return "UNKNOWN"
+
+        if sensor.id == "memory_available":
+            if avg >= 8:
+                return "HEALTHY"
+            if avg >= 4:
+                return "LOW"
+            return "CRITICAL"
+
+        if sensor.id == "memory_used":
+            if avg < 16:
+                return "HEALTHY"
+            if avg < 24:
+                return "HIGH"
+            return "CRITICAL"
+
+        return "UNKNOWN"
 
     def memory_usage_status(self, sensor: Sensor) -> str:
         avg = sensor.average

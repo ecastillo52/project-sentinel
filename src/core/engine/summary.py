@@ -24,9 +24,13 @@ from core.models.sensor import Sensor
 
 HEALTH_PRIORITY = (
     "CRITICAL",
+    "MAXED",
     "POOR",
     "HIGH",
+    "LOW",
     "WARM",
+    "BUSY",
+    "PLAYABLE",
     "HEALTHY",
     "EXCELLENT",
 )

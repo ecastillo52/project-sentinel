@@ -106,10 +106,18 @@ def find_best_match(log: Log, keyword: str) -> str | None:
 # ==========================================================
 
 
-def extract_column(log: Log, header: str) -> list[str]:
+def extract_column(log, header):
     index = log["header_map"][header]
 
-    return [row[index] for row in log["rows"]]
+    values = []
+
+    for row in log["rows"]:
+        if index < len(row):
+            values.append(row[index])
+        else:
+            values.append("")
+
+    return values
 
 
 def clean_values(values: list[Any], value_type: str) -> list[Any]:
@@ -137,6 +145,18 @@ def clean_values(values: list[Any], value_type: str) -> list[Any]:
         cleaned = list(values)
 
     return cleaned
+
+
+def transform_values(
+    values: list[float],
+    sensor: SensorDefinition,
+) -> list[float]:
+    transform = sensor.get("transform")
+
+    if transform == "mb_to_gb":
+        return [round(value / 1024, 2) for value in values]
+
+    return values
 
 
 # ==========================================================
@@ -171,5 +191,7 @@ def analyze_sensor(log: Log, sensor: SensorDefinition) -> dict[str, Any] | None:
     values = extract_column(log, header)
 
     numbers = clean_values(values, sensor["value_type"])
+
+    numbers = transform_values(numbers, sensor)
 
     return calculate_statistics(numbers)

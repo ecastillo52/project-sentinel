@@ -96,8 +96,20 @@ def cpu_temperature_direction(history):
     return _trend(history, metrics.CPU_TEMPERATURE)
 
 
+def cpu_usage_direction(history):
+    return _trend(history, metrics.CPU_USAGE)
+
+
 def gpu_temperature_direction(history):
     return _trend(history, metrics.GPU_TEMPERATURE)
+
+
+def gpu_usage_direction(history):
+    return _trend(history, metrics.GPU_USAGE)
+
+
+def memory_used_direction(history):
+    return _trend(history, metrics.MEMORY_USED)
 
 
 def memory_usage_direction(history):

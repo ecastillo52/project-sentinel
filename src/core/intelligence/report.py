@@ -141,8 +141,20 @@ def build_report(
             "highest_temperature":
                 metrics.highest_cpu_temperature(history),
 
-            "trend":
+            "highest_average_temperature":
+                metrics.highest_average_cpu_temperature(history),
+
+            "average_load":
+                metrics.average_cpu_usage(history),
+
+            "highest_load":
+                metrics.highest_cpu_usage(history),
+
+            "temperature_trend":
                 insights.cpu_temperature_direction(history),
+
+            "load_trend":
+                insights.cpu_usage_direction(history),
 
             "intelligence":
                 historical.cpu(history),
@@ -160,8 +172,20 @@ def build_report(
             "highest_temperature":
                 metrics.highest_gpu_temperature(history),
 
-            "trend":
+            "highest_average_temperature":
+                metrics.highest_average_gpu_temperature(history),
+
+            "average_load":
+                metrics.average_gpu_usage(history),
+
+            "highest_load":
+                metrics.highest_gpu_usage(history),
+
+            "temperature_trend":
                 insights.gpu_temperature_direction(history),
+
+            "load_trend":
+                insights.gpu_usage_direction(history),
 
             "intelligence":
                 historical.gpu(history),
@@ -173,13 +197,28 @@ def build_report(
 
         "memory": {
 
+            "average_used":
+                metrics.average_memory_used(history),
+
+            "highest_used":
+                metrics.highest_memory_used(history),
+
+            "average_available":
+                metrics.average_memory_available(history),
+
+            "lowest_available":
+                metrics.lowest_memory_available(history),
+
             "average_load":
                 metrics.average_memory_load(history),
 
             "highest_load":
                 metrics.highest_memory_load(history),
 
-            "trend":
+            "used_trend":
+                insights.memory_used_direction(history),
+
+            "load_trend":
                 insights.memory_usage_direction(history),
 
             "intelligence":

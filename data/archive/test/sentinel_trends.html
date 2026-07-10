@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>test - Sentinel Trends</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --text: #16202a;
+  --muted: #66717f;
+  --line: #d9e0e8;
+  --good: #2f9e44;
+  --warning: #f08c00;
+  --critical: #d9480f;
+  --unknown: #687385;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
+}
+
+.page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+.report-header,
+section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  padding: 28px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+
+section {
+  padding: 24px;
+}
+
+.eyebrow,
+.metric span,
+dt,
+.muted {
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.session-meta,
+.details {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.details {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.metric span,
+.metric strong {
+  display: block;
+}
+
+.metric strong {
+  font-size: 22px;
+  margin-top: 6px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.trend-grid {
+  grid-template-columns: 1fr;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+}
+
+svg .title {
+  fill: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+svg .label,
+svg .value,
+svg .muted {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+svg .value {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 11px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.pill {
+  border-radius: 999px;
+  color: white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 74px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.pill.good {
+  background: var(--good);
+}
+
+.pill.warning {
+  background: var(--warning);
+}
+
+.pill.critical {
+  background: var(--critical);
+}
+
+.pill.unknown {
+  background: var(--unknown);
+}
+
+.recommendations {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.recommendations li + li {
+  margin-top: 8px;
+}
+
+.print-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.print-actions button {
+  background: var(--text);
+  border: 0;
+  border-radius: 6px;
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+@media (max-width: 860px) {
+  .report-header,
+  .details,
+  .summary-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page {
+    width: min(100% - 20px, 1180px);
+    padding-top: 16px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+
+  body {
+    background: white;
+  }
+
+  .page {
+    width: 100%;
+    padding: 0;
+  }
+
+  .print-actions {
+    display: none;
+  }
+
+  .report-header,
+  section,
+  .metric,
+  .chart-card {
+    border-color: #bfc7d1;
+    break-inside: avoid;
+  }
+
+  .chart-grid,
+  .summary-grid,
+  .details,
+  .report-header {
+    grid-template-columns: 1fr;
+  }
+
+  svg {
+    min-width: 0;
+  }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="report-header">
+  <div>
+    <p class="eyebrow">Project Sentinel 0.6.0 - A Complete Working Model</p>
+    <h1>test Trends</h1>
+    <p>4 sessions tracked. Latest session: 2026-07-02T21:31:14.839002</p>
+  </div>
+  <dl class="session-meta">
+    <div><dt>Report</dt><dd>Rolling game archive</dd></div>
+    <div><dt>Updated</dt><dd>2026-07-02T21:31:14.839002</dd></div>
+    <div><dt>PDF</dt><dd>Use Print / Save as PDF</dd></div>
+  </dl>
+</header>
+
+
+<div class="print-actions">
+  <button type="button" onclick="window.print()">Print or Save as PDF</button>
+</div>
+
+
+<section>
+  <h2>Current Snapshot</h2>
+  <div class="summary-grid">
+    
+<article class="metric">
+  <span>Sessions</span>
+  <strong>4</strong>
+</article>
+
+<article class="metric">
+  <span>Latest FPS</span>
+  <strong>63 FPS</strong>
+</article>
+
+<article class="metric">
+  <span>Latest CPU Peak</span>
+  <strong>78.2 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Latest GPU Peak</span>
+  <strong>38.4 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Latest RAM Peak</span>
+  <strong>88.8 %</strong>
+</article>
+
+  </div>
+</section>
+
+
+<section>
+  <h2>Session Trends</h2>
+  <div class="chart-grid trend-grid">
+    <article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Average FPS</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">68 FPS</text><text x="12" y="218" class="muted">21 FPS</text><polyline points="58.0,42.0 283.3,207.3 508.7,212.0 734.0,60.7" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 1: 68 FPS</title><circle cx="283.3" cy="207.3" r="4" fill="#2364aa" /><title>Session 2: 23 FPS</title><circle cx="508.7" cy="212.0" r="4" fill="#2364aa" /><title>Session 3: 21 FPS</title><circle cx="734.0" cy="60.7" r="4" fill="#2364aa" /><title>Session 4: 63 FPS</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">63 FPS</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Peak CPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">94.5 °C</text><text x="12" y="218" class="muted">73.5 °C</text><polyline points="58.0,212.0 283.3,42.8 508.7,42.0 734.0,174.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 73.5 °C</title><circle cx="283.3" cy="42.8" r="4" fill="#2364aa" /><title>Session 2: 94.4 °C</title><circle cx="508.7" cy="42.0" r="4" fill="#2364aa" /><title>Session 3: 94.5 °C</title><circle cx="734.0" cy="174.0" r="4" fill="#2364aa" /><title>Session 4: 78.2 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">78.2 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Peak GPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">76.5 °C</text><text x="12" y="218" class="muted">34.3 °C</text><polyline points="58.0,212.0 283.3,42.0 508.7,45.2 734.0,195.5" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 34.3 °C</title><circle cx="283.3" cy="42.0" r="4" fill="#2364aa" /><title>Session 2: 76.5 °C</title><circle cx="508.7" cy="45.2" r="4" fill="#2364aa" /><title>Session 3: 75.7 °C</title><circle cx="734.0" cy="195.5" r="4" fill="#2364aa" /><title>Session 4: 38.4 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">38.4 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Peak RAM Usage</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">88.8 %</text><text x="12" y="218" class="muted">54.0 %</text><polyline points="58.0,212.0 283.3,85.0 508.7,82.5 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 54.0 %</title><circle cx="283.3" cy="85.0" r="4" fill="#2364aa" /><title>Session 2: 80.0 %</title><circle cx="508.7" cy="82.5" r="4" fill="#2364aa" /><title>Session 3: 80.5 %</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 4: 88.8 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">88.8 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">CPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">92.0 °C</text><text x="12" y="218" class="muted">65.2 °C</text><polyline points="58.0,212.0 283.3,42.0 508.7,47.7 734.0,159.6" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 65.2 °C</title><circle cx="283.3" cy="42.0" r="4" fill="#2364aa" /><title>Session 2: 92.0 °C</title><circle cx="508.7" cy="47.7" r="4" fill="#2364aa" /><title>Session 3: 91.1 °C</title><circle cx="734.0" cy="159.6" r="4" fill="#2364aa" /><title>Session 4: 73.5 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">73.5 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">CPU Usage</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">91.8 %</text><text x="12" y="218" class="muted">8.8 %</text><polyline points="58.0,212.0 283.3,42.0 508.7,62.2 734.0,186.9" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 8.8 %</title><circle cx="283.3" cy="42.0" r="4" fill="#2364aa" /><title>Session 2: 91.8 %</title><circle cx="508.7" cy="62.2" r="4" fill="#2364aa" /><title>Session 3: 81.9 %</title><circle cx="734.0" cy="186.9" r="4" fill="#2364aa" /><title>Session 4: 21.1 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">21.1 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Average FPS</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">68 FPS</text><text x="12" y="218" class="muted">21 FPS</text><polyline points="58.0,42.0 283.3,207.3 508.7,212.0 734.0,60.7" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 1: 68 FPS</title><circle cx="283.3" cy="207.3" r="4" fill="#2364aa" /><title>Session 2: 23 FPS</title><circle cx="508.7" cy="212.0" r="4" fill="#2364aa" /><title>Session 3: 21 FPS</title><circle cx="734.0" cy="60.7" r="4" fill="#2364aa" /><title>Session 4: 63 FPS</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">63 FPS</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">GPU Temperature</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">70.3 °C</text><text x="12" y="218" class="muted">32.5 °C</text><polyline points="58.0,212.0 283.3,48.5 508.7,42.0 734.0,185.6" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 32.5 °C</title><circle cx="283.3" cy="48.5" r="4" fill="#2364aa" /><title>Session 2: 68.9 °C</title><circle cx="508.7" cy="42.0" r="4" fill="#2364aa" /><title>Session 3: 70.3 °C</title><circle cx="734.0" cy="185.6" r="4" fill="#2364aa" /><title>Session 4: 38.4 °C</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">38.4 °C</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">GPU Usage</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">51.7 %</text><text x="12" y="218" class="muted">1.1 %</text><polyline points="58.0,212.0 283.3,42.0 508.7,58.9 734.0,106.5" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 1.1 %</title><circle cx="283.3" cy="42.0" r="4" fill="#2364aa" /><title>Session 2: 51.7 %</title><circle cx="508.7" cy="58.9" r="4" fill="#2364aa" /><title>Session 3: 46.6 %</title><circle cx="734.0" cy="106.5" r="4" fill="#2364aa" /><title>Session 4: 32.5 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">32.5 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Physical Memory Available</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">7.3 GB</text><text x="12" y="218" class="muted">1.8 GB</text><polyline points="58.0,42.0 283.3,164.5 508.7,165.1 734.0,212.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 1: 7.3 GB</title><circle cx="283.3" cy="164.5" r="4" fill="#2364aa" /><title>Session 2: 3.4 GB</title><circle cx="508.7" cy="165.1" r="4" fill="#2364aa" /><title>Session 3: 3.3 GB</title><circle cx="734.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 4: 1.8 GB</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">1.8 GB</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Physical Memory Load</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">88.6 %</text><text x="12" y="218" class="muted">53.8 %</text><polyline points="58.0,212.0 283.3,89.5 508.7,89.0 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 53.8 %</title><circle cx="283.3" cy="89.5" r="4" fill="#2364aa" /><title>Session 2: 78.9 %</title><circle cx="508.7" cy="89.0" r="4" fill="#2364aa" /><title>Session 3: 79.0 %</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 4: 88.6 %</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">88.6 %</text></svg></article><article class="chart-card"><svg viewBox="0 0 760 260" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="24" class="title">Physical Memory Used</text><line x1="58" y1="212" x2="734" y2="212" stroke="#d9e0e8" stroke-width="1" /><line x1="58" y1="42" x2="58" y2="212" stroke="#d9e0e8" stroke-width="1" /><text x="12" y="46" class="muted">14.1 GB</text><text x="12" y="218" class="muted">8.6 GB</text><polyline points="58.0,212.0 283.3,89.5 508.7,88.9 734.0,42.0" fill="none" stroke="#2364aa" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" /><circle cx="58.0" cy="212.0" r="4" fill="#2364aa" /><title>Session 1: 8.6 GB</title><circle cx="283.3" cy="89.5" r="4" fill="#2364aa" /><title>Session 2: 12.6 GB</title><circle cx="508.7" cy="88.9" r="4" fill="#2364aa" /><title>Session 3: 12.6 GB</title><circle cx="734.0" cy="42.0" r="4" fill="#2364aa" /><title>Session 4: 14.1 GB</title><text x="58" y="238" class="muted">Session 1</text><text x="678" y="238" class="muted">Session 4</text><text x="664" y="34" class="value">14.1 GB</text></svg></article>
+  </div>
+</section>
+
+
+<section>
+  <h2>Sessions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>Analyzed</th>
+          <th>Average FPS</th>
+          <th>CPU Peak</th>
+          <th>GPU Peak</th>
+          <th>RAM Peak</th>
+          <th>Health</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr>
+  <td>Session 1</td>
+  <td>2026-07-02T21:31:05.247803</td>
+  <td>68 FPS</td>
+  <td>73.5 °C</td>
+  <td>34.3 °C</td>
+  <td>54.0 %</td>
+  <td>LOW</td>
+</tr>
+
+<tr>
+  <td>Session 2</td>
+  <td>2026-07-02T21:31:10.107028</td>
+  <td>23 FPS</td>
+  <td>94.4 °C</td>
+  <td>76.5 °C</td>
+  <td>80.0 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 3</td>
+  <td>2026-07-02T21:31:12.465701</td>
+  <td>21 FPS</td>
+  <td>94.5 °C</td>
+  <td>75.7 °C</td>
+  <td>80.5 %</td>
+  <td>CRITICAL</td>
+</tr>
+
+<tr>
+  <td>Session 4</td>
+  <td>2026-07-02T21:31:14.839002</td>
+  <td>63 FPS</td>
+  <td>78.2 °C</td>
+  <td>38.4 °C</td>
+  <td>88.8 %</td>
+  <td>CRITICAL</td>
+</tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

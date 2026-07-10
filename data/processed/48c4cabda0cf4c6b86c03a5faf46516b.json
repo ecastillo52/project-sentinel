@@ -16,117 +16,124 @@
     },
     "report": {
         "summary": {
-            "average_fps": null,
-            "peak_cpu_temp": null,
-            "peak_gpu_temp": null,
-            "peak_ram_usage": null,
-            "overall_health": "Critical"
+            "average_fps": 68.47,
+            "peak_cpu_temp": 73.5,
+            "peak_gpu_temp": 34.3,
+            "peak_ram_usage": 54.0,
+            "overall_health": "LOW"
         },
         "health": {
-            "cpu_temp": "Excellent",
-            "cpu_usage": "Healthy",
-            "gpu_temp": "Excellent",
-            "gpu_usage": "Healthy",
-            "memory_used": "Critical",
-            "memory_available": "Critical",
-            "memory_load": "Healthy",
-            "fps": "Playable"
+            "cpu_temp": "HEALTHY",
+            "cpu_usage": "HEALTHY",
+            "gpu_temp": "EXCELLENT",
+            "gpu_usage": "HEALTHY",
+            "memory_used": "HEALTHY",
+            "memory_available": "LOW",
+            "memory_load": "HEALTHY",
+            "fps": "PLAYABLE"
         },
         "sensors": {
             "cpu_temp": {
                 "id": "cpu_temp",
-                "name": "CPU Temperature",
+                "name": "cpu_temp",
                 "display": "CPU Temperature",
                 "category": "CPU",
                 "description": "Overall CPU package temperature.",
-                "current": 0.0,
-                "minimum": 0.0,
+                "current": 63.0,
+                "minimum": 58.2,
                 "maximum": 73.5,
-                "average": 58.65,
+                "average": 65.17,
                 "unit": "°C",
-                "status": "Excellent"
+                "health_rule": "cpu_temperature_status",
+                "status": "HEALTHY"
             },
             "cpu_usage": {
                 "id": "cpu_usage",
-                "name": "CPU Usage",
+                "name": "cpu_usage",
                 "display": "CPU Usage",
                 "category": "CPU",
                 "description": "Overall processor utilization.",
-                "current": 0.0,
-                "minimum": 0.0,
+                "current": 16.7,
+                "minimum": 4.4,
                 "maximum": 16.7,
-                "average": 7.93,
+                "average": 8.81,
                 "unit": "%",
-                "status": "Healthy"
+                "health_rule": "cpu_usage_status",
+                "status": "HEALTHY"
             },
             "gpu_temp": {
                 "id": "gpu_temp",
-                "name": "GPU Temperature",
+                "name": "gpu_temp",
                 "display": "GPU Temperature",
                 "category": "GPU",
                 "description": "GPU core temperature.",
-                "current": 0.0,
-                "minimum": 0.0,
+                "current": 34.3,
+                "minimum": 32.2,
                 "maximum": 34.3,
-                "average": 29.25,
+                "average": 32.5,
                 "unit": "°C",
-                "status": "Excellent"
+                "health_rule": "gpu_temperature_status",
+                "status": "EXCELLENT"
             },
             "gpu_usage": {
                 "id": "gpu_usage",
-                "name": "GPU Usage",
+                "name": "gpu_usage",
                 "display": "GPU Usage",
                 "category": "GPU",
                 "description": "GPU utilization.",
                 "current": 0.0,
                 "minimum": 0.0,
                 "maximum": 3.0,
-                "average": 1.0,
+                "average": 1.11,
                 "unit": "%",
-                "status": "Healthy"
+                "health_rule": "gpu_usage_status",
+                "status": "HEALTHY"
             },
             "memory_used": {
                 "id": "memory_used",
-                "name": "Physical Memory Used",
+                "name": "memory_used",
                 "display": "Physical Memory Used",
                 "category": "Memory",
                 "description": "Amount of physical memory currently in use.",
-                "current": 25.0,
-                "minimum": 25.0,
-                "maximum": 8801.0,
-                "average": 7896.1,
+                "current": 8.52,
+                "minimum": 8.51,
+                "maximum": 8.59,
+                "average": 8.56,
                 "unit": "GB",
-                "status": "Critical"
+                "health_rule": "memory_amount_status",
+                "status": "HEALTHY"
             },
             "memory_available": {
                 "id": "memory_available",
-                "name": "Physical Memory Available",
+                "name": "memory_available",
                 "display": "Physical Memory Available",
                 "category": "Memory",
                 "description": "Amount of available physical memory.",
-                "current": 25.0,
-                "minimum": 25.0,
-                "maximum": 7582.0,
-                "average": 6777.0,
+                "current": 7.39,
+                "minimum": 7.32,
+                "maximum": 7.4,
+                "average": 7.35,
                 "unit": "GB",
-                "status": "Critical"
+                "health_rule": "memory_amount_status",
+                "status": "LOW"
             },
             "memory_load": {
                 "id": "memory_load",
-                "name": "Physical Memory Load",
+                "name": "memory_load",
                 "display": "Physical Memory Load",
                 "category": "Memory",
                 "description": "Overall physical memory utilization.",
-                "current": 25.0,
-                "minimum": 25.0,
+                "current": 53.5,
+                "minimum": 53.4,
                 "maximum": 54.0,
-                "average": 50.89,
+                "average": 53.77,
                 "unit": "%",
-                "status": "Healthy"
+                "health_rule": "memory_usage_status",
+                "status": "HEALTHY"
             },
             "fps": {
                 "id": "fps",
-                "name": "Average FPS",
+                "name": "fps",
                 "display": "Average FPS",
                 "category": "Performance",
                 "description": "Average displayed framerate.",
@@ -135,11 +142,18 @@
                 "maximum": 74.6,
                 "average": 68.47,
                 "unit": "FPS",
-                "status": "Playable"
+                "health_rule": "fps_status",
+                "status": "PLAYABLE"
             }
         },
         "warnings": [],
-        "recommendations": [],
+        "recommendations": [
+            {
+                "level": "Information",
+                "title": "Performance Can Be Improved",
+                "message": "Performance is playable but below high-refresh gaming targets."
+            }
+        ],
         "metadata": {
             "machine": {
                 "cpu": "AMD Ryzen 7 3700X 8-Core Processor",

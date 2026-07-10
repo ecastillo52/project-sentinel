@@ -73,7 +73,8 @@ def main_menu():
     print("1. Analyze New Logs")
     print("2. View Previous Reports")
     print("3. Historical Intelligence")
-    print("4. Exit")
+    print("4. Export All HTML Trend Reports")
+    print("5. Exit")
 
 
 def prompt(message):
@@ -133,6 +134,17 @@ def show_processed(count):
     divider()
     print(f"Processed {count} log(s).")
     divider()
+
+
+def show_exported(path):
+    print()
+    print("HTML report exported.")
+    print(path)
+
+
+def show_exported_count(count):
+    print()
+    print(f"Exported {count} trend report(s).")
 
 
 def goodbye():

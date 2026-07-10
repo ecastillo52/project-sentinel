@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StarCraft II - Session 1 - Sentinel Report</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --text: #16202a;
+  --muted: #66717f;
+  --line: #d9e0e8;
+  --good: #2f9e44;
+  --warning: #f08c00;
+  --critical: #d9480f;
+  --unknown: #687385;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
+}
+
+.page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+.report-header,
+section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  padding: 28px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+
+section {
+  padding: 24px;
+}
+
+.eyebrow,
+.metric span,
+dt,
+.muted {
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.session-meta,
+.details {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.details {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.metric span,
+.metric strong {
+  display: block;
+}
+
+.metric strong {
+  font-size: 22px;
+  margin-top: 6px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.trend-grid {
+  grid-template-columns: 1fr;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+}
+
+svg .title {
+  fill: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+svg .label,
+svg .value,
+svg .muted {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+svg .value {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 11px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.pill {
+  border-radius: 999px;
+  color: white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 74px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.pill.good {
+  background: var(--good);
+}
+
+.pill.warning {
+  background: var(--warning);
+}
+
+.pill.critical {
+  background: var(--critical);
+}
+
+.pill.unknown {
+  background: var(--unknown);
+}
+
+.recommendations {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.recommendations li + li {
+  margin-top: 8px;
+}
+
+.print-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.print-actions button {
+  background: var(--text);
+  border: 0;
+  border-radius: 6px;
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+@media (max-width: 860px) {
+  .report-header,
+  .details,
+  .summary-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page {
+    width: min(100% - 20px, 1180px);
+    padding-top: 16px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+
+  body {
+    background: white;
+  }
+
+  .page {
+    width: 100%;
+    padding: 0;
+  }
+
+  .print-actions {
+    display: none;
+  }
+
+  .report-header,
+  section,
+  .metric,
+  .chart-card {
+    border-color: #bfc7d1;
+    break-inside: avoid;
+  }
+
+  .chart-grid,
+  .summary-grid,
+  .details,
+  .report-header {
+    grid-template-columns: 1fr;
+  }
+
+  svg {
+    min-width: 0;
+  }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="report-header">
+  <div>
+    <p class="eyebrow">Project Sentinel 0.6.0 - A Complete Working Model</p>
+    <h1>StarCraft II</h1>
+    <p>Session 1 analyzed 2026-07-02T21:31:07.736785</p>
+  </div>
+  <dl class="session-meta">
+    <div><dt>Source</dt><dd>SC2 Run 1.CSV</dd></div>
+    <div><dt>Archive</dt><dd>C:\Users\erik_\PycharmProjects\pythonProject\Programming\Sentinel\data\archive\StarCraft II\Session_001.csv</dd></div>
+    <div><dt>Session ID</dt><dd>bd8561d73c944b29b695cd51c67c6319</dd></div>
+  </dl>
+</header>
+
+
+<div class="print-actions">
+  <button type="button" onclick="window.print()">Print or Save as PDF</button>
+</div>
+
+
+<section>
+  <h2>Session Summary</h2>
+  <div class="summary-grid">
+    
+<article class="metric">
+  <span>Average FPS</span>
+  <strong>50 FPS</strong>
+</article>
+
+<article class="metric">
+  <span>Peak CPU Temp</span>
+  <strong>88.5 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Peak GPU Temp</span>
+  <strong>67.2 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Peak RAM Usage</span>
+  <strong>73.8 %</strong>
+</article>
+
+<article class="metric">
+  <span>Overall Health</span>
+  <strong>POOR</strong>
+</article>
+
+  </div>
+</section>
+
+
+<section>
+  <h2>Machine</h2>
+  <dl class="details">
+    <div><dt>CPU</dt><dd>AMD Ryzen 7 3700X 8-Core Processor</dd></div>
+    <div><dt>GPU</dt><dd>NVIDIA GeForce RTX 3070</dd></div>
+    <div><dt>RAM</dt><dd>16 GB</dd></div>
+    <div><dt>Motherboard</dt><dd>HP 87C3</dd></div>
+  </dl>
+</section>
+
+
+<section>
+  <h2>Charts</h2>
+  <div class="chart-grid">
+    <article class="chart-card"><svg viewBox="0 0 680 152" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="20" class="title">Sensor Health</text><text x="20" y="50" class="label">Good</text><rect x="126" y="35" width="490" height="16" rx="4" fill="#2f9e44" /><text x="626" y="49" class="value">6</text><text x="20" y="84" class="label">Critical</text><rect x="126" y="69" width="81" height="16" rx="4" fill="#d9480f" /><text x="217" y="83" class="value">1</text><text x="20" y="118" class="label">Warning</text><rect x="126" y="103" width="81" height="16" rx="4" fill="#f08c00" /><text x="217" y="117" class="value">1</text></svg></article>
+    <article class="chart-card"><svg viewBox="0 0 760 156" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Temperature</text><text x="20" y="57" class="label">CPU Temperature</text><rect x="220" y="42" width="460" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="42" width="376" height="18" rx="4" fill="#2f9e44" /><rect x="220" y="42" width="299" height="18" rx="4" fill="#788391" /><text x="694" y="57" class="value">72.4 °C</text><text x="20" y="99" class="label">GPU Temperature</text><rect x="220" y="84" width="349" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="84" width="252" height="18" rx="4" fill="#2f9e44" /><rect x="220" y="84" width="175" height="18" rx="4" fill="#788391" /><text x="694" y="99" class="value">48.5 °C</text></svg></article>
+    <article class="chart-card"><svg viewBox="0 0 760 198" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Load</text><text x="20" y="57" class="label">CPU Usage</text><rect x="220" y="42" width="460" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="42" width="151" height="18" rx="4" fill="#2f9e44" /><rect x="220" y="42" width="38" height="18" rx="4" fill="#788391" /><text x="694" y="57" class="value">29.0 %</text><text x="20" y="99" class="label">GPU Usage</text><rect x="220" y="84" width="356" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="84" width="189" height="18" rx="4" fill="#2f9e44" /><rect x="220" y="84" width="5" height="18" rx="4" fill="#788391" /><text x="694" y="99" class="value">36.1 %</text><text x="20" y="141" class="label">Physical Memory Load</text><rect x="220" y="126" width="387" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="126" width="353" height="18" rx="4" fill="#2f9e44" /><rect x="220" y="126" width="255" height="18" rx="4" fill="#788391" /><text x="694" y="141" class="value">67.3 %</text></svg></article>
+    <article class="chart-card"><svg viewBox="0 0 760 156" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Memory</text><text x="20" y="57" class="label">Physical Memory Available</text><rect x="220" y="42" width="318" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="42" width="203" height="18" rx="4" fill="#f08c00" /><rect x="220" y="42" width="162" height="18" rx="4" fill="#788391" /><text x="694" y="57" class="value">5.2 GB</text><text x="20" y="99" class="label">Physical Memory Used</text><rect x="220" y="84" width="460" height="18" rx="4" fill="#d7dee8" /><rect x="220" y="84" width="419" height="18" rx="4" fill="#2f9e44" /><rect x="220" y="84" width="303" height="18" rx="4" fill="#788391" /><text x="694" y="99" class="value">10.7 GB</text></svg></article>
+  </div>
+</section>
+
+
+<section>
+  <h2>Sensors</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Sensor</th>
+          <th>Category</th>
+          <th>Current</th>
+          <th>Average</th>
+          <th>Minimum</th>
+          <th>Maximum</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr>
+  <td>CPU Temperature</td>
+  <td>CPU</td>
+  <td>70.5 °C</td>
+  <td>72.4 °C</td>
+  <td>57.6 °C</td>
+  <td>88.5 °C</td>
+  <td><span class="pill good">HEALTHY</span></td>
+</tr>
+
+<tr>
+  <td>CPU Usage</td>
+  <td>CPU</td>
+  <td>14.9 %</td>
+  <td>29.0 %</td>
+  <td>7.4 %</td>
+  <td>87.7 %</td>
+  <td><span class="pill good">HEALTHY</span></td>
+</tr>
+
+<tr>
+  <td>GPU Temperature</td>
+  <td>GPU</td>
+  <td>43.3 °C</td>
+  <td>48.5 °C</td>
+  <td>33.8 °C</td>
+  <td>67.2 °C</td>
+  <td><span class="pill good">EXCELLENT</span></td>
+</tr>
+
+<tr>
+  <td>GPU Usage</td>
+  <td>GPU</td>
+  <td>6.0 %</td>
+  <td>36.1 %</td>
+  <td>1.0 %</td>
+  <td>68.0 %</td>
+  <td><span class="pill good">HEALTHY</span></td>
+</tr>
+
+<tr>
+  <td>Physical Memory Available</td>
+  <td>Memory</td>
+  <td>8.0 GB</td>
+  <td>5.2 GB</td>
+  <td>4.2 GB</td>
+  <td>8.2 GB</td>
+  <td><span class="pill warning">LOW</span></td>
+</tr>
+
+<tr>
+  <td>Physical Memory Load</td>
+  <td>Memory</td>
+  <td>49.7 %</td>
+  <td>67.3 %</td>
+  <td>48.7 %</td>
+  <td>73.8 %</td>
+  <td><span class="pill good">HEALTHY</span></td>
+</tr>
+
+<tr>
+  <td>Physical Memory Used</td>
+  <td>Memory</td>
+  <td>7.9 GB</td>
+  <td>10.7 GB</td>
+  <td>7.8 GB</td>
+  <td>11.8 GB</td>
+  <td><span class="pill good">HEALTHY</span></td>
+</tr>
+
+<tr>
+  <td>Average FPS</td>
+  <td>Performance</td>
+  <td>9 FPS</td>
+  <td>50 FPS</td>
+  <td>0 FPS</td>
+  <td>240 FPS</td>
+  <td><span class="pill critical">POOR</span></td>
+</tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+
+<section>
+  <h2>Recommendations</h2>
+  <ul class="recommendations"><li>{&#x27;level&#x27;: &#x27;Warning&#x27;, &#x27;title&#x27;: &#x27;CPU Temperature Elevated&#x27;, &#x27;message&#x27;: &#x27;CPU temperatures are higher than ideal. Monitor cooling performance and airflow.&#x27;}</li><li>{&#x27;level&#x27;: &#x27;Warning&#x27;, &#x27;title&#x27;: &#x27;Low Average FPS&#x27;, &#x27;message&#x27;: &#x27;Average FPS dropped below 60. Lower graphics settings or investigate system bottlenecks.&#x27;}</li></ul>
+</section>
+
+</main>
+</body>
+</html>

@@ -63,7 +63,15 @@ def render(report: dict) -> None:
         (
             ("Average Temp", "average_temperature", format_temperature),
             ("Highest Temp", "highest_temperature", format_temperature),
-            ("Trend", "trend", str),
+            (
+                "Highest Average Temp",
+                "highest_average_temperature",
+                format_temperature,
+            ),
+            ("Average Load", "average_load", format_percent),
+            ("Highest Load", "highest_load", format_percent),
+            ("Temp Trend", "temperature_trend", str),
+            ("Load Trend", "load_trend", str),
         ),
     )
 
@@ -73,7 +81,15 @@ def render(report: dict) -> None:
         (
             ("Average Temp", "average_temperature", format_temperature),
             ("Highest Temp", "highest_temperature", format_temperature),
-            ("Trend", "trend", str),
+            (
+                "Highest Average Temp",
+                "highest_average_temperature",
+                format_temperature,
+            ),
+            ("Average Load", "average_load", format_percent),
+            ("Highest Load", "highest_load", format_percent),
+            ("Temp Trend", "temperature_trend", str),
+            ("Load Trend", "load_trend", str),
         ),
     )
 
@@ -81,9 +97,14 @@ def render(report: dict) -> None:
         "Memory",
         report.get("memory"),
         (
+            ("Average Used", "average_used", format_gb),
+            ("Highest Used", "highest_used", format_gb),
+            ("Average Available", "average_available", format_gb),
+            ("Lowest Available", "lowest_available", format_gb),
             ("Average Load", "average_load", format_percent),
             ("Highest Load", "highest_load", format_percent),
-            ("Trend", "trend", str),
+            ("Used Trend", "used_trend", str),
+            ("Load Trend", "load_trend", str),
         ),
     )
 
@@ -291,6 +312,16 @@ def format_percent(
         return "--"
 
     return f"{value:.1f} %"
+
+
+def format_gb(
+    value: Any,
+) -> str:
+
+    if value is None:
+        return "--"
+
+    return f"{value:.1f} GB"
 
 
 def format_fps(

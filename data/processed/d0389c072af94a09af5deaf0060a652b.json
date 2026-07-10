@@ -1,0 +1,171 @@
+{
+    "id": "d0389c072af94a09af5deaf0060a652b",
+    "game": {
+        "name": "Call of Duty Modern Warfare",
+        "session": 1
+    },
+    "source": {
+        "filename": "cod 2.CSV",
+        "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\Call of Duty Modern Warfare\\Session_001.csv",
+        "hash": "d6740da835c0164f096ccf63fe090015900a54d5945fc6507e8e40cb32b560da"
+    },
+    "analysis": {
+        "created": "2026-07-07T20:51:43.943935",
+        "version": "0.2.0",
+        "engine": "Sentinel Analysis Engine"
+    },
+    "report": {
+        "summary": {
+            "average_fps": 78.52,
+            "peak_cpu_temp": 92.0,
+            "peak_gpu_temp": 80.3,
+            "peak_ram_usage": 63.5,
+            "overall_health": "HIGH"
+        },
+        "health": {
+            "cpu_temp": "WARM",
+            "cpu_usage": "HEALTHY",
+            "gpu_temp": "WARM",
+            "gpu_usage": "HEALTHY",
+            "memory_used": "HIGH",
+            "memory_available": "HEALTHY",
+            "memory_load": "HEALTHY",
+            "fps": "PLAYABLE"
+        },
+        "sensors": {
+            "cpu_temp": {
+                "id": "cpu_temp",
+                "name": "cpu_temp",
+                "display": "CPU Temperature",
+                "category": "CPU",
+                "description": "Overall CPU package temperature.",
+                "current": 84.4,
+                "minimum": 77.6,
+                "maximum": 92.0,
+                "average": 82.41,
+                "unit": "°C",
+                "health_rule": "cpu_temperature_status",
+                "status": "WARM"
+            },
+            "cpu_usage": {
+                "id": "cpu_usage",
+                "name": "cpu_usage",
+                "display": "CPU Usage",
+                "category": "CPU",
+                "description": "Overall processor utilization.",
+                "current": 43.7,
+                "minimum": 16.6,
+                "maximum": 92.2,
+                "average": 65.72,
+                "unit": "%",
+                "health_rule": "cpu_usage_status",
+                "status": "HEALTHY"
+            },
+            "gpu_temp": {
+                "id": "gpu_temp",
+                "name": "gpu_temp",
+                "display": "GPU Temperature",
+                "category": "GPU",
+                "description": "GPU core temperature.",
+                "current": 62.1,
+                "minimum": 57.2,
+                "maximum": 80.3,
+                "average": 72.36,
+                "unit": "°C",
+                "health_rule": "gpu_temperature_status",
+                "status": "WARM"
+            },
+            "gpu_usage": {
+                "id": "gpu_usage",
+                "name": "gpu_usage",
+                "display": "GPU Usage",
+                "category": "GPU",
+                "description": "GPU utilization.",
+                "current": 14.0,
+                "minimum": 0.0,
+                "maximum": 99.0,
+                "average": 68.15,
+                "unit": "%",
+                "health_rule": "gpu_usage_status",
+                "status": "HEALTHY"
+            },
+            "memory_used": {
+                "id": "memory_used",
+                "name": "memory_used",
+                "display": "Physical Memory Used",
+                "category": "Memory",
+                "description": "Amount of physical memory currently in use.",
+                "current": 12.55,
+                "minimum": 12.55,
+                "maximum": 20.28,
+                "average": 19.38,
+                "unit": "GB",
+                "health_rule": "memory_amount_status",
+                "status": "HIGH"
+            },
+            "memory_available": {
+                "id": "memory_available",
+                "name": "memory_available",
+                "display": "Physical Memory Available",
+                "category": "Memory",
+                "description": "Amount of available physical memory.",
+                "current": 19.36,
+                "minimum": 11.63,
+                "maximum": 19.36,
+                "average": 12.54,
+                "unit": "GB",
+                "health_rule": "memory_amount_status",
+                "status": "HEALTHY"
+            },
+            "memory_load": {
+                "id": "memory_load",
+                "name": "memory_load",
+                "display": "Physical Memory Load",
+                "category": "Memory",
+                "description": "Overall physical memory utilization.",
+                "current": 39.3,
+                "minimum": 39.3,
+                "maximum": 63.5,
+                "average": 60.66,
+                "unit": "%",
+                "health_rule": "memory_usage_status",
+                "status": "HEALTHY"
+            },
+            "fps": {
+                "id": "fps",
+                "name": "fps",
+                "display": "Average FPS",
+                "category": "Performance",
+                "description": "Average displayed framerate.",
+                "current": 84.8,
+                "minimum": 0.0,
+                "maximum": 219.1,
+                "average": 78.52,
+                "unit": "FPS",
+                "health_rule": "fps_status",
+                "status": "PLAYABLE"
+            }
+        },
+        "warnings": [],
+        "recommendations": [
+            {
+                "level": "CRITICAL",
+                "title": "CPU Running Extremely Hot",
+                "message": "CPU temperatures exceeded 90°C. Inspect the cooling system immediately."
+            },
+            {
+                "level": "Information",
+                "title": "Performance Can Be Improved",
+                "message": "Performance is playable but below high-refresh gaming targets."
+            }
+        ],
+        "metadata": {
+            "machine": {
+                "cpu": "AMD Ryzen 7 3700X 8-Core Processor",
+                "gpu": "NVIDIA GeForce RTX 3070",
+                "ram": "32 GB",
+                "motherboard": "HP 87C3"
+            }
+        }
+    }
+}

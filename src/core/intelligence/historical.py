@@ -73,6 +73,7 @@ def cpu(
     statements: list[str] = []
 
     average = metrics.average_cpu_temperature(history)
+    load = metrics.average_cpu_usage(history)
 
     if average is not None:
         statements.append(
@@ -80,11 +81,22 @@ def cpu(
             f"{average:.1f} °C."
         )
 
+    if load is not None:
+        statements.append(
+            f"Average CPU load is {load:.1f}%."
+        )
+
     trend = insights.cpu_temperature_direction(history)
+    load_trend = insights.cpu_usage_direction(history)
 
     if trend != "Unknown":
         statements.append(
             f"CPU temperatures are {trend.lower()} over time."
+        )
+
+    if load_trend != "Unknown":
+        statements.append(
+            f"CPU load is {load_trend.lower()} over time."
         )
 
     hottest = insights.hottest_cpu_session(history)
@@ -112,6 +124,7 @@ def gpu(
     statements: list[str] = []
 
     average = metrics.average_gpu_temperature(history)
+    load = metrics.average_gpu_usage(history)
 
     if average is not None:
         statements.append(
@@ -119,11 +132,22 @@ def gpu(
             f"{average:.1f} °C."
         )
 
+    if load is not None:
+        statements.append(
+            f"Average GPU load is {load:.1f}%."
+        )
+
     trend = insights.gpu_temperature_direction(history)
+    load_trend = insights.gpu_usage_direction(history)
 
     if trend != "Unknown":
         statements.append(
             f"GPU temperatures are {trend.lower()} over time."
+        )
+
+    if load_trend != "Unknown":
+        statements.append(
+            f"GPU load is {load_trend.lower()} over time."
         )
 
     hottest = insights.hottest_gpu_session(history)
@@ -150,6 +174,13 @@ def memory(
 
     statements: list[str] = []
 
+    used = metrics.average_memory_used(history)
+
+    if used is not None:
+        statements.append(
+            f"Average memory used is {used:.1f} GB."
+        )
+
     average = metrics.average_memory_load(history)
 
     if average is not None:
@@ -159,10 +190,16 @@ def memory(
         )
 
     trend = insights.memory_usage_direction(history)
+    used_trend = insights.memory_used_direction(history)
 
     if trend != "Unknown":
         statements.append(
             f"Memory usage is {trend.lower()} over time."
+        )
+
+    if used_trend != "Unknown":
+        statements.append(
+            f"Memory used is {used_trend.lower()} over time."
         )
 
     highest = insights.highest_memory_session(history)

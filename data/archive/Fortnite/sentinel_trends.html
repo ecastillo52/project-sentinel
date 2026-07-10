@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fortnite - Sentinel Trends</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --text: #16202a;
+  --muted: #66717f;
+  --line: #d9e0e8;
+  --good: #2f9e44;
+  --warning: #f08c00;
+  --critical: #d9480f;
+  --unknown: #687385;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
+}
+
+.page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+.report-header,
+section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  padding: 28px;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+
+section {
+  padding: 24px;
+}
+
+.eyebrow,
+.metric span,
+dt,
+.muted {
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.session-meta,
+.details {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.details {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.metric span,
+.metric strong {
+  display: block;
+}
+
+.metric strong {
+  font-size: 22px;
+  margin-top: 6px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.trend-grid {
+  grid-template-columns: 1fr;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+}
+
+svg .title {
+  fill: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+svg .label,
+svg .value,
+svg .muted {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+svg .value {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 11px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.pill {
+  border-radius: 999px;
+  color: white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 74px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.pill.good {
+  background: var(--good);
+}
+
+.pill.warning {
+  background: var(--warning);
+}
+
+.pill.critical {
+  background: var(--critical);
+}
+
+.pill.unknown {
+  background: var(--unknown);
+}
+
+.recommendations {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.recommendations li + li {
+  margin-top: 8px;
+}
+
+.print-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.print-actions button {
+  background: var(--text);
+  border: 0;
+  border-radius: 6px;
+  color: var(--panel);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+@media (max-width: 860px) {
+  .report-header,
+  .details,
+  .summary-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page {
+    width: min(100% - 20px, 1180px);
+    padding-top: 16px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+
+  body {
+    background: white;
+  }
+
+  .page {
+    width: 100%;
+    padding: 0;
+  }
+
+  .print-actions {
+    display: none;
+  }
+
+  .report-header,
+  section,
+  .metric,
+  .chart-card {
+    border-color: #bfc7d1;
+    break-inside: avoid;
+  }
+
+  .chart-grid,
+  .summary-grid,
+  .details,
+  .report-header {
+    grid-template-columns: 1fr;
+  }
+
+  svg {
+    min-width: 0;
+  }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+<header class="report-header">
+  <div>
+    <p class="eyebrow">Project Sentinel 0.6.0 - A Complete Working Model</p>
+    <h1>Fortnite Trends</h1>
+    <p>1 sessions tracked. Latest session: 2026-07-02T21:30:22.060115</p>
+  </div>
+  <dl class="session-meta">
+    <div><dt>Report</dt><dd>Rolling game archive</dd></div>
+    <div><dt>Updated</dt><dd>2026-07-02T21:30:22.060115</dd></div>
+    <div><dt>PDF</dt><dd>Use Print / Save as PDF</dd></div>
+  </dl>
+</header>
+
+
+<div class="print-actions">
+  <button type="button" onclick="window.print()">Print or Save as PDF</button>
+</div>
+
+
+<section>
+  <h2>Current Snapshot</h2>
+  <div class="summary-grid">
+    
+<article class="metric">
+  <span>Sessions</span>
+  <strong>1</strong>
+</article>
+
+<article class="metric">
+  <span>Latest FPS</span>
+  <strong>75 FPS</strong>
+</article>
+
+<article class="metric">
+  <span>Latest CPU Peak</span>
+  <strong>87.0 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Latest GPU Peak</span>
+  <strong>57.7 °C</strong>
+</article>
+
+<article class="metric">
+  <span>Latest RAM Peak</span>
+  <strong>86.6 %</strong>
+</article>
+
+  </div>
+</section>
+
+
+<section>
+  <h2>Session Trends</h2>
+  <div class="chart-grid trend-grid">
+    <article class="chart-card"><svg viewBox="0 0 680 96" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Chart</text><text x="20" y="58" class="muted">Not enough data to chart.</text></svg></article><article class="chart-card"><svg viewBox="0 0 680 96" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Chart</text><text x="20" y="58" class="muted">Not enough data to chart.</text></svg></article><article class="chart-card"><svg viewBox="0 0 680 96" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Chart</text><text x="20" y="58" class="muted">Not enough data to chart.</text></svg></article><article class="chart-card"><svg viewBox="0 0 680 96" role="img" xmlns="http://www.w3.org/2000/svg"><text x="20" y="22" class="title">Chart</text><text x="20" y="58" class="muted">Not enough data to chart.</text></svg></article>
+  </div>
+</section>
+
+
+<section>
+  <h2>Sessions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>Analyzed</th>
+          <th>Average FPS</th>
+          <th>CPU Peak</th>
+          <th>GPU Peak</th>
+          <th>RAM Peak</th>
+          <th>Health</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr>
+  <td>Session 1</td>
+  <td>2026-07-02T21:30:22.060115</td>
+  <td>75 FPS</td>
+  <td>87.0 °C</td>
+  <td>57.7 °C</td>
+  <td>86.6 %</td>
+  <td>CRITICAL</td>
+</tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

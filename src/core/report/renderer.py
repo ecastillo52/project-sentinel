@@ -34,12 +34,17 @@ HEALTH_ICONS = {
     "PASS": "✓",
     "HEALTHY": "✓",
     "EXCELLENT": "✓",
+    "PLAYABLE": "✓",
     "WARNING": "⚠",
     "WARN": "⚠",
     "WARM": "⚠",
+    "BUSY": "⚠",
+    "HIGH": "⚠",
+    "LOW": "⚠",
     "CRITICAL": "✗",
     "FAIL": "✗",
-    "CRITICAL": "✗",
+    "MAXED": "✗",
+    "POOR": "✗",
 }
 
 

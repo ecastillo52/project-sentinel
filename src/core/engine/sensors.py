@@ -85,11 +85,12 @@ SENSORS = {
         "keyword": "physical memory used",
         "unit": "GB",
         "value_type": "float",
+        "transform": "mb_to_gb",
         "type": "memory",
         "category": "Memory",
         "priority": 1,
         "description": "Amount of physical memory currently in use.",
-        "health": "memory_usage_status",
+        "health": "memory_amount_status",
     },
 
     "memory_available": {
@@ -97,11 +98,12 @@ SENSORS = {
         "keyword": "physical memory available",
         "unit": "GB",
         "value_type": "float",
+        "transform": "mb_to_gb",
         "type": "memory",
         "category": "Memory",
         "priority": 2,
         "description": "Amount of available physical memory.",
-        "health": "memory_usage_status",
+        "health": "memory_amount_status",
     },
 
     "memory_load": {

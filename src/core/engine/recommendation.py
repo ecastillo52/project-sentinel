@@ -32,9 +32,9 @@ def generate(report: Report) -> list[dict[str, str]]:
 
     sensors = report.sensors
 
-    cpu = _sensor(sensors, "cpu_temperature")
-    gpu = _sensor(sensors, "gpu_temperature")
-    memory = _sensor(sensors, "memory_usage")
+    cpu = _sensor(sensors, "cpu_temp")
+    gpu = _sensor(sensors, "gpu_temp")
+    memory = _sensor(sensors, "memory_load")
     fps = _sensor(sensors, "fps")
 
     if cpu:

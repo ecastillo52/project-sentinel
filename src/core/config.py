@@ -26,7 +26,7 @@ from pathlib import Path
 
 APP_NAME = "Project Sentinel"
 
-APP_VERSION = "0.6.0 - A Complete Working Model"
+APP_VERSION = "0.7.0 - It's a Bird, It's a Plane"
 
 REPORT_SCHEMA = 2
 

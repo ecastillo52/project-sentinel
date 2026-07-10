@@ -28,11 +28,17 @@ from core.database.session_store import SessionStore
 
 from core.engine.analyzer import Analyzer
 from core.engine.health_engine import HealthEngine
+from core.engine.recommendation import (
+    generate as build_recommendations,
+)
 from core.engine.reader import Reader
+from core.engine.summary import build_summary
 
 from core.report.builder import ReportBuilder
 
 from core.services.analysis_service import AnalysisService
+from core.models.sensor import Sensor
+from core.visualization import html
 
 
 class App:
@@ -111,3 +117,75 @@ class App:
         Folder containing new HWiNFO logs.
         """
         return INCOMING_FOLDER
+
+    def export_html(
+        self,
+        session,
+    ):
+        """
+        Export a stored session as an HTML report.
+        """
+
+        self.refresh_session_health(session)
+
+        return html.export(session)
+
+    def export_game_trends(
+        self,
+        game: str,
+    ):
+        """
+        Export the rolling trend report for a game.
+        """
+
+        for session in self.sessions.by_game(game):
+            self.refresh_session_health(session)
+
+        return html.export_game(
+            self.sessions.by_game(game),
+            game=game,
+            directory=ARCHIVE_FOLDER / game,
+        )
+
+    def export_all_game_trends(self):
+        """
+        Export rolling trend reports for every known game.
+        """
+
+        return [
+            self.export_game_trends(game)
+            for game in self.sessions.games()
+        ]
+
+    def refresh_session_health(
+        self,
+        session,
+    ):
+        """
+        Re-evaluate stored session health metadata.
+        """
+
+        sensors = [
+            sensor
+            for sensor in session.report.sensors.values()
+            if isinstance(sensor, Sensor)
+        ]
+
+        self._health_engine.evaluate(sensors)
+
+        session.report.health = {
+            sensor.id: sensor.status
+            for sensor in sensors
+        }
+
+        session.report.summary = build_summary(
+            session.report
+        )
+
+        session.report.recommendations = (
+            build_recommendations(session.report)
+        )
+
+        self.sessions.save(session)
+
+        return session

@@ -1,0 +1,171 @@
+{
+    "id": "571498a6877749978750fb767ff5c955",
+    "game": {
+        "name": "Diablo II",
+        "session": 2
+    },
+    "source": {
+        "filename": "d2.CSV",
+        "archive_path": "C:\\Users\\erik_\\PycharmProjects\\pythonProject\\Programming\\Sentinel\\data\\archive\\Diablo II\\Session_002.csv",
+        "hash": "0dfd43d71fd0d018286aca5c6193e85cb9498595573f1e89b32e8a4acd92c933"
+    },
+    "analysis": {
+        "created": "2026-07-04T00:56:11.773377",
+        "version": "0.2.0",
+        "engine": "Sentinel Analysis Engine"
+    },
+    "report": {
+        "summary": {
+            "average_fps": 0.0,
+            "peak_cpu_temp": 90.5,
+            "peak_gpu_temp": 80.4,
+            "peak_ram_usage": 50.5,
+            "overall_health": "POOR"
+        },
+        "health": {
+            "cpu_temp": "WARM",
+            "cpu_usage": "HEALTHY",
+            "gpu_temp": "WARM",
+            "gpu_usage": "HEALTHY",
+            "memory_used": "HEALTHY",
+            "memory_available": "HEALTHY",
+            "memory_load": "HEALTHY",
+            "fps": "POOR"
+        },
+        "sensors": {
+            "cpu_temp": {
+                "id": "cpu_temp",
+                "name": "cpu_temp",
+                "display": "CPU Temperature",
+                "category": "CPU",
+                "description": "Overall CPU package temperature.",
+                "current": 75.6,
+                "minimum": 73.9,
+                "maximum": 90.5,
+                "average": 80.83,
+                "unit": "°C",
+                "health_rule": "cpu_temperature_status",
+                "status": "WARM"
+            },
+            "cpu_usage": {
+                "id": "cpu_usage",
+                "name": "cpu_usage",
+                "display": "CPU Usage",
+                "category": "CPU",
+                "description": "Overall processor utilization.",
+                "current": 27.0,
+                "minimum": 25.6,
+                "maximum": 61.6,
+                "average": 42.87,
+                "unit": "%",
+                "health_rule": "cpu_usage_status",
+                "status": "HEALTHY"
+            },
+            "gpu_temp": {
+                "id": "gpu_temp",
+                "name": "gpu_temp",
+                "display": "GPU Temperature",
+                "category": "GPU",
+                "description": "GPU core temperature.",
+                "current": 66.6,
+                "minimum": 66.6,
+                "maximum": 80.4,
+                "average": 73.52,
+                "unit": "°C",
+                "health_rule": "gpu_temperature_status",
+                "status": "WARM"
+            },
+            "gpu_usage": {
+                "id": "gpu_usage",
+                "name": "gpu_usage",
+                "display": "GPU Usage",
+                "category": "GPU",
+                "description": "GPU utilization.",
+                "current": 5.0,
+                "minimum": 5.0,
+                "maximum": 100.0,
+                "average": 66.44,
+                "unit": "%",
+                "health_rule": "gpu_usage_status",
+                "status": "HEALTHY"
+            },
+            "memory_used": {
+                "id": "memory_used",
+                "name": "memory_used",
+                "display": "Physical Memory Used",
+                "category": "Memory",
+                "description": "Amount of physical memory currently in use.",
+                "current": 15.37,
+                "minimum": 14.85,
+                "maximum": 16.13,
+                "average": 15.32,
+                "unit": "GB",
+                "health_rule": "memory_amount_status",
+                "status": "HEALTHY"
+            },
+            "memory_available": {
+                "id": "memory_available",
+                "name": "memory_available",
+                "display": "Physical Memory Available",
+                "category": "Memory",
+                "description": "Amount of available physical memory.",
+                "current": 16.55,
+                "minimum": 15.78,
+                "maximum": 17.07,
+                "average": 16.6,
+                "unit": "GB",
+                "health_rule": "memory_amount_status",
+                "status": "HEALTHY"
+            },
+            "memory_load": {
+                "id": "memory_load",
+                "name": "memory_load",
+                "display": "Physical Memory Load",
+                "category": "Memory",
+                "description": "Overall physical memory utilization.",
+                "current": 48.1,
+                "minimum": 46.5,
+                "maximum": 50.5,
+                "average": 47.96,
+                "unit": "%",
+                "health_rule": "memory_usage_status",
+                "status": "HEALTHY"
+            },
+            "fps": {
+                "id": "fps",
+                "name": "fps",
+                "display": "Average FPS",
+                "category": "Performance",
+                "description": "Average displayed framerate.",
+                "current": 0.0,
+                "minimum": 0.0,
+                "maximum": 0.0,
+                "average": 0.0,
+                "unit": "FPS",
+                "health_rule": "fps_status",
+                "status": "POOR"
+            }
+        },
+        "warnings": [],
+        "recommendations": [
+            {
+                "level": "CRITICAL",
+                "title": "CPU Running Extremely Hot",
+                "message": "CPU temperatures exceeded 90°C. Inspect the cooling system immediately."
+            },
+            {
+                "level": "Warning",
+                "title": "Low Average FPS",
+                "message": "Average FPS dropped below 60. Lower graphics settings or investigate system bottlenecks."
+            }
+        ],
+        "metadata": {
+            "machine": {
+                "cpu": "AMD Ryzen 7 3700X 8-Core Processor",
+                "gpu": "NVIDIA GeForce RTX 3070",
+                "ram": "32 GB",
+                "motherboard": "HP 87C3"
+            }
+        }
+    }
+}

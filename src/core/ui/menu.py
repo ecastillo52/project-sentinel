@@ -37,6 +37,8 @@ from .console import (
     show_no_history,
     show_no_logs,
     show_processed,
+    show_exported,
+    show_exported_count,
     show_session_not_found,
 )
 
@@ -85,6 +87,14 @@ def analyze_logs(app: App) -> None:
             session=session,
         )
 
+        show_exported(
+            app.export_html(session)
+        )
+
+        show_exported(
+            app.export_game_trends(game)
+        )
+
         processed += 1
 
     show_processed(processed)
@@ -118,23 +128,19 @@ def view_history(app: App) -> None:
         print("=" * 70)
         print()
 
-        for index, session in enumerate(
-            sessions,
-            start=1,
-        ):
+        games = app.sessions.games()
 
-            print(
-                f"{index:>2}. "
-                f"{session.game} "
-                f"(Session {session.session_number})"
-            )
+        for index, game in enumerate(games, start=1):
 
-            print(f"    {session.analyzed_at}")
-            print(f"    {session.filename}")
-            print()
+            count = len(app.sessions.by_game(game))
+            session_text = "session" if count == 1 else "sessions"
+
+            print(f"{index:>2}. {game} ({count} {session_text})")
+
+        print()
 
         choice = prompt(
-            "Select a session (Enter to return): "
+            "Select a game (Enter to return): "
         )
 
         if not choice:
@@ -146,24 +152,109 @@ def view_history(app: App) -> None:
             pause()
             continue
 
-        index = int(choice) - 1
+        game_index = int(choice) - 1
 
-        if index < 0 or index >= len(sessions):
+        if game_index < 0 or game_index >= len(games):
 
-            show_session_not_found()
+            show_invalid_selection()
             pause()
             continue
 
-        session = sessions[index]
+        game = games[game_index]
+        game_sessions = app.sessions.by_game(game)
 
-        header()
+        while True:
 
-        render(
-            session.report,
-            session=session,
-        )
+            header()
 
+            print("=" * 70)
+            print(game)
+            print("=" * 70)
+            print()
+
+            for index, session in enumerate(
+                game_sessions,
+                start=1,
+            ):
+
+                print(
+                    f"{index:>2}. "
+                    f"Session {session.session_number}"
+                )
+
+                print(f"    {session.analyzed_at}")
+                print(f"    {session.filename}")
+                print()
+
+            choice = prompt(
+                "Select a session (Enter to games): "
+            )
+
+            if not choice:
+                break
+
+            if not choice.isdigit():
+
+                show_invalid_selection()
+                pause()
+                continue
+
+            session_index = int(choice) - 1
+
+            if session_index < 0 or session_index >= len(game_sessions):
+
+                show_session_not_found()
+                pause()
+                continue
+
+            session = game_sessions[session_index]
+
+            header()
+
+            render(
+                session.report,
+                session=session,
+            )
+
+            choice = prompt(
+                "Export this report as HTML? [y/N]: "
+            )
+
+            if choice.lower() == "y":
+                show_exported(
+                    app.export_html(session)
+                )
+                show_exported(
+                    app.export_game_trends(session.game)
+                )
+
+            pause()
+
+
+# ==========================================================
+# HTML Export
+# ==========================================================
+
+def export_all_html(app: App) -> None:
+    """
+    Export rolling trend reports for every known game.
+    """
+
+    header()
+
+    if app.sessions.empty():
+        show_no_history()
         pause()
+        return
+
+    paths = app.export_all_game_trends()
+
+    for path in paths:
+        show_exported(path)
+
+    show_exported_count(len(paths))
+
+    pause()
 
 
 # ==========================================================
@@ -234,6 +325,10 @@ def run_menu(app: App) -> None:
             historical_intelligence(app)
 
         elif choice == "4":
+
+            export_all_html(app)
+
+        elif choice == "5":
 
             goodbye()
             break

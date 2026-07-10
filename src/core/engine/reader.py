@@ -63,7 +63,11 @@ class Reader:
             for header in csv_rows[0]
         ]
 
-        rows = csv_rows[1:]
+        rows = [
+            row
+            for row in csv_rows[1:]
+            if self._is_sample_row(row)
+        ]
 
         header_map = {
             header: index
@@ -100,3 +104,20 @@ class Reader:
             return list(
                 csv.reader(file)
             )
+
+    @staticmethod
+    def _is_sample_row(row: list[str]) -> bool:
+        """
+        Keep timestamped data rows and ignore HWiNFO footer metadata.
+        """
+
+        if len(row) < 2:
+            return False
+
+        date = row[0].strip().lower()
+        time = row[1].strip().lower()
+
+        if not date or not time:
+            return False
+
+        return date != "date" and time != "time"
