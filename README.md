@@ -29,37 +29,13 @@ driver, settings, or hardware changes.
 
 ## Install
 
-Clone the repository and open a PowerShell terminal in the project folder:
-
-```powershell
-git clone <your-repository-url>
-cd Sentinel
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
-
-If PowerShell prevents virtual-environment activation, run the following once
-for your user account, then reopen the terminal:
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+Open release folder and double click Sentinel-Setup.exe
 
 ## Run Sentinel
 
-With the virtual environment active and the terminal in the repository root:
-
-```powershell
-python .\src\main.py
-```
-
-The desktop application opens directly; no console menu is required.
-
 ### Launch by double-clicking
 
-After installing the requirements, double-click `Sentinel.pyw` in the project
-root. Windows launches it with Python without opening a console window. You can
+After installing double-click `Sentinel.exe`. Windows launches it with Python without opening a console window. You can
 right-click the file and choose **Send to > Desktop (create shortcut)** for a
 desktop shortcut.
 
