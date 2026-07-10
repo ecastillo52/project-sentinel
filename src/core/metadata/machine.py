@@ -22,7 +22,7 @@ If Sentinel is ever ported to another operating system,
 only this module should require modification.
 """
 
-from subprocess import run, PIPE
+from subprocess import CREATE_NO_WINDOW, PIPE, run
 
 
 # ==========================================================
@@ -134,6 +134,7 @@ def _run_powershell(command):
             stderr=PIPE,
             text=True,
             check=True,
+            creationflags=CREATE_NO_WINDOW,
         )
 
         output = result.stdout.strip()

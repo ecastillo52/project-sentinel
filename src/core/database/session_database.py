@@ -42,6 +42,29 @@ class SessionDatabase:
             for session in self.store.load_all()
         }
 
+        self._merge_game_name_casing()
+
+    def _merge_game_name_casing(self) -> None:
+        """Merge game labels that differ only by capitalization."""
+
+        groups: dict[str, list[Session]] = {}
+
+        for session in self._sessions.values():
+            key = session.game.strip().casefold()
+            groups.setdefault(key, []).append(session)
+
+        for sessions in groups.values():
+            names = {session.game.strip() for session in sessions}
+            canonical = min(
+                names,
+                key=lambda name: (name == name.casefold(), name.casefold()),
+            )
+
+            for session in sessions:
+                if session.game != canonical:
+                    session.game = canonical
+                    self.store.save(session)
+
     # ======================================================
     # Public
     # ======================================================
@@ -62,8 +85,27 @@ class SessionDatabase:
         Save a session.
         """
 
+        session.game = self._canonical_game_name(session.game)
         self.store.save(session)
         self._sessions[session.id] = session
+
+    def _canonical_game_name(self, game: str) -> str:
+        """Return the established spelling for a game name, if one exists."""
+
+        game = game.strip()
+        matches = [
+            session.game.strip()
+            for session in self._sessions.values()
+            if session.game.strip().casefold() == game.casefold()
+        ]
+
+        if not matches:
+            return game
+
+        return min(
+            {*matches, game},
+            key=lambda name: (name == name.casefold(), name.casefold()),
+        )
 
     def delete(self, session_id: str) -> None:
         """
@@ -136,7 +178,7 @@ class SessionDatabase:
         return sorted(
             session
             for session in self._sessions.values()
-            if session.game == game
+            if session.game.casefold() == game.strip().casefold()
         )
 
     def latest_for_game(
@@ -171,12 +213,13 @@ class SessionDatabase:
         Return every unique game.
         """
 
-        return sorted(
-            {
-                session.game
-                for session in self._sessions.values()
-            }
-        )
+        games: dict[str, str] = {}
+
+        for session in self._sessions.values():
+            key = session.game.strip().casefold()
+            games[key] = self._canonical_game_name(session.game)
+
+        return sorted(games.values(), key=str.casefold)
 
     # ======================================================
     # Statistics

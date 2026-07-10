@@ -17,6 +17,9 @@ Every module should import paths from here instead of
 building paths with Path(__file__).parents[x].
 """
 
+import json
+import os
+import sys
 from pathlib import Path
 
 
@@ -26,7 +29,7 @@ from pathlib import Path
 
 APP_NAME = "Project Sentinel"
 
-APP_VERSION = "0.7.0 - It's a Bird, It's a Plane"
+APP_VERSION = "0.7.2 - Silent Analysis"
 
 REPORT_SCHEMA = 2
 
@@ -39,7 +42,16 @@ ENGINE_NAME = "Sentinel Analysis Engine"
 # Project Root
 # ==========================================================
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if getattr(sys, "frozen", False):
+    # A packaged application must not try to write beside the bundled EXE.
+    # LocalAppData is writable for normal Windows accounts and persists across
+    # application upgrades.
+    PROJECT_ROOT = (
+        Path(os.environ.get("LOCALAPPDATA", Path.home()))
+        / "Project Sentinel"
+    )
+else:
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 # ==========================================================
@@ -48,15 +60,55 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DATA_FOLDER = PROJECT_ROOT / "data"
 
-INCOMING_FOLDER = DATA_FOLDER / "incoming"
-
-ARCHIVE_FOLDER = DATA_FOLDER / "archive"
-
-PROCESSED_FOLDER = DATA_FOLDER / "processed"
-
 CONFIG_FOLDER = DATA_FOLDER / "config"
 
-EXPORTS_FOLDER = DATA_FOLDER / "exports"
+SETTINGS_FILE = CONFIG_FOLDER / "settings.json"
+
+DEFAULT_PATH_SETTINGS = {
+    "incoming_folder": str(DATA_FOLDER / "incoming"),
+    "archive_folder": str(DATA_FOLDER / "archive"),
+    "processed_folder": str(DATA_FOLDER / "processed"),
+    "exports_folder": str(DATA_FOLDER / "exports"),
+}
+
+
+def load_path_settings() -> dict[str, Path]:
+    """Return configured folder paths, falling back safely to defaults."""
+    values = DEFAULT_PATH_SETTINGS.copy()
+    try:
+        with SETTINGS_FILE.open(encoding="utf-8") as file:
+            saved = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        saved = {}
+    if isinstance(saved, dict):
+        for key in values:
+            value = saved.get(key)
+            if isinstance(value, str) and value.strip():
+                values[key] = value.strip()
+    return {key: Path(value).expanduser() for key, value in values.items()}
+
+
+def save_path_settings(paths: dict[str, Path | str]) -> dict[str, Path]:
+    """Persist user-selected folder paths and create them when possible."""
+    values = DEFAULT_PATH_SETTINGS.copy()
+    for key in values:
+        value = paths.get(key)
+        if value:
+            values[key] = str(Path(value).expanduser())
+    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    SETTINGS_FILE.write_text(json.dumps(values, indent=4), encoding="utf-8")
+    configured = {key: Path(value) for key, value in values.items()}
+    for folder in configured.values():
+        folder.mkdir(parents=True, exist_ok=True)
+    return configured
+
+
+_PATH_SETTINGS = load_path_settings()
+
+INCOMING_FOLDER = _PATH_SETTINGS["incoming_folder"]
+ARCHIVE_FOLDER = _PATH_SETTINGS["archive_folder"]
+PROCESSED_FOLDER = _PATH_SETTINGS["processed_folder"]
+EXPORTS_FOLDER = _PATH_SETTINGS["exports_folder"]
 
 
 # ==========================================================

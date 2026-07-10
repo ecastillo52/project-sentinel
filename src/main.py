@@ -7,7 +7,7 @@ Main Entry Point
 """
 
 from core.app import App
-from core.ui.menu import run_menu
+from core.ui.desktop import run
 
 
 def main() -> None:
@@ -15,9 +15,7 @@ def main() -> None:
     Launch Project Sentinel.
     """
 
-    app = App()
-
-    run_menu(app)
+    raise SystemExit(run(App()))
 
 
 if __name__ == "__main__":

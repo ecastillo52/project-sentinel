@@ -18,9 +18,8 @@ from __future__ import annotations
 from core.archive.session_archive import SessionArchive
 
 from core.config import (
-    ARCHIVE_FOLDER,
-    INCOMING_FOLDER,
-    PROCESSED_FOLDER,
+    load_path_settings,
+    save_path_settings,
 )
 
 from core.database.session_database import SessionDatabase
@@ -51,12 +50,28 @@ class App:
 
     def __init__(self) -> None:
 
+        self._configure_storage(load_path_settings())
+
+        self._reader = Reader()
+        self._analyzer = Analyzer()
+        self._health_engine = HealthEngine()
+        self._report_builder = ReportBuilder()
+        self._configure_analysis_service()
+
+    def _configure_storage(self, paths) -> None:
+        """Build persistence services from the current folder settings."""
+
+        self._incoming_folder = paths["incoming_folder"]
+        self._archive_folder = paths["archive_folder"]
+        self._processed_folder = paths["processed_folder"]
+        self._exports_folder = paths["exports_folder"]
+
         # ==================================================
         # Persistence
         # ==================================================
 
         self._store = SessionStore(
-            PROCESSED_FOLDER,
+            self._processed_folder,
         )
 
         self._database = SessionDatabase(
@@ -65,24 +80,11 @@ class App:
 
         self._archive = SessionArchive(
             database=self._database,
-            archive_directory=ARCHIVE_FOLDER,
+            archive_directory=self._archive_folder,
         )
 
-        # ==================================================
-        # Engine
-        # ==================================================
-
-        self._reader = Reader()
-
-        self._analyzer = Analyzer()
-
-        self._health_engine = HealthEngine()
-
-        self._report_builder = ReportBuilder()
-
-        # ==================================================
-        # Services
-        # ==================================================
+    def _configure_analysis_service(self) -> None:
+        """Wire the analysis service after persistence is configured."""
 
         self._analysis = AnalysisService(
             reader=self._reader,
@@ -116,7 +118,22 @@ class App:
         """
         Folder containing new HWiNFO logs.
         """
-        return INCOMING_FOLDER
+        return self._incoming_folder
+
+    @property
+    def settings(self):
+        """Configured application folders used by this session."""
+        return {
+            "incoming_folder": self._incoming_folder,
+            "archive_folder": self._archive_folder,
+            "processed_folder": self._processed_folder,
+            "exports_folder": self._exports_folder,
+        }
+
+    def save_settings(self, paths) -> None:
+        """Persist paths and immediately reconfigure Sentinel services."""
+        self._configure_storage(save_path_settings(paths))
+        self._configure_analysis_service()
 
     def export_html(
         self,
@@ -128,7 +145,7 @@ class App:
 
         self.refresh_session_health(session)
 
-        return html.export(session)
+        return html.export(session, directory=self._exports_folder)
 
     def export_game_trends(
         self,
@@ -144,7 +161,7 @@ class App:
         return html.export_game(
             self.sessions.by_game(game),
             game=game,
-            directory=ARCHIVE_FOLDER / game,
+            directory=self._archive_folder / game,
         )
 
     def export_all_game_trends(self):
