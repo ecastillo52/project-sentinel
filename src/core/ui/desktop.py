@@ -284,9 +284,9 @@ class MainWindow(QMainWindow):
         grid = QGridLayout(); grid.setSpacing(12)
         self.cards = {}
         for index, (key, name) in enumerate((
-            ("cpu_temp", "CPU Temperature"), ("gpu_temp", "GPU Temperature"),
+            ("fps", "Frame Rate"), ("cpu_temp", "CPU Temperature"),
+            ("gpu_temp", "GPU Temperature"), ("memory_load", "RAM Usage"),
             ("cpu_usage", "CPU Usage"), ("gpu_usage", "GPU Usage"),
-            ("memory_load", "RAM Usage"), ("fps", "Frame Rate"),
         )):
             card = MetricCard(name); self.cards[key] = card
             grid.addWidget(card, index // 3, index % 3)
@@ -318,8 +318,8 @@ class MainWindow(QMainWindow):
         self.trend_charts = {}
         for index, (sensor_id, title) in enumerate((
             ("fps", "FPS over sessions"), ("cpu_temp", "CPU temperature"),
-            ("gpu_temp", "GPU temperature"), ("cpu_usage", "CPU usage"),
-            ("gpu_usage", "GPU usage"), ("memory_load", "RAM usage"),
+            ("gpu_temp", "GPU temperature"), ("memory_load", "RAM usage"),
+            ("cpu_usage", "CPU usage"), ("gpu_usage", "GPU usage"),
         )):
             chart = TrendChart(title); self.trend_charts[sensor_id] = chart
             charts.addWidget(chart, index // 3, index % 3)
